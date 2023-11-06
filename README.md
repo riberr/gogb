@@ -13,3 +13,5 @@ https://izik1.github.io/gbops/index.html
 https://gbdev.gg8.se/wiki/articles/Gameboy_Bootstrap_ROM
 
 https://gbdev.io/pandocs/Timer_and_Divider_Registers.html
+
+https://gekkio.fi/files/gb-docs/gbctr.pdf

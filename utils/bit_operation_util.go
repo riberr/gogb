@@ -19,6 +19,6 @@ func HasBit(n uint8, pos int) bool {
 	return val > 0
 }
 
-func ToUint16(lo uint8, hi uint8) uint16 {
-	return uint16(lo) | (uint16(hi) << 8)
+func ToUint16(lsb uint8, msb uint8) uint16 {
+	return uint16(lsb) | (uint16(msb) << 8)
 }

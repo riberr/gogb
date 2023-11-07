@@ -1,8 +1,12 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+	"strings"
+)
 
-func generate8bitArithmetics(opCodes *OpCodes, output *os.File) {
+func generate8bitArithmetics(opCodes *OpCodes) {
 	var add []OpCode     // Add (register), Add (indirect HL), Add (immediate)
 	var adc []OpCode     // Add with carry (register), Add with carry (indirect HL), Add with carry (immediate)
 	var sub []OpCode     // Subtract (register), Subtract (indirect HL), Subtract (immediate)
@@ -14,6 +18,19 @@ func generate8bitArithmetics(opCodes *OpCodes, output *os.File) {
 	var or []OpCode      // Bitwise OR (register),  Bitwise OR (indirect HL), Bitwise OR (immediate)
 	var xor []OpCode     // Bitwise XOR (register),  Bitwise XOR (indirect HL), Bitwise XOR (immediate)
 	var various []OpCode // CCF: Complement carry flag, SCF: Set carry flag, DAA: Decimal adjust accumulator, CPL: Complement accumulator
+
+	output, err := os.Create(OutputPath + "/generated_8bit_arithmetics.go")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer output.Close()
+
+	_, _ = output.WriteString("package cpu\n\n")
+	//_, _ = output.WriteString("import \"gogb/utils\"\n")
+	_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
+
+	_, _ = output.WriteString("var OpCodes8bitArithmeticsGenerated = map[uint8]OpCode{\n")
 
 	for i, opCode := range opCodes.Unprefixed {
 		opCode.i = i
@@ -54,61 +71,163 @@ func generate8bitArithmetics(opCodes *OpCodes, output *os.File) {
 
 	_, _ = output.WriteString("    // Add (register), Add (indirect HL), Add (immediate)\n")
 	for _, opCode := range add {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "ADD A,(HL)":
+			instr := fmt.Sprintf("add(cpu, memory.BusRead(cpu.regs.getHL()))")
+			writeCodeWithInstruction(opCode, output, instr)
+		case opCode.Name == "ADD A,u8":
+			instr := fmt.Sprintf("add(cpu, memory.BusRead(cpu.pc)); cpu.pc++")
+			writeCodeWithInstruction(opCode, output, instr)
+		default:
+			from := strings.ToLower(string(opCode.Name[6]))
+			instr := fmt.Sprintf("add(cpu, cpu.regs.%v)", from)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Add with carry (register), Add with carry (indirect HL), Add with carry (immediate)\n")
 	for _, opCode := range adc {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "ADC A,(HL)":
+			instr := fmt.Sprintf("adc(cpu, memory.BusRead(cpu.regs.getHL()))")
+			writeCodeWithInstruction(opCode, output, instr)
+		case opCode.Name == "ADC A,u8":
+			instr := fmt.Sprintf("adc(cpu, memory.BusRead(cpu.pc)); cpu.pc++")
+			writeCodeWithInstruction(opCode, output, instr)
+		default:
+			from := strings.ToLower(string(opCode.Name[6]))
+			instr := fmt.Sprintf("adc(cpu, cpu.regs.%v)", from)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Subtract (register), Subtract (indirect HL), Subtract (immediate)\n")
 	for _, opCode := range sub {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "SUB A,(HL)":
+			instr := fmt.Sprintf("sub(cpu, memory.BusRead(cpu.regs.getHL()))")
+			writeCodeWithInstruction(opCode, output, instr)
+		case opCode.Name == "SUB A,u8":
+			instr := fmt.Sprintf("sub(cpu, memory.BusRead(cpu.pc)); cpu.pc++")
+			writeCodeWithInstruction(opCode, output, instr)
+		default:
+			from := strings.ToLower(string(opCode.Name[6]))
+			instr := fmt.Sprintf("sub(cpu, cpu.regs.%v)", from)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Subtract with carry (register),  Subtract with carry (indirect HL), Subtract with carry (immediate)\n")
 	for _, opCode := range sbc {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "SBC A,(HL)":
+			instr := fmt.Sprintf("sbc(cpu, memory.BusRead(cpu.regs.getHL()))")
+			writeCodeWithInstruction(opCode, output, instr)
+		case opCode.Name == "SBC A,u8":
+			instr := fmt.Sprintf("sbc(cpu, memory.BusRead(cpu.pc)); cpu.pc++")
+			writeCodeWithInstruction(opCode, output, instr)
+		default:
+			from := strings.ToLower(string(opCode.Name[6]))
+			instr := fmt.Sprintf("sbc(cpu, cpu.regs.%v)", from)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Compare (register), Compare (indirect HL), Compare (immediate)\n")
 	for _, opCode := range cp {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "CP A,(HL)":
+			instr := fmt.Sprintf("cp(cpu, memory.BusRead(cpu.regs.getHL()))")
+			writeCodeWithInstruction(opCode, output, instr)
+		case opCode.Name == "CP A,u8":
+			instr := fmt.Sprintf("cp(cpu, memory.BusRead(cpu.pc)); cpu.pc++")
+			writeCodeWithInstruction(opCode, output, instr)
+		default:
+			from := strings.ToLower(string(opCode.Name[5]))
+			instr := fmt.Sprintf("cp(cpu, cpu.regs.%v)", from)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Increment (register),Increment (indirect HL)\n")
 	for _, opCode := range inc {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "INC (HL)":
+			writeCode(opCode, output)
+		default:
+			reg := strings.ToLower(string(opCode.Name[4]))
+			instr := fmt.Sprintf("cpu.regs.%v = inc(cpu, cpu.regs.%v)", reg, reg)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Decrement (register), Decrement (indirect HL)\n")
 	for _, opCode := range dec {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "DEC (HL)":
+			writeCode(opCode, output)
+		default:
+			reg := strings.ToLower(string(opCode.Name[4]))
+			instr := fmt.Sprintf("cpu.regs.%v = dec(cpu, cpu.regs.%v)", reg, reg)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Bitwise AND (register), Bitwise AND (indirect HL), Bitwise AND (immediate)\n")
 	for _, opCode := range and {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "AND A,(HL)":
+			instr := fmt.Sprintf("and(cpu, memory.BusRead(cpu.regs.getHL()))")
+			writeCodeWithInstruction(opCode, output, instr)
+		case opCode.Name == "AND A,u8":
+			instr := fmt.Sprintf("and(cpu, memory.BusRead(cpu.pc)); cpu.pc++")
+			writeCodeWithInstruction(opCode, output, instr)
+		default:
+			from := strings.ToLower(string(opCode.Name[6]))
+			instr := fmt.Sprintf("and(cpu, cpu.regs.%v)", from)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Bitwise OR (register),  Bitwise OR (indirect HL), Bitwise OR (immediate)\n")
 	for _, opCode := range or {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "OR A,(HL)":
+			instr := fmt.Sprintf("or(cpu, memory.BusRead(cpu.regs.getHL()))")
+			writeCodeWithInstruction(opCode, output, instr)
+		case opCode.Name == "OR A,u8":
+			instr := fmt.Sprintf("or(cpu, memory.BusRead(cpu.pc)); cpu.pc++")
+			writeCodeWithInstruction(opCode, output, instr)
+		default:
+			from := strings.ToLower(string(opCode.Name[5]))
+			instr := fmt.Sprintf("or(cpu, cpu.regs.%v)", from)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Bitwise XOR (register),  Bitwise XOR (indirect HL), Bitwise XOR (immediate)\n")
 	for _, opCode := range xor {
-		writeCode(opCode, output)
+		switch {
+		case opCode.Name == "XOR A,(HL)":
+			instr := fmt.Sprintf("xor(cpu, memory.BusRead(cpu.regs.getHL()))")
+			writeCodeWithInstruction(opCode, output, instr)
+		case opCode.Name == "XOR A,u8":
+			instr := fmt.Sprintf("xor(cpu, memory.BusRead(cpu.pc)); cpu.pc++")
+			writeCodeWithInstruction(opCode, output, instr)
+		default:
+			from := strings.ToLower(string(opCode.Name[6]))
+			instr := fmt.Sprintf("xor(cpu, cpu.regs.%v)", from)
+			writeCodeWithInstruction(opCode, output, instr)
+		}
 	}
 	_, _ = output.WriteString("\n")
 
@@ -117,6 +236,9 @@ func generate8bitArithmetics(opCodes *OpCodes, output *os.File) {
 		writeCode(opCode, output)
 	}
 	_, _ = output.WriteString("\n")
+
+	_, _ = output.WriteString("\n")
+	_, _ = output.WriteString("}\n")
 
 	// Verify
 	var hits = 0

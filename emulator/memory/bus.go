@@ -1,4 +1,4 @@
-package main
+package memory
 
 // 0x0000 - 0x3FFF : ROM Bank 0
 // 0x4000 - 0x7FFF : ROM Bank 1 - Switchable
@@ -14,7 +14,7 @@ package main
 // 0xFF00 - 0xFF7F : I/O Registers
 // 0xFF80 - 0xFFFE : Zero Page
 
-func busRead(address uint16) uint8 {
+func BusRead(address uint16) uint8 {
 	if address < 0x8000 {
 		//ROM Data
 		return cartRead(address)
@@ -23,7 +23,7 @@ func busRead(address uint16) uint8 {
 	panic("NO IMPL")
 }
 
-func busWrite(address uint16, value uint8) {
+func BusWrite(address uint16, value uint8) {
 	if address < 0x8000 {
 		//ROM Data
 		cartWrite(address, value)

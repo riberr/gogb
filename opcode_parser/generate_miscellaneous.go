@@ -1,13 +1,24 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
-func generateMiscellaneous(opCodes *OpCodes, output *os.File) {
+func generateMiscellaneous(opCodes *OpCodes) {
 	var halt OpCode
 	var stop OpCode
 	var di OpCode
 	var ei OpCode
 	var nop OpCode
+
+	output, err := os.Create(OutputPath + "/generated_misc.go")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer output.Close()
+
 	for i, opCode := range opCodes.Unprefixed {
 		opCode.i = i
 
@@ -25,6 +36,12 @@ func generateMiscellaneous(opCodes *OpCodes, output *os.File) {
 		}
 
 	}
+
+	_, _ = output.WriteString("package cpu\n\n")
+	//_, _ = output.WriteString("import \"gogb/utils\"\n")
+	//_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
+
+	_, _ = output.WriteString("var OpCodesMisc = map[uint8]OpCode{\n")
 
 	_, _ = output.WriteString("    // ~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 	_, _ = output.WriteString("    // Miscellaneous \n")
@@ -50,6 +67,9 @@ func generateMiscellaneous(opCodes *OpCodes, output *os.File) {
 	_, _ = output.WriteString("    // No operation\n")
 	writeCode(nop, output)
 	_, _ = output.WriteString("\n")
+
+	_, _ = output.WriteString("\n")
+	_, _ = output.WriteString("}\n")
 
 	// Verify
 	var hits = 0

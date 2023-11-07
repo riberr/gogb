@@ -1,11 +1,21 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
-func generate16bitArithmetics(opCodes *OpCodes, output *os.File) {
+func generate16bitArithmetics(opCodes *OpCodes) {
 	var add []OpCode // Add (register?), Add SP?
 	var inc []OpCode // Increment (register), Increment SP
 	var dec []OpCode // Decrement (register), Decrement SP
+
+	output, err := os.Create(OutputPath + "/generated_16bit_arithmetics.go")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer output.Close()
 
 	for i, opCode := range opCodes.Unprefixed {
 		opCode.i = i
@@ -22,6 +32,12 @@ func generate16bitArithmetics(opCodes *OpCodes, output *os.File) {
 			dec = append(dec, opCode)
 		}
 	}
+
+	_, _ = output.WriteString("package cpu\n\n")
+	//_, _ = output.WriteString("import \"gogb/utils\"\n")
+	//_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
+
+	_, _ = output.WriteString("var OpCodes16bitArithmeticsGenerated = map[uint8]OpCode{\n")
 
 	_, _ = output.WriteString("    // ~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 	_, _ = output.WriteString("    // 16BIT ARITHMETICS & LOGICAL\n")
@@ -45,6 +61,9 @@ func generate16bitArithmetics(opCodes *OpCodes, output *os.File) {
 		writeCode(opCode, output)
 	}
 	_, _ = output.WriteString("\n")
+
+	_, _ = output.WriteString("\n")
+	_, _ = output.WriteString("}\n")
 
 	// Verify
 	var hits = 0

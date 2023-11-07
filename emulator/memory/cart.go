@@ -1,4 +1,4 @@
-package main
+package memory
 
 import (
 	"fmt"
@@ -162,7 +162,7 @@ func newHeader(data []uint8) header {
 
 var cart = Cart{}
 
-func cartLoad() bool {
+func CartLoad() bool {
 
 	romPath := "roms/cpu_instrs/individual/"
 	romName := "10-bit ops.gb"

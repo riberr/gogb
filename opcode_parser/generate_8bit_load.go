@@ -6,12 +6,25 @@ import (
 	"strings"
 )
 
-func generate8bitLoad(opCodes *OpCodes, output *os.File) {
+func generate8bitLoad(opCodes *OpCodes /*, output *os.File*/) {
 	var loadRegFromReg []OpCode        // Load register (register)
 	var loadRegFromBus []OpCode        // Load register (immediate)
 	var loadRegFromIndirectHL []OpCode // Load register (indirect HL)
 	var loadFromRegIndirectHL []OpCode // Load from register (indirect HL)
 	var various []OpCode               // one offs...
+
+	output, err := os.Create(OutputPath + "/generated_8bit_load.go")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer output.Close()
+
+	_, _ = output.WriteString("package cpu\n\n")
+	_, _ = output.WriteString("import \"gogb/utils\"\n")
+	_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
+
+	_, _ = output.WriteString("var OpCodes8bitLoadGenerated = map[uint8]OpCode{\n")
 
 	for i, opCode := range opCodes.Unprefixed {
 		opCode.i = i
@@ -54,27 +67,27 @@ func generate8bitLoad(opCodes *OpCodes, output *os.File) {
 
 	_, _ = output.WriteString("    // Load register (immediate)\n")
 	for _, opCode := range loadRegFromBus {
-		// cpu.regs.b = busRead(cpu.pc); cpu.pc++
+		// cpu.regs.b = memory.BusRead(cpu.pc); cpu.pc++
 		to := strings.ToLower(string(opCode.Name[3]))
-		instr := fmt.Sprintf("cpu.regs.%v = busRead(cpu.pc); cpu.pc++", to)
+		instr := fmt.Sprintf("cpu.regs.%v = memory.BusRead(cpu.pc); cpu.pc++", to)
 		writeCodeWithInstruction(opCode, output, instr)
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Load register (indirect HL)\n")
 	for _, opCode := range loadRegFromIndirectHL {
-		// cpu.regs.b = busRead(cpu.regs.getHL())
+		// cpu.regs.b = memory.BusRead(cpu.regs.getHL())
 		to := strings.ToLower(string(opCode.Name[3]))
-		instr := fmt.Sprintf("cpu.regs.%v = busRead(cpu.regs.getHL())", to)
+		instr := fmt.Sprintf("cpu.regs.%v = memory.BusRead(cpu.regs.getHL())", to)
 		writeCodeWithInstruction(opCode, output, instr)
 	}
 	_, _ = output.WriteString("\n")
 
 	_, _ = output.WriteString("    // Load from register (indirect HL)\n")
 	for _, opCode := range loadFromRegIndirectHL {
-		// busWrite(cpu.regs.getHL(), cpu.regs.b)
+		// memory.busWrite(cpu.regs.getHL(), cpu.regs.b)
 		from := strings.ToLower(string(opCode.Name[8]))
-		instr := fmt.Sprintf("busWrite(cpu.regs.getHL(), cpu.regs.%v)", from)
+		instr := fmt.Sprintf("memory.BusWrite(cpu.regs.getHL(), cpu.regs.%v)", from)
 		writeCodeWithInstruction(opCode, output, instr)
 	}
 	_, _ = output.WriteString("\n")
@@ -84,38 +97,39 @@ func generate8bitLoad(opCodes *OpCodes, output *os.File) {
 		//writeCode(opCode, output)
 		switch opCode.Name {
 		case "LD (BC),A":
-			writeCodeWithInstruction(opCode, output, "busWrite(cpu.regs.getBC(), cpu.regs.a)")
+			writeCodeWithInstruction(opCode, output, "memory.BusWrite(cpu.regs.getBC(), cpu.regs.a)")
 		case "LD A,(BC)":
-			writeCodeWithInstruction(opCode, output, "cpu.regs.a = busRead(cpu.regs.getBC())")
+			writeCodeWithInstruction(opCode, output, "cpu.regs.a = memory.BusRead(cpu.regs.getBC())")
 		case "LD (DE),A":
-			writeCodeWithInstruction(opCode, output, "busWrite(cpu.regs.getDE(), cpu.regs.a)")
+			writeCodeWithInstruction(opCode, output, "memory.BusWrite(cpu.regs.getDE(), cpu.regs.a)")
 		case "LD A,(DE)":
-			writeCodeWithInstruction(opCode, output, "cpu.regs.a = busRead(cpu.regs.getDE())")
+			writeCodeWithInstruction(opCode, output, "cpu.regs.a = memory.BusRead(cpu.regs.getDE())")
 		case "LD (HL+),A":
-			writeCodeWithInstruction(opCode, output, "busWrite(cpu.regs.getHL(), cpu.regs.a); cpu.regs.getHL()++") //todo HL++
+			writeCodeWithInstruction(opCode, output, "memory.BusWrite(cpu.regs.getHL(), cpu.regs.a); cpu.regs.incHL()")
 		case "LD A,(HL+)":
-			writeCodeWithInstruction(opCode, output, "cpu.regs.a = busRead(cpu.regs.getHL()); cpu.regs.getHL()++") //todo HL++
+			writeCodeWithInstruction(opCode, output, "cpu.regs.a = memory.BusRead(cpu.regs.getHL()); cpu.regs.incHL()")
 		case "LD (HL-),A":
-			writeCodeWithInstruction(opCode, output, "busWrite(cpu.regs.getHL(), cpu.regs.a); cpu.regs.getHL() -= 1") //todo HL-1
+			writeCodeWithInstruction(opCode, output, "memory.BusWrite(cpu.regs.getHL(), cpu.regs.a); cpu.regs.decHL()")
 		case "LD (HL),u8":
-			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) { lsb = busRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) {busWrite(cpu.regs.getHL(), lsb)}")
+			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) {memory.BusWrite(cpu.regs.getHL(), lsb)}")
 		case "LD A,(HL-)":
-			writeCodeWithInstruction(opCode, output, "cpu.regs.a = busRead(cpu.regs.getHL()); cpu.pc--")
+			writeCodeWithInstruction(opCode, output, "cpu.regs.a = memory.BusRead(cpu.regs.getHL()); cpu.pc--")
 		case "LD (FF00+u8),A":
-			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) { lsb = busRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) { busWrite(utils.ToUint16(lsb, 0xFF), cpu.regs.a) }")
+			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) { memory.BusWrite(utils.ToUint16(lsb, 0xFF), cpu.regs.a) }")
 		case "LD (FF00+C),A":
-			writeCodeWithInstruction(opCode, output, "busWrite(utils.ToUint16(cpu.regs.c, 0xFF), cpu.regs.a)")
+			writeCodeWithInstruction(opCode, output, "memory.BusWrite(utils.ToUint16(cpu.regs.c, 0xFF), cpu.regs.a)")
 		case "LD (u16),A":
-			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) { lsb = busRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) { msb = busRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) { busWrite(utils.ToUint16(lsb, msb), cpu.regs.a) }")
+			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) { memory.BusWrite(utils.ToUint16(lsb, msb), cpu.regs.a) }")
 		case "LD A,(FF00+u8)":
-			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) { lsb = busRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) {cpu.regs.a = busRead(utils.ToUint16(lsb, 0xFF))}")
+			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) {cpu.regs.a = memory.BusRead(utils.ToUint16(lsb, 0xFF))}")
 		case "LD A,(FF00+C)":
-			writeCodeWithInstruction(opCode, output, "cpu.regs.a = busRead(utils.ToUint16(cpu.regs.c, 0xFF))")
+			writeCodeWithInstruction(opCode, output, "cpu.regs.a = memory.BusRead(utils.ToUint16(cpu.regs.c, 0xFF))")
 		case "LD A,(u16)":
-			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) {lsb = busRead(cpu.pc); cpu.pc++}, func(cpu *CPU) {msb = busRead(cpu.pc); cpu.pc++}, func(cpu *CPU) {cpu.regs.a = busRead(utils.ToUint16(lsb, msb))}")
+			writeCodeWithMultipleInstructions(opCode, output, "func(cpu *CPU) {lsb = memory.BusRead(cpu.pc); cpu.pc++}, func(cpu *CPU) {msb = memory.BusRead(cpu.pc); cpu.pc++}, func(cpu *CPU) {cpu.regs.a = memory.BusRead(utils.ToUint16(lsb, msb))}")
 		}
 	}
 	_, _ = output.WriteString("\n")
+	_, _ = output.WriteString("}\n")
 
 	// Verify
 

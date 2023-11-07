@@ -1,13 +1,23 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
-func generateRotateShiftBitOperations(opCodes *OpCodes, output *os.File) {
+func generateRotateShiftBitOperations(opCodes *OpCodes) {
 	var rlca OpCode
 	var rla OpCode
 	var rrca OpCode
 	var rra OpCode
 	var cb OpCode
+
+	output, err := os.Create(OutputPath + "/generated_rotate_shift_bitoperations.go")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer output.Close()
 
 	for i, opCode := range opCodes.Unprefixed {
 		opCode.i = i
@@ -25,6 +35,12 @@ func generateRotateShiftBitOperations(opCodes *OpCodes, output *os.File) {
 			cb = opCode
 		}
 	}
+
+	_, _ = output.WriteString("package cpu\n\n")
+	//_, _ = output.WriteString("import \"gogb/utils\"\n")
+	//_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
+
+	_, _ = output.WriteString("var OpCodesRotateShiftBitoperations = map[uint8]OpCode{\n")
 
 	// TODO: add CB-prefixed instructions
 
@@ -44,6 +60,9 @@ func generateRotateShiftBitOperations(opCodes *OpCodes, output *os.File) {
 	_, _ = output.WriteString("    // Increment (register), Increment SP\n")
 	writeCode(cb, output)
 	_, _ = output.WriteString("\n")
+
+	_, _ = output.WriteString("\n")
+	_, _ = output.WriteString("}\n")
 
 	// Verify
 	var hits = 0

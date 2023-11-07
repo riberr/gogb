@@ -1,6 +1,9 @@
-package main
+package cpu
 
-import "fmt"
+import (
+	"fmt"
+	"gogb/emulator/memory"
+)
 
 type CPU struct {
 	regs      Registers
@@ -19,11 +22,11 @@ func NewCPU() CPU {
 }
 
 func (cpu *CPU) Step() {
-	cpu.curOpCode = OpCodes[busRead(cpu.pc)]
+	cpu.curOpCode = OpCodes[memory.BusRead(cpu.pc)]
 
 	pc := cpu.pc
 	fmt.Printf("%04X: (%02X %02X %02X) A: %02X B: %02X C: %02X D: %02X E: %02X H: %02X L: %02X. opcode: %v\n",
-		pc, busRead(pc), busRead(pc+1), busRead(pc+2),
+		pc, memory.BusRead(pc), memory.BusRead(pc+1), memory.BusRead(pc+2),
 		cpu.regs.a, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.curOpCode.label)
 
 	// represents the 'fetch' step

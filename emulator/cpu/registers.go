@@ -1,4 +1,4 @@
-package main
+package cpu
 
 import "gogb/utils"
 
@@ -77,3 +77,6 @@ func (r *Registers) setHL(value uint16) {
 	r.h = uint8((value & 0xFF00) >> 8)
 	r.l = uint8(value & 0xFF)
 }
+
+func (r *Registers) incHL() { r.setHL(r.getHL() + 1) }
+func (r Registers) decHL()  { r.setHL(r.getHL() - 1) }

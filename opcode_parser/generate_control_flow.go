@@ -1,14 +1,24 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
-func generateControlFlow(opCodes *OpCodes, output *os.File) {
+func generateControlFlow(opCodes *OpCodes) {
 	var variousJump []OpCode             // Add (register?), Add SP?
 	var jumpConditional []OpCode         // Jump (conditional)
 	var relativeJumpConditional []OpCode // Relative jump (conditional)
 	var variousCall []OpCode             // Call function
 	var variousRet []OpCode              // Return from function, Return from function (conditional), Return from interrupt handler
 	var restart []OpCode                 // Restart / Call function (implied)
+
+	output, err := os.Create(OutputPath + "/generated_control_flow.go")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer output.Close()
 
 	for i, opCode := range opCodes.Unprefixed {
 		opCode.i = i
@@ -29,6 +39,12 @@ func generateControlFlow(opCodes *OpCodes, output *os.File) {
 		}
 
 	}
+
+	_, _ = output.WriteString("package cpu\n\n")
+	//_, _ = output.WriteString("import \"gogb/utils\"\n")
+	//_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
+
+	_, _ = output.WriteString("var OpCodesControlFlow = map[uint8]OpCode{\n")
 
 	_, _ = output.WriteString("    // ~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 	_, _ = output.WriteString("    // Control flow \n")
@@ -70,6 +86,9 @@ func generateControlFlow(opCodes *OpCodes, output *os.File) {
 		writeCode(opCode, output)
 	}
 	_, _ = output.WriteString("\n")
+
+	_, _ = output.WriteString("\n")
+	_, _ = output.WriteString("}\n")
 
 	// Verify
 	var hits = 0

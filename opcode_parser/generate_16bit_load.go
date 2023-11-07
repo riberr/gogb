@@ -1,12 +1,22 @@
 package main
 
-import "os"
+import (
+	"fmt"
+	"os"
+)
 
-func generate16bitLoad(opCodes *OpCodes, output *os.File) {
+func generate16bitLoad(opCodes *OpCodes) {
 	var load16bitReg []OpCode // Load 16-bit register / register pair
 	var stackVarious []OpCode
 	var pushToStack []OpCode  // Push to stack
 	var popFromStack []OpCode // Pop from stack
+
+	output, err := os.Create(OutputPath + "/generated_16bit_load.go")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer output.Close()
 
 	for i, opCode := range opCodes.Unprefixed {
 		opCode.i = i
@@ -27,6 +37,12 @@ func generate16bitLoad(opCodes *OpCodes, output *os.File) {
 
 		}
 	}
+
+	_, _ = output.WriteString("package cpu\n\n")
+	//_, _ = output.WriteString("import \"gogb/utils\"\n")
+	//_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
+
+	_, _ = output.WriteString("var OpCodes16bitLoadGenerated = map[uint8]OpCode{\n")
 
 	_, _ = output.WriteString("    // ~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 	_, _ = output.WriteString("    // 16BIT LOAD\n")
@@ -56,6 +72,9 @@ func generate16bitLoad(opCodes *OpCodes, output *os.File) {
 		writeCode(opCode, output)
 	}
 	_, _ = output.WriteString("\n")
+
+	_, _ = output.WriteString("\n")
+	_, _ = output.WriteString("}\n")
 
 	// Verify
 

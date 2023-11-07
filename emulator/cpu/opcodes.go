@@ -117,7 +117,8 @@ func xor(cpu *CPU, value uint8) {
 	cpu.regs.a = result
 }
 
-var lsb, msb uint8 = 0, 0
+var lsb, msb, e uint8 = 0, 0, 0 // temp values when executing opcodes
+var stop = false                // used for conditional jumps
 
 //var OpCodes = map[uint8]OpCode{}
 

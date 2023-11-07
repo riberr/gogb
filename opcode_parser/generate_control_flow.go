@@ -13,7 +13,7 @@ func generateControlFlow(opCodes *OpCodes) {
 	var variousRet []OpCode              // Return from function, Return from function (conditional), Return from interrupt handler
 	var restart []OpCode                 // Restart / Call function (implied)
 
-	output, err := os.Create(OutputPath + "/generated_control_flow.go")
+	output, err := os.Create(OutputPath + "/opcodes_control_flow.go")
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		return

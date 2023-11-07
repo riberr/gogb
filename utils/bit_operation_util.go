@@ -22,3 +22,11 @@ func HasBit(n uint8, pos int) bool {
 func ToUint16(lsb uint8, msb uint8) uint16 {
 	return uint16(lsb) | (uint16(msb) << 8)
 }
+
+func Msb(value uint16) uint8 {
+	return uint8((value & 0xFF00) >> 8)
+}
+
+func Lsb(value uint16) uint8 {
+	return uint8(value & 0x00FF)
+}

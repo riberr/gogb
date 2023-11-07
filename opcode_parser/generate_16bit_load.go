@@ -42,7 +42,7 @@ func generate16bitLoad(opCodes *OpCodes) {
 	//_, _ = output.WriteString("import \"gogb/utils\"\n")
 	//_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
 
-	_, _ = output.WriteString("var OpCodes16bitLoadGenerated = map[uint8]OpCode{\n")
+	_, _ = output.WriteString("var GeneratedOpCodes16bitLoadGenerated = map[uint8]OpCode{\n")
 
 	_, _ = output.WriteString("    // ~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 	_, _ = output.WriteString("    // 16BIT LOAD\n")

@@ -10,58 +10,43 @@ var OpCodesControlFlow = map[uint8]OpCode{
 	// Control flow
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-	**************** REDO WITH STOP
-	// Jump, Jump to HL, Relative jump
+	// Relative jump
 	0x18: NewOpCode(0x18, "JR i8", 2, 12, []func(cpu *CPU){
 		func(cpu *CPU) { e = memory.BusRead(cpu.pc); cpu.pc++ },
 		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(e)) }, // todo: correct casting? e = signed_8(read(PC++)); PC = PC + e
 	}),
+
+	// Jump
 	0xc3: NewOpCode(0xc3, "JP u16", 3, 16, []func(cpu *CPU){
 		func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ },
 		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++ },
 		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
 	}),
+
+	// Jump to HL
 	0xe9: NewOpCode(0xe9, "JP HL", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.pc = cpu.regs.getHL() }}),
 
-	// Jump (conditional) todo: should we set stop=true if condition true?
+	// Jump (conditional)
 	0xc2: NewOpCode(0xc2, "JP NZ,u16", 3, 16, []func(cpu *CPU){
 		func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) {
-			if !cpu.regs.getFlag(FLAG_ZERO_Z_BIT) {
-				cpu.pc = utils.ToUint16(lsb, msb)
-			}
-		},
+		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++; stop = cpu.regs.getFlag(FLAG_ZERO_Z_BIT) },
+		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
 	}),
 	0xca: NewOpCode(0xca, "JP Z,u16", 3, 16, []func(cpu *CPU){
 		func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) {
-			if cpu.regs.getFlag(FLAG_ZERO_Z_BIT) {
-				cpu.pc = utils.ToUint16(lsb, msb)
-			}
-		},
+		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++; stop = !cpu.regs.getFlag(FLAG_ZERO_Z_BIT) },
+		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
 	}),
 	0xd2: NewOpCode(0xd2, "JP NC,u16", 3, 16, []func(cpu *CPU){
 		func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) {
-			if !cpu.regs.getFlag(FLAG_CARRY_C_BIT) {
-				cpu.pc = utils.ToUint16(lsb, msb)
-			}
-		},
+		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++; stop = cpu.regs.getFlag(FLAG_CARRY_C_BIT) },
+		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
 	}),
 	0xda: NewOpCode(0xda, "JP C,u16", 3, 16, []func(cpu *CPU){
 		func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) {
-			if cpu.regs.getFlag(FLAG_CARRY_C_BIT) {
-				cpu.pc = utils.ToUint16(lsb, msb)
-			}
-		},
+		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++; stop = !cpu.regs.getFlag(FLAG_CARRY_C_BIT) },
+		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
 	}),
-
-	TILL HITTTTTTTTTTTTTTTTT
 
 	// Relative jump (conditional)
 	0x20: NewOpCode(0x20, "JR NZ,i8", 2, 12, []func(cpu *CPU){
@@ -130,18 +115,18 @@ var OpCodesControlFlow = map[uint8]OpCode{
 		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++ },
 		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
 	}),
-	0xd0: NewOpCode(0xd0, "RET NC", 1, 20, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xc8: NewOpCode(0xc8, "RET Z", 1, 20, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xd8: NewOpCode(0xd8, "RET C", 1, 20, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xd9: NewOpCode(0xd9, "RETI", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xd0: NewOpCode(0xd0, "RET NC /*todo*/", 1, 20, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xc8: NewOpCode(0xc8, "RET Z /*todo*/", 1, 20, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xd8: NewOpCode(0xd8, "RET C /*todo*/", 1, 20, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xd9: NewOpCode(0xd9, "RETI /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
 
 	// Restart / Call function (implied)
-	0xc7: NewOpCode(0xc7, "RST 00h", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xcf: NewOpCode(0xcf, "RST 08h", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xd7: NewOpCode(0xd7, "RST 10h", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xdf: NewOpCode(0xdf, "RST 18h", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xe7: NewOpCode(0xe7, "RST 20h", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xef: NewOpCode(0xef, "RST 28h", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xf7: NewOpCode(0xf7, "RST 30h", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xff: NewOpCode(0xff, "RST 38h", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xc7: NewOpCode(0xc7, "RST 00h /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xcf: NewOpCode(0xcf, "RST 08h /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xd7: NewOpCode(0xd7, "RST 10h /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xdf: NewOpCode(0xdf, "RST 18h /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xe7: NewOpCode(0xe7, "RST 20h /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xef: NewOpCode(0xef, "RST 28h /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xf7: NewOpCode(0xf7, "RST 30h /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xff: NewOpCode(0xff, "RST 38h /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
 }

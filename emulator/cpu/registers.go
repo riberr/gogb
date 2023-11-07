@@ -24,14 +24,14 @@ const (
 
 func NewRegisters() Registers {
 	return Registers{
-		a: 0,
+		a: 0x01,
 		b: 0,
-		c: 0,
+		c: 0x13,
 		d: 0,
-		e: 0,
-		f: 0,
-		h: 0,
-		l: 0,
+		e: 0xD8,
+		f: 0xB0,
+		h: 0x01,
+		l: 0x4D,
 	}
 }
 
@@ -42,6 +42,15 @@ func (r *Registers) getFlag(flag Flag) bool {
 func (r *Registers) setFlag(flag Flag, value bool) {
 	//r.f |= 1 << flag
 	r.f = utils.SetBit(r.f, int(flag))
+}
+
+func (r *Registers) getAF() uint16 {
+	return (uint16(r.a) << 8) | uint16(r.f)
+}
+
+func (r *Registers) setAF(value uint16) {
+	r.a = uint8((value & 0xFF00) >> 8)
+	r.f = uint8(value & 0xFF)
 }
 
 func (r *Registers) getBC() uint16 {
@@ -79,4 +88,4 @@ func (r *Registers) setHL(value uint16) {
 }
 
 func (r *Registers) incHL() { r.setHL(r.getHL() + 1) }
-func (r Registers) decHL()  { r.setHL(r.getHL() - 1) }
+func (r *Registers) decHL() { r.setHL(r.getHL() - 1) }

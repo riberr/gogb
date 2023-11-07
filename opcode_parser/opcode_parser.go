@@ -88,7 +88,7 @@ func main() {
 	generate8bitArithmetics(&opCodes)
 	generate16bitArithmetics(&opCodes)
 	generateRotateShiftBitOperations(&opCodes)
-	generateControlFlow(&opCodes)
+	//generateControlFlow(&opCodes)		// using non-generated code. Don't override!
 	generateMiscellaneous(&opCodes)
 
 }

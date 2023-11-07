@@ -162,20 +162,7 @@ func newHeader(data []uint8) header {
 
 var cart = Cart{}
 
-func CartLoad() bool {
-
-	romPath := "roms/cpu_instrs/individual/"
-	romName := "10-bit ops.gb"
-
-	/*
-		romPath := "roms/games/"
-		romName := "Pokemon Red.gb"
-	*/
-	/*
-		romPath := "roms/dmg_boot/"
-		romName := "dmg_boot.bin"
-	*/
-
+func CartLoad(romPath string, romName string) bool {
 	// Read the file into a byte array
 	rom, err := os.ReadFile(romPath + romName)
 	if err != nil {

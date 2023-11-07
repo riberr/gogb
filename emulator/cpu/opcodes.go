@@ -76,7 +76,7 @@ func inc(cpu *CPU, value uint8) uint8 {
 	result := value + 1
 	cpu.regs.setFlag(FLAG_ZERO_Z_BIT, result == 0)
 	cpu.regs.setFlag(FLAG_SUBTRACTION_N_BIT, false)
-	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, (0xF&value) == 0xF)
+	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, (0x0F&value) == 0x0F)
 	// flag c unmodified
 	return result
 }
@@ -85,7 +85,7 @@ func dec(cpu *CPU, value uint8) uint8 {
 	result := value - 1
 	cpu.regs.setFlag(FLAG_ZERO_Z_BIT, result == 0)
 	cpu.regs.setFlag(FLAG_SUBTRACTION_N_BIT, true)
-	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, (0xF&value) == 0x00)
+	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, (0x0F&value) == 0x00)
 	// flag c unmodified
 	return result
 }

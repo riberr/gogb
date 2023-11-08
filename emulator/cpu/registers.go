@@ -40,8 +40,11 @@ func (r *Registers) getFlag(flag Flag) bool {
 }
 
 func (r *Registers) setFlag(flag Flag, value bool) {
-	//r.f |= 1 << flag
-	r.f = utils.SetBit(r.f, int(flag))
+	if value {
+		r.f = utils.SetBit(r.f, int(flag))
+	} else {
+		r.f = utils.ClearBit(r.f, int(flag))
+	}
 }
 
 func (r *Registers) getAF() uint16 {

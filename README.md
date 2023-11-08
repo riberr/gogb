@@ -17,3 +17,9 @@ https://gbdev.io/pandocs/
 https://gekkio.fi/files/gb-docs/gbctr.pdf
 
 https://github.com/wheremyfoodat/Gameboy-logs
+
+resources:
+
+https://gbdev.gg8.se/files/roms/blargg-gb-tests/
+
+https://github.com/wheremyfoodat/Gameboy-logs/tree/master

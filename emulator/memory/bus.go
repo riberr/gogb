@@ -1,6 +1,9 @@
 package memory
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+)
 
 // MBC1
 // The majority of games for the original Game Boy use the MBC1 chip
@@ -18,14 +21,24 @@ import "fmt"
 // 0xFF00 - 0xFF7F : I/O Registers
 // 0xFF80 - 0xFFFE : Zero Page
 
+var wram = NewMemory(0xC000, 0xCFFF)
+
 func BusRead(address uint16) uint8 {
 	if address < 0x8000 {
 		//ROM Data
 		return cartRead(address)
 	}
 
-	//panic("NO IMPL")
-	return cartRead(address)
+	if wram.from <= address && address <= wram.to {
+		return wram.read(address)
+	}
+
+	if wram.has(address) {
+		return wram.read(address)
+	}
+
+	log.Panicf("READ NO IMPL (%02x)", address)
+	return 0
 }
 
 func BusWrite(address uint16, value uint8) {
@@ -40,4 +53,10 @@ func BusWrite(address uint16, value uint8) {
 		return
 	}
 
+	if wram.has(address) {
+		wram.write(address, value)
+		return
+	}
+
+	log.Panicf("WRITE NO IMPL (%02x)", address)
 }

@@ -66,7 +66,7 @@ var OpCodes8bitArithmeticsGenerated = map[uint8]OpCode{
 	0x04: NewOpCode(0x04, "INC B", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = inc(cpu, cpu.regs.b) }}),
 	0x0c: NewOpCode(0x0c, "INC C", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.c = inc(cpu, cpu.regs.c) }}),
 	0x14: NewOpCode(0x14, "INC D", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.d = inc(cpu, cpu.regs.d) }}),
-	0x1c: NewOpCode(0x1c, "INC E", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.e = inc(cpu, cpu.regs.e) }}), //todo: bug in F
+	0x1c: NewOpCode(0x1c, "INC E", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.e = inc(cpu, cpu.regs.e) }}),
 	0x24: NewOpCode(0x24, "INC H", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.h = inc(cpu, cpu.regs.h) }}),
 	0x2c: NewOpCode(0x2c, "INC L", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = inc(cpu, cpu.regs.l) }}),
 	0x34: NewOpCode(0x34, "INC (HL)", 1, 12, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),

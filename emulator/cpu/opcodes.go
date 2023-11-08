@@ -73,6 +73,7 @@ func cp(cpu *CPU, value uint8) {
 }
 
 func inc(cpu *CPU, value uint8) uint8 {
+	//fmt.Printf("%08b \n", cpu.regs.f)
 	result := value + 1
 	cpu.regs.setFlag(FLAG_ZERO_Z_BIT, result == 0)
 	cpu.regs.setFlag(FLAG_SUBTRACTION_N_BIT, false)

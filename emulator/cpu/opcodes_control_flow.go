@@ -51,19 +51,19 @@ var OpCodesControlFlow = map[uint8]OpCode{
 	// Relative jump (conditional)
 	0x20: NewOpCode(0x20, "JR NZ,i8", 2, 12, []func(cpu *CPU){
 		func(cpu *CPU) { e = memory.BusRead(cpu.pc); cpu.pc++; stop = cpu.regs.getFlag(FLAG_ZERO_Z_BIT) },
-		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(e)) },
+		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(int8(e))) },
 	}),
 	0x28: NewOpCode(0x28, "JR Z,i8", 2, 12, []func(cpu *CPU){
 		func(cpu *CPU) { e = memory.BusRead(cpu.pc); cpu.pc++; stop = !cpu.regs.getFlag(FLAG_ZERO_Z_BIT) },
-		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(e)) },
+		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(int8(e))) },
 	}),
 	0x30: NewOpCode(0x30, "JR NC,i8", 2, 12, []func(cpu *CPU){
 		func(cpu *CPU) { e = memory.BusRead(cpu.pc); cpu.pc++; stop = cpu.regs.getFlag(FLAG_CARRY_C_BIT) },
-		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(e)) },
+		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(int8(e))) },
 	}),
 	0x38: NewOpCode(0x38, "JR C,i8", 2, 12, []func(cpu *CPU){
 		func(cpu *CPU) { e = memory.BusRead(cpu.pc); cpu.pc++; stop = !cpu.regs.getFlag(FLAG_CARRY_C_BIT) },
-		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(e)) },
+		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(int8(e))) },
 	}),
 
 	// Call function,  Call function (conditional)

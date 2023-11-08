@@ -40,7 +40,7 @@ func generateRotateShiftBitOperations(opCodes *OpCodes) {
 	//_, _ = output.WriteString("import \"gogb/utils\"\n")
 	//_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
 
-	_, _ = output.WriteString("var OpCodesRotateShiftBitoperations = map[uint8]OpCode{\n")
+	_, _ = output.WriteString("var GeneratedOpCodesRotateShiftBitoperations = map[uint8]OpCode{\n")
 
 	// TODO: add CB-prefixed instructions
 

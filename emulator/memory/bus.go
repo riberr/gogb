@@ -21,6 +21,7 @@ import (
 // 0xFF00 - 0xFF7F : I/O Registers
 // 0xFF80 - 0xFFFE : Zero Page
 
+var vram = NewMemory(0x8000, 0x9FFF) // Video RAM
 var wramC = NewMemory(0xC000, 0xCFFF)
 var wramD = NewMemory(0xD000, 0xDFFF)
 var oam = NewMemory(0xFE00, 0xFE9F) // Object attribute memory
@@ -37,6 +38,15 @@ func BusRead(address uint16) uint8 {
 	if address < 0x8000 {
 		//ROM Data
 		return cartRead(address)
+	}
+
+	// todo remove when implementing PPU
+	if address == 0xFF44 {
+		return 0x90
+	}
+
+	if vram.has(address) {
+		return vram.read(address)
 	}
 
 	if wramC.has(address) {
@@ -77,14 +87,14 @@ func BusWrite(address uint16, value uint8) {
 		fmt.Printf("!!! %v\n", BusRead(0xFF01))
 	}
 
-	if address == 0xFF01 || address == 0xFF02 {
-		fmt.Printf("writing %02x to %04x \n", value, address)
-		panic("LALA")
-	}
-
 	if address < 0x8000 {
 		//ROM Data
 		cartWrite(address, value)
+		return
+	}
+
+	if vram.has(address) {
+		vram.write(address, value)
 		return
 	}
 

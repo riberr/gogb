@@ -43,10 +43,12 @@ func adc(cpu *CPU, value uint8) {
 }
 
 func sub(cpu *CPU, value uint8) {
+	println(value)
 	result := int(cpu.regs.a) - int(value) // cast to int to be able to detect overflow
+	println(result)
 	cpu.regs.setFlag(FLAG_ZERO_Z_BIT, uint8(result) == 0)
 	cpu.regs.setFlag(FLAG_SUBTRACTION_N_BIT, true)
-	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, (value+0xF) > (cpu.regs.a&0xF))
+	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, (value+0x0F) > (cpu.regs.a&0xF))
 	cpu.regs.setFlag(FLAG_CARRY_C_BIT, (result>>8) != 0)
 	cpu.regs.a = uint8(result)
 }

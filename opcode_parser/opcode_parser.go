@@ -50,7 +50,7 @@ var OpCodes = map[uint8]OpCode{
 inspiration: https://github.com/rvaccarim/FrozenBoy/blob/master/FrozenBoyCore/Processor/Opcode/OpcodeHandler.cs
 */
 
-const OutputPath = "emulator/cpu/"
+const OutputPath = "generated/"
 
 func main() {
 	// Open the JSON file for reading
@@ -90,6 +90,8 @@ func main() {
 	generateRotateShiftBitOperations(&opCodes)
 	//generateControlFlow(&opCodes)		// using non-generated code. Don't override!
 	generateMiscellaneous(&opCodes)
+
+	generateCB(&opCodes)
 
 }
 

@@ -21,20 +21,50 @@ import (
 // 0xFF00 - 0xFF7F : I/O Registers
 // 0xFF80 - 0xFFFE : Zero Page
 
-var wram = NewMemory(0xC000, 0xCFFF)
+var wramC = NewMemory(0xC000, 0xCFFF)
+var wramD = NewMemory(0xD000, 0xDFFF)
+var oam = NewMemory(0xFE00, 0xFE9F) // Object attribute memory
+var notUsable = NewMemory(0xFEA0, 0xFEFF)
+var ioRegs = NewMemory(0xFF00, 0xFF7F) // I/O Registers
+var hram = NewMemory(0xFF80, 0xFFFE)
+var ieReg uint8 = 0 //Interrupt Enable register
 
 func BusRead(address uint16) uint8 {
+	if address == 0xFF44 {
+		fmt.Printf("reading %02x from 0xff44 \n", ioRegs.read(address))
+	}
+
 	if address < 0x8000 {
 		//ROM Data
 		return cartRead(address)
 	}
 
-	if wram.from <= address && address <= wram.to {
-		return wram.read(address)
+	if wramC.has(address) {
+		return wramC.read(address)
 	}
 
-	if wram.has(address) {
-		return wram.read(address)
+	if wramD.has(address) {
+		return wramD.read(address)
+	}
+
+	if oam.has(address) {
+		return oam.read(address)
+	}
+
+	if notUsable.has(address) {
+		return notUsable.read(address)
+	}
+
+	if ioRegs.has(address) {
+		return ioRegs.read(address)
+	}
+
+	if hram.has(address) {
+		return hram.read(address)
+	}
+
+	if address == 0xFFFF {
+		return ieReg
 	}
 
 	log.Panicf("READ NO IMPL (%02x)", address)
@@ -47,14 +77,49 @@ func BusWrite(address uint16, value uint8) {
 		fmt.Printf("!!! %v\n", BusRead(0xFF01))
 	}
 
+	if address == 0xFF01 || address == 0xFF02 {
+		fmt.Printf("writing %02x to %04x \n", value, address)
+		panic("LALA")
+	}
+
 	if address < 0x8000 {
 		//ROM Data
 		cartWrite(address, value)
 		return
 	}
 
-	if wram.has(address) {
-		wram.write(address, value)
+	if wramC.has(address) {
+		wramC.write(address, value)
+		return
+	}
+
+	if wramD.has(address) {
+		wramD.write(address, value)
+		return
+	}
+
+	if oam.has(address) {
+		oam.write(address, value)
+		return
+	}
+
+	if notUsable.has(address) {
+		notUsable.write(address, value)
+		return
+	}
+
+	if ioRegs.has(address) {
+		ioRegs.write(address, value)
+		return
+	}
+
+	if hram.has(address) {
+		hram.write(address, value)
+		return
+	}
+
+	if address == 0xFFFF {
+		ieReg = value
 		return
 	}
 

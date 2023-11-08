@@ -105,20 +105,37 @@ var OpCodesControlFlow = map[uint8]OpCode{
 
 	// Return from function, Return from function (conditional), Return from interrupt handler
 	0xc9: NewOpCode(0xc9, "RET", 1, 16, []func(cpu *CPU){
-		func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++ },
+		func(cpu *CPU) { lsb = memory.BusRead(cpu.sp); cpu.sp++ },
+		func(cpu *CPU) { msb = memory.BusRead(cpu.sp); cpu.sp++ },
 		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
 	}),
 	0xc0: NewOpCode(0xc0, "RET NZ", 1, 20, []func(cpu *CPU){
 		func(cpu *CPU) { stop = cpu.regs.getFlag(FLAG_ZERO_Z_BIT) },
-		func(cpu *CPU) { lsb = memory.BusRead(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) { msb = memory.BusRead(cpu.pc); cpu.pc++ },
+		func(cpu *CPU) { lsb = memory.BusRead(cpu.sp); cpu.sp++ },
+		func(cpu *CPU) { msb = memory.BusRead(cpu.sp); cpu.sp++ },
 		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
 	}),
-	0xd0: NewOpCode(0xd0, "RET NC /*todo*/", 1, 20, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xc8: NewOpCode(0xc8, "RET Z /*todo*/", 1, 20, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xd8: NewOpCode(0xd8, "RET C /*todo*/", 1, 20, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0xd9: NewOpCode(0xd9, "RETI /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0xd0: NewOpCode(0xd0, "RET NC", 1, 20, []func(cpu *CPU){
+		func(cpu *CPU) { stop = cpu.regs.getFlag(FLAG_CARRY_C_BIT) },
+		func(cpu *CPU) { lsb = memory.BusRead(cpu.sp); cpu.sp++ },
+		func(cpu *CPU) { msb = memory.BusRead(cpu.sp); cpu.sp++ },
+		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
+	}),
+	0xc8: NewOpCode(0xc8, "RET Z", 1, 20, []func(cpu *CPU){
+		func(cpu *CPU) { stop = !cpu.regs.getFlag(FLAG_ZERO_Z_BIT) },
+		func(cpu *CPU) { lsb = memory.BusRead(cpu.sp); cpu.sp++ },
+		func(cpu *CPU) { msb = memory.BusRead(cpu.sp); cpu.sp++ },
+		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
+	}),
+	0xd8: NewOpCode(0xd8, "RET C", 1, 20, []func(cpu *CPU){
+		func(cpu *CPU) { stop = !cpu.regs.getFlag(FLAG_CARRY_C_BIT) },
+		func(cpu *CPU) { lsb = memory.BusRead(cpu.sp); cpu.sp++ },
+		func(cpu *CPU) { msb = memory.BusRead(cpu.sp); cpu.sp++ },
+		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
+	}),
+	0xd9: NewOpCode(0xd9, "RETI /*todo*/", 1, 16, []func(cpu *CPU){
+		func(cpu *CPU) { /*todo*/ },
+	}),
 
 	// Restart / Call function (implied)
 	0xc7: NewOpCode(0xc7, "RST 00h /*todo*/", 1, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),

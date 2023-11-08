@@ -65,6 +65,9 @@ func (r *Registers) setBC(value uint16) {
 	r.c = uint8(value & 0xFF)
 }
 
+func (r *Registers) incBC() { r.setBC(r.getBC() + 1) }
+func (r *Registers) decBC() { r.setBC(r.getBC() - 1) }
+
 /*
 func (r *Registers) setBC(lsb uint8, msb uint8) {
 	r.b = msb
@@ -80,6 +83,9 @@ func (r *Registers) setDE(value uint16) {
 	r.d = uint8((value & 0xFF00) >> 8)
 	r.e = uint8(value & 0xFF)
 }
+
+func (r *Registers) incDE() { r.setDE(r.getDE() + 1) }
+func (r *Registers) decDE() { r.setDE(r.getDE() - 1) }
 
 func (r *Registers) getHL() uint16 {
 	return (uint16(r.h) << 8) | uint16(r.l)

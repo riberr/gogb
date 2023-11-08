@@ -68,7 +68,7 @@ func cp(cpu *CPU, value uint8) {
 	result := int(cpu.regs.a) - int(value)
 	cpu.regs.setFlag(FLAG_ZERO_Z_BIT, result == 0)
 	cpu.regs.setFlag(FLAG_SUBTRACTION_N_BIT, true)
-	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, (0xF&value) > (0xF&cpu.regs.a))
+	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, (0x0F&value) > (0x0F&cpu.regs.a))
 	cpu.regs.setFlag(FLAG_CARRY_C_BIT, (result>>8) != 0)
 }
 

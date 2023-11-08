@@ -20,6 +20,12 @@ https://github.com/wheremyfoodat/Gameboy-logs
 
 resources:
 
-https://gbdev.gg8.se/files/roms/blargg-gb-tests/
+https://gbdev.gg8.se/files/roms/blargg-gb-tests/    test roms
 
-https://github.com/wheremyfoodat/Gameboy-logs/tree/master
+https://github.com/wheremyfoodat/Gameboy-logs/tree/master   test rom logs
+
+https://bgb.bircd.org/  debugger
+
+TODO
+getting stuck on 0xFF44. Have to implement some basic PPU timing
+https://www.reddit.com/r/EmuDev/comments/rjh1ls/gameboy_emulator_stuck_in_loop/

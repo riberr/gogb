@@ -24,7 +24,7 @@ func generate8bitLoad(opCodes *OpCodes /*, output *os.File*/) {
 	_, _ = output.WriteString("import \"gogb/utils\"\n")
 	_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
 
-	_, _ = output.WriteString("var OpCodes8bitLoadGenerated = map[uint8]OpCode{\n")
+	_, _ = output.WriteString("var GeneratedOpCodes8bitLoadGenerated = map[uint8]OpCode{\n")
 
 	for i, opCode := range opCodes.Unprefixed {
 		opCode.i = i

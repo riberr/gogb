@@ -41,7 +41,7 @@ func generateMiscellaneous(opCodes *OpCodes) {
 	//_, _ = output.WriteString("import \"gogb/utils\"\n")
 	//_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
 
-	_, _ = output.WriteString("var OpCodesMisc = map[uint8]OpCode{\n")
+	_, _ = output.WriteString("var GeneratedOpCodesMisc = map[uint8]OpCode{\n")
 
 	_, _ = output.WriteString("    // ~~~~~~~~~~~~~~~~~~~~~~~~~~\n")
 	_, _ = output.WriteString("    // Miscellaneous \n")

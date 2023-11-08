@@ -13,14 +13,14 @@ var OpCodes16bitArithmeticsGenerated = map[uint8]OpCode{
 	0xe8: NewOpCode(0xe8, "ADD SP,i8 /*todo*/", 2, 16, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
 
 	// Increment (register), Increment SP
-	0x03: NewOpCode(0x03, "INC BC /*todo*/", 1, 8, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0x13: NewOpCode(0x13, "INC DE /*todo*/", 1, 8, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0x23: NewOpCode(0x23, "INC HL /*todo*/", 1, 8, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0x33: NewOpCode(0x33, "INC SP /*todo*/", 1, 8, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0x03: NewOpCode(0x03, "INC BC", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.incBC() }}),
+	0x13: NewOpCode(0x13, "INC DE", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.incDE() }}),
+	0x23: NewOpCode(0x23, "INC HL", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.incHL() }}),
+	0x33: NewOpCode(0x33, "INC SP", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.sp++ }}),
 
 	// Decrement (register), Decrement SP
-	0x0b: NewOpCode(0x0b, "DEC BC /*todo*/", 1, 8, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0x1b: NewOpCode(0x1b, "DEC DE /*todo*/", 1, 8, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0x2b: NewOpCode(0x2b, "DEC HL /*todo*/", 1, 8, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0x3b: NewOpCode(0x3b, "DEC SP /*todo*/", 1, 8, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0x0b: NewOpCode(0x0b, "DEC BC", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.decBC() }}),
+	0x1b: NewOpCode(0x1b, "DEC DE", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.decDE() }}),
+	0x2b: NewOpCode(0x2b, "DEC HL", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.decHL() }}),
+	0x3b: NewOpCode(0x3b, "DEC SP", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.sp-- }}),
 }

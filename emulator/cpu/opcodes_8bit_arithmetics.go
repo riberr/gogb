@@ -69,8 +69,11 @@ var OpCodes8bitArithmeticsGenerated = map[uint8]OpCode{
 	0x1c: NewOpCode(0x1c, "INC E", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.e = inc(cpu, cpu.regs.e) }}),
 	0x24: NewOpCode(0x24, "INC H", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.h = inc(cpu, cpu.regs.h) }}),
 	0x2c: NewOpCode(0x2c, "INC L", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = inc(cpu, cpu.regs.l) }}),
-	0x34: NewOpCode(0x34, "INC (HL)", 1, 12, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
 	0x3c: NewOpCode(0x3c, "INC A", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = inc(cpu, cpu.regs.a) }}),
+	0x34: NewOpCode(0x34, "INC (HL)", 1, 12, []func(cpu *CPU){
+		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), inc(cpu, e)) },
+	}),
 
 	// Decrement (register), Decrement (indirect HL)
 	0x05: NewOpCode(0x05, "DEC B", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = dec(cpu, cpu.regs.b) }}),
@@ -79,8 +82,11 @@ var OpCodes8bitArithmeticsGenerated = map[uint8]OpCode{
 	0x1d: NewOpCode(0x1d, "DEC E", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.e = dec(cpu, cpu.regs.e) }}),
 	0x25: NewOpCode(0x25, "DEC H", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.h = dec(cpu, cpu.regs.h) }}),
 	0x2d: NewOpCode(0x2d, "DEC L", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = dec(cpu, cpu.regs.l) }}),
-	0x35: NewOpCode(0x35, "DEC (HL)", 1, 12, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
 	0x3d: NewOpCode(0x3d, "DEC A", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = dec(cpu, cpu.regs.a) }}),
+	0x35: NewOpCode(0x35, "DEC (HL)", 1, 12, []func(cpu *CPU){
+		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), dec(cpu, e)) },
+	}),
 
 	// Bitwise AND (register), Bitwise AND (indirect HL), Bitwise AND (immediate)
 	0xa0: NewOpCode(0xa0, "AND A,B", 1, 4, []func(cpu *CPU){func(cpu *CPU) { and(cpu, cpu.regs.b) }}),
@@ -116,8 +122,29 @@ var OpCodes8bitArithmeticsGenerated = map[uint8]OpCode{
 	0xee: NewOpCode(0xee, "XOR A,u8", 2, 8, []func(cpu *CPU){func(cpu *CPU) { xor(cpu, memory.BusRead(cpu.pc)); cpu.pc++ }}),
 
 	// CCF: Complement carry flag, SCF: Set carry flag, DAA: Decimal adjust accumulator, CPL: Complement accumulator
-	0x27: NewOpCode(0x27, "DAA", 1, 4, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0x2f: NewOpCode(0x2f, "CPL", 1, 4, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0x37: NewOpCode(0x37, "SCF", 1, 4, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
-	0x3f: NewOpCode(0x3f, "CCF", 1, 4, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0x27: NewOpCode(0x27, "DAA todo", 1, 4, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0x2f: NewOpCode(0x2f, "CPL", 1, 4, []func(cpu *CPU){
+		// flip all bits
+		func(cpu *CPU) {
+			cpu.regs.a = ^cpu.regs.a
+			cpu.regs.setFlag(FLAG_SUBTRACTION_N_BIT, true)
+			cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, true)
+		},
+	}),
+	0x37: NewOpCode(0x37, "SCF", 1, 4, []func(cpu *CPU){
+		// Set carry flag
+		func(cpu *CPU) {
+			cpu.regs.setFlag(FLAG_SUBTRACTION_N_BIT, false)
+			cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, false)
+			cpu.regs.setFlag(FLAG_CARRY_C_BIT, true)
+		},
+	}),
+	0x3f: NewOpCode(0x3f, "CCF", 1, 4, []func(cpu *CPU){
+		// Complement carry flag
+		func(cpu *CPU) {
+			cpu.regs.setFlag(FLAG_SUBTRACTION_N_BIT, false)
+			cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, false)
+			cpu.regs.setFlag(FLAG_CARRY_C_BIT, !cpu.regs.getFlag(FLAG_CARRY_C_BIT))
+		},
+	}),
 }

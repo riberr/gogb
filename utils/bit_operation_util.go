@@ -30,3 +30,11 @@ func Msb(value uint16) uint8 {
 func Lsb(value uint16) uint8 {
 	return uint8(value & 0x00FF)
 }
+
+// ToInt transforms a bool into a 1/0 value.
+func ToInt(val bool) uint8 {
+	if val {
+		return 1
+	}
+	return 0
+}

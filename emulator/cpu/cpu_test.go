@@ -15,7 +15,7 @@ import (
  https://github.com/wheremyfoodat/Gameboy-logs/tree/master
 */
 
-func TestCpuOutput06(t *testing.T) {
+func TestCpuOutput09(t *testing.T) {
 	logFile, err := os.Open("../../Gameboy-logs-master/Blargg9LYStubbed/Blargg9.txt")
 	if err != nil {
 		t.Fatalf("Error opening file: %v", err)
@@ -27,7 +27,7 @@ func TestCpuOutput06(t *testing.T) {
 	if !memory.CartLoad("../../roms/cpu_instrs/individual/", "09-op r,r.gb") {
 		t.Fatalf("error loading rom")
 	}
-	cpu := NewCPU()
+	cpu := NewCPU(false)
 
 	nrOfLines := 243272
 	i := 1
@@ -40,7 +40,12 @@ func TestCpuOutput06(t *testing.T) {
 
 		logLine, _, err := log.ReadLine()
 		if err != nil {
-			fmt.Println("Error opening file:", err)
+
+			if err.Error() == "EOF" {
+				break
+			}
+
+			fmt.Println("Error reading line:", err)
 			return
 		}
 
@@ -49,8 +54,4 @@ func TestCpuOutput06(t *testing.T) {
 		}
 		i++
 	}
-}
-
-func CompareOutputToTruth06(t *testing.T) {
-
 }

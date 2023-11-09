@@ -30,7 +30,7 @@ func generate8bitArithmetics(opCodes *OpCodes) {
 	//_, _ = output.WriteString("import \"gogb/utils\"\n")
 	_, _ = output.WriteString("import \"gogb/emulator/memory\"\n\n")
 
-	_, _ = output.WriteString("var OpCodes8bitArithmeticsGenerated = map[uint8]OpCode{\n")
+	_, _ = output.WriteString("var GeneratedOpCodes8bitArithmeticsGenerated = map[uint8]OpCode{\n")
 
 	for i, opCode := range opCodes.Unprefixed {
 		opCode.i = i

@@ -21,7 +21,6 @@ func generate16bitArithmetics(opCodes *OpCodes) {
 		opCode.i = i
 		x := i & 0x0F
 		y := i & 0xF0 >> 4
-		//fmt.Printf("0x%02x, 0x%02x\n", x, y)
 
 		switch {
 		case x == 0x9 && isBetween(0x0, y, 0x3), i == 0xE8:

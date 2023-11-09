@@ -1,7 +1,7 @@
 package bus
 
 import (
-	"fmt"
+	"gogb/gameboy/seriallink"
 	"log"
 )
 
@@ -23,6 +23,7 @@ import (
 
 type Bus struct {
 	cart *Cart
+	sl   *seriallink.SerialLink
 }
 
 var vram = NewMemory(0x8000, 0x9FFF) // Video RAM
@@ -34,9 +35,10 @@ var ioRegs = NewMemory(0xFF00, 0xFF7F) // I/O Registers
 var hram = NewMemory(0xFF80, 0xFFFE)
 var ieReg uint8 = 0 //Interrupt Enable register
 
-func New() *Bus {
+func New(sl *seriallink.SerialLink) *Bus {
 	return &Bus{
 		cart: &Cart{},
+		sl:   sl,
 	}
 }
 
@@ -75,16 +77,21 @@ func (b *Bus) BusRead(address uint16) uint8 {
 		return notUsable.read(address)
 	}
 
-	if ioRegs.has(address) {
-		return ioRegs.read(address)
-	}
-
 	if hram.has(address) {
 		return hram.read(address)
 	}
 
-	if address == 0xFFFF {
+	switch address {
+	case 0xFF01:
+		return b.sl.GetSB()
+	case 0xFF02:
+		return b.sl.GetSC()
+	case 0xFFFF:
 		return ieReg
+	default:
+		if ioRegs.has(address) {
+			return ioRegs.read(address)
+		}
 	}
 
 	log.Panicf("READ NO IMPL (%02x)", address)
@@ -92,11 +99,6 @@ func (b *Bus) BusRead(address uint16) uint8 {
 }
 
 func (b *Bus) BusWrite(address uint16, value uint8) {
-	// for testing with blargg's cpu_instrs roms
-	if address == 0xFF02 && value == 0x81 {
-		fmt.Printf("%02x ", b.BusRead(0xFF01))
-	}
-
 	if address < 0x8000 {
 		//ROM Data
 		println("warning: writing to ROM")
@@ -129,19 +131,26 @@ func (b *Bus) BusWrite(address uint16, value uint8) {
 		return
 	}
 
-	if ioRegs.has(address) {
-		ioRegs.write(address, value)
-		return
-	}
-
 	if hram.has(address) {
 		hram.write(address, value)
 		return
 	}
 
-	if address == 0xFFFF {
+	switch address {
+	case 0xFF01:
+		b.sl.SetSB(value)
+		return
+	case 0xFF02:
+		b.sl.SetSC(value)
+		return
+	case 0xFFFF:
 		ieReg = value
 		return
+	default:
+		if ioRegs.has(address) {
+			ioRegs.write(address, value)
+			return
+		}
 	}
 
 	log.Panicf("WRITE NO IMPL (%02x)", address)

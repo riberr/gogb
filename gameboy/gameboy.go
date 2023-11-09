@@ -3,13 +3,15 @@ package gameboy
 import (
 	busPackage "gogb/gameboy/bus"
 	cpuPackage "gogb/gameboy/cpu"
+	"gogb/gameboy/seriallink"
 	"time"
 )
 
 func Run(debug bool) {
 
 	// dependency injection
-	bus := busPackage.New()
+	sl := seriallink.New()
+	bus := busPackage.New(sl)
 	cpu := cpuPackage.New(bus, debug)
 
 	romPath := "roms/cpu_instrs/individual/"

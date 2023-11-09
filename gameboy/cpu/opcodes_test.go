@@ -2,6 +2,7 @@ package cpu
 
 import (
 	bus2 "gogb/gameboy/bus"
+	"gogb/gameboy/seriallink"
 	"testing"
 )
 
@@ -16,7 +17,8 @@ func TestSBC(t *testing.T) {
 	*/
 
 	// setup
-	bus := bus2.New()
+	sl := seriallink.New()
+	bus := bus2.New(sl)
 	cpu := New(bus, false)
 
 	// preconditions

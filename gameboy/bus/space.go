@@ -1,15 +1,15 @@
-package memory
+package bus
 
-type Memory struct {
+type Space struct {
 	from uint16
 	to   uint16
 	size uint16
 	data []uint8
 }
 
-func NewMemory(from uint16, to uint16) Memory {
+func NewMemory(from uint16, to uint16) Space {
 	size := to - from + 1
-	mem := Memory{
+	mem := Space{
 		from: from,
 		to:   to,
 		size: size,
@@ -19,15 +19,15 @@ func NewMemory(from uint16, to uint16) Memory {
 	return mem
 }
 
-func (m *Memory) write(address uint16, value uint8) {
+func (m *Space) write(address uint16, value uint8) {
 	m.data[address-m.from] = value
 }
 
-func (m *Memory) read(address uint16) uint8 {
+func (m *Space) read(address uint16) uint8 {
 	return m.data[address-m.from]
 }
 
-func (m *Memory) has(address uint16) bool {
+func (m *Space) has(address uint16) bool {
 	if m.from <= address && address <= m.to {
 		return true
 	} else {

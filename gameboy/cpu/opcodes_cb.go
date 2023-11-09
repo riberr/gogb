@@ -1,7 +1,6 @@
 package cpu
 
 import (
-	"gogb/emulator/memory"
 	"gogb/utils"
 )
 
@@ -116,8 +115,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x05: NewOpCode(0x05, "RLC L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RLC(cpu, cpu.regs.l) }}),
 	0x07: NewOpCode(0x07, "RLC A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RLC(cpu, cpu.regs.a) }}),
 	0x06: NewOpCode(0x06, "RLC (HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RLC(cpu, e)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RLC(cpu, e)) },
 	}),
 
 	// rotate right
@@ -129,8 +128,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x0d: NewOpCode(0x0d, "RRC L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RRC(cpu, cpu.regs.l) }}),
 	0x0f: NewOpCode(0x0f, "RRC A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RRC(cpu, cpu.regs.a) }}),
 	0x0e: NewOpCode(0x0e, "RRC (HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RRC(cpu, e)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RRC(cpu, e)) },
 	}),
 
 	// 	rotate left through carry
@@ -142,8 +141,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x15: NewOpCode(0x15, "RL L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RL(cpu, cpu.regs.l) }}),
 	0x17: NewOpCode(0x17, "RL A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RL(cpu, cpu.regs.a) }}),
 	0x16: NewOpCode(0x16, "RL (HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RL(cpu, e)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RL(cpu, e)) },
 	}),
 
 	// rotate right through carry
@@ -155,8 +154,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x1d: NewOpCode(0x1d, "RR L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RR(cpu, cpu.regs.l) }}),
 	0x1f: NewOpCode(0x1f, "RR A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RR(cpu, cpu.regs.a) }}),
 	0x1e: NewOpCode(0x1e, "RR (HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RR(cpu, e)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RR(cpu, e)) },
 	}),
 
 	// shift left arithmetic (b0=0)
@@ -168,8 +167,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x25: NewOpCode(0x25, "SLA L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SLA(cpu, cpu.regs.l) }}),
 	0x27: NewOpCode(0x27, "SLA A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SLA(cpu, cpu.regs.a) }}),
 	0x26: NewOpCode(0x26, "SLA (HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SLA(cpu, e)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SLA(cpu, e)) },
 	}),
 
 	// shift right arithmetic (b7=b7)
@@ -181,8 +180,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x2d: NewOpCode(0x2d, "SRA L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SRA(cpu, cpu.regs.l) }}),
 	0x2f: NewOpCode(0x2f, "SRA A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SRA(cpu, cpu.regs.a) }}),
 	0x2e: NewOpCode(0x2e, "SRA (HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SRA(cpu, e)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SRA(cpu, e)) },
 	}),
 
 	// exchange low/hi-nibble
@@ -194,8 +193,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x35: NewOpCode(0x35, "SWAP L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SWAP(cpu, cpu.regs.l) }}),
 	0x37: NewOpCode(0x37, "SWAP A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SWAP(cpu, cpu.regs.a) }}),
 	0x36: NewOpCode(0x36, "SWAP (HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SWAP(cpu, e)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SWAP(cpu, e)) },
 	}),
 
 	// shift right logical (b7=0)
@@ -207,8 +206,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x3d: NewOpCode(0x3d, "SRL L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SRL(cpu, cpu.regs.l) }}),
 	0x3f: NewOpCode(0x3f, "SRL A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SRL(cpu, cpu.regs.a) }}),
 	0x3e: NewOpCode(0x3e, "SRL (HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SRL(cpu, e)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SRL(cpu, e)) },
 	}),
 
 	// test bit n
@@ -220,7 +219,7 @@ var OpCodesCB = map[uint8]OpCode{
 	0x45: NewOpCode(0x45, "BIT 0,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.l, 0) }}),
 	0x47: NewOpCode(0x47, "BIT 0,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.a, 0) }}),
 	0x46: NewOpCode(0x46, "BIT 0,(HL)", 2, 12, []func(cpu *CPU){
-		func(cpu *CPU) { BIT(cpu, memory.BusRead(cpu.regs.getHL()), 0) },
+		func(cpu *CPU) { BIT(cpu, cpu.bus.BusRead(cpu.regs.getHL()), 0) },
 	}),
 
 	0x48: NewOpCode(0x48, "BIT 1,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.b, 1) }}),
@@ -231,7 +230,7 @@ var OpCodesCB = map[uint8]OpCode{
 	0x4d: NewOpCode(0x4d, "BIT 1,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.l, 1) }}),
 	0x4f: NewOpCode(0x4f, "BIT 1,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.a, 1) }}),
 	0x4e: NewOpCode(0x4e, "BIT 1,(HL)", 2, 12, []func(cpu *CPU){
-		func(cpu *CPU) { BIT(cpu, memory.BusRead(cpu.regs.getHL()), 1) },
+		func(cpu *CPU) { BIT(cpu, cpu.bus.BusRead(cpu.regs.getHL()), 1) },
 	}),
 
 	0x50: NewOpCode(0x50, "BIT 2,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.b, 2) }}),
@@ -242,7 +241,7 @@ var OpCodesCB = map[uint8]OpCode{
 	0x55: NewOpCode(0x55, "BIT 2,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.l, 2) }}),
 	0x57: NewOpCode(0x57, "BIT 2,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.a, 2) }}),
 	0x56: NewOpCode(0x56, "BIT 2,(HL)", 2, 12, []func(cpu *CPU){
-		func(cpu *CPU) { BIT(cpu, memory.BusRead(cpu.regs.getHL()), 2) },
+		func(cpu *CPU) { BIT(cpu, cpu.bus.BusRead(cpu.regs.getHL()), 2) },
 	}),
 
 	0x58: NewOpCode(0x58, "BIT 3,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.b, 3) }}),
@@ -253,7 +252,7 @@ var OpCodesCB = map[uint8]OpCode{
 	0x5d: NewOpCode(0x5d, "BIT 3,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.l, 3) }}),
 	0x5f: NewOpCode(0x5f, "BIT 3,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.a, 3) }}),
 	0x5e: NewOpCode(0x5e, "BIT 3,(HL)", 2, 12, []func(cpu *CPU){
-		func(cpu *CPU) { BIT(cpu, memory.BusRead(cpu.regs.getHL()), 3) },
+		func(cpu *CPU) { BIT(cpu, cpu.bus.BusRead(cpu.regs.getHL()), 3) },
 	}),
 
 	0x60: NewOpCode(0x60, "BIT 4,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.b, 4) }}),
@@ -264,7 +263,7 @@ var OpCodesCB = map[uint8]OpCode{
 	0x65: NewOpCode(0x65, "BIT 4,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.l, 4) }}),
 	0x67: NewOpCode(0x67, "BIT 4,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.a, 4) }}),
 	0x66: NewOpCode(0x66, "BIT 4,(HL)", 2, 12, []func(cpu *CPU){
-		func(cpu *CPU) { BIT(cpu, memory.BusRead(cpu.regs.getHL()), 4) },
+		func(cpu *CPU) { BIT(cpu, cpu.bus.BusRead(cpu.regs.getHL()), 4) },
 	}),
 
 	0x68: NewOpCode(0x68, "BIT 5,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.b, 5) }}),
@@ -275,7 +274,7 @@ var OpCodesCB = map[uint8]OpCode{
 	0x6d: NewOpCode(0x6d, "BIT 5,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.l, 5) }}),
 	0x6f: NewOpCode(0x6f, "BIT 5,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.a, 5) }}),
 	0x6e: NewOpCode(0x6e, "BIT 5,(HL)", 2, 12, []func(cpu *CPU){
-		func(cpu *CPU) { BIT(cpu, memory.BusRead(cpu.regs.getHL()), 5) },
+		func(cpu *CPU) { BIT(cpu, cpu.bus.BusRead(cpu.regs.getHL()), 5) },
 	}),
 
 	0x70: NewOpCode(0x70, "BIT 6,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.b, 6) }}),
@@ -286,7 +285,7 @@ var OpCodesCB = map[uint8]OpCode{
 	0x75: NewOpCode(0x75, "BIT 6,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.l, 6) }}),
 	0x77: NewOpCode(0x77, "BIT 6,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.a, 6) }}),
 	0x76: NewOpCode(0x76, "BIT 6,(HL)", 2, 12, []func(cpu *CPU){
-		func(cpu *CPU) { BIT(cpu, memory.BusRead(cpu.regs.getHL()), 6) },
+		func(cpu *CPU) { BIT(cpu, cpu.bus.BusRead(cpu.regs.getHL()), 6) },
 	}),
 
 	0x78: NewOpCode(0x78, "BIT 7,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.b, 7) }}),
@@ -297,7 +296,7 @@ var OpCodesCB = map[uint8]OpCode{
 	0x7d: NewOpCode(0x7d, "BIT 7,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.l, 7) }}),
 	0x7f: NewOpCode(0x7f, "BIT 7,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { BIT(cpu, cpu.regs.a, 7) }}),
 	0x7e: NewOpCode(0x7e, "BIT 7,(HL)", 2, 12, []func(cpu *CPU){
-		func(cpu *CPU) { BIT(cpu, memory.BusRead(cpu.regs.getHL()), 7) },
+		func(cpu *CPU) { BIT(cpu, cpu.bus.BusRead(cpu.regs.getHL()), 7) },
 	}),
 
 	// reset bit n
@@ -309,8 +308,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x85: NewOpCode(0x85, "RES 0,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RES(cpu.regs.l, 0) }}),
 	0x87: NewOpCode(0x87, "RES 0,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RES(cpu.regs.a, 0) }}),
 	0x86: NewOpCode(0x86, "RES 0,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RES(e, 0)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RES(e, 0)) },
 	}),
 
 	0x88: NewOpCode(0x88, "RES 1,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = RES(cpu.regs.b, 1) }}),
@@ -321,8 +320,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x8d: NewOpCode(0x8d, "RES 1,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RES(cpu.regs.l, 1) }}),
 	0x8f: NewOpCode(0x8f, "RES 1,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RES(cpu.regs.a, 1) }}),
 	0x8e: NewOpCode(0x8e, "RES 1,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RES(e, 1)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RES(e, 1)) },
 	}),
 
 	0x90: NewOpCode(0x90, "RES 2,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = RES(cpu.regs.b, 2) }}),
@@ -333,8 +332,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x95: NewOpCode(0x95, "RES 2,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RES(cpu.regs.l, 2) }}),
 	0x97: NewOpCode(0x97, "RES 2,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RES(cpu.regs.a, 2) }}),
 	0x96: NewOpCode(0x96, "RES 2,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RES(e, 2)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RES(e, 2)) },
 	}),
 
 	0x98: NewOpCode(0x98, "RES 3,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = RES(cpu.regs.b, 3) }}),
@@ -345,8 +344,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0x9d: NewOpCode(0x9d, "RES 3,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RES(cpu.regs.l, 3) }}),
 	0x9f: NewOpCode(0x9f, "RES 3,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RES(cpu.regs.a, 3) }}),
 	0x9e: NewOpCode(0x9e, "RES 3,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RES(e, 3)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RES(e, 3)) },
 	}),
 
 	0xa0: NewOpCode(0xa0, "RES 4,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = RES(cpu.regs.b, 4) }}),
@@ -357,8 +356,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xa5: NewOpCode(0xa5, "RES 4,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RES(cpu.regs.l, 4) }}),
 	0xa7: NewOpCode(0xa7, "RES 4,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RES(cpu.regs.a, 4) }}),
 	0xa6: NewOpCode(0xa6, "RES 4,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RES(e, 4)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RES(e, 4)) },
 	}),
 
 	0xa8: NewOpCode(0xa8, "RES 5,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = RES(cpu.regs.b, 5) }}),
@@ -369,8 +368,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xad: NewOpCode(0xad, "RES 5,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RES(cpu.regs.l, 5) }}),
 	0xaf: NewOpCode(0xaf, "RES 5,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RES(cpu.regs.a, 5) }}),
 	0xae: NewOpCode(0xae, "RES 5,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RES(e, 5)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RES(e, 5)) },
 	}),
 
 	0xb0: NewOpCode(0xb0, "RES 6,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = RES(cpu.regs.b, 6) }}),
@@ -381,8 +380,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xb5: NewOpCode(0xb5, "RES 6,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RES(cpu.regs.l, 6) }}),
 	0xb7: NewOpCode(0xb7, "RES 6,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RES(cpu.regs.a, 6) }}),
 	0xb6: NewOpCode(0xb6, "RES 6,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RES(e, 6)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RES(e, 6)) },
 	}),
 
 	0xb8: NewOpCode(0xb8, "RES 7,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = RES(cpu.regs.b, 7) }}),
@@ -393,8 +392,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xbd: NewOpCode(0xbd, "RES 7,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = RES(cpu.regs.l, 7) }}),
 	0xbf: NewOpCode(0xbf, "RES 7,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = RES(cpu.regs.a, 7) }}),
 	0xbe: NewOpCode(0xbe, "RES 7,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), RES(e, 7)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), RES(e, 7)) },
 	}),
 
 	// set bit n
@@ -406,8 +405,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xc5: NewOpCode(0xc5, "SET 0,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SET(cpu.regs.l, 0) }}),
 	0xc7: NewOpCode(0xc7, "SET 0,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SET(cpu.regs.a, 0) }}),
 	0xc6: NewOpCode(0xc6, "SET 0,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SET(e, 0)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SET(e, 0)) },
 	}),
 
 	0xc8: NewOpCode(0xc8, "SET 1,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = SET(cpu.regs.b, 1) }}),
@@ -418,8 +417,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xcd: NewOpCode(0xcd, "SET 1,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SET(cpu.regs.l, 1) }}),
 	0xcf: NewOpCode(0xcf, "SET 1,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SET(cpu.regs.a, 1) }}),
 	0xce: NewOpCode(0xce, "SET 1,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SET(e, 1)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SET(e, 1)) },
 	}),
 
 	0xd0: NewOpCode(0xd0, "SET 2,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = SET(cpu.regs.b, 2) }}),
@@ -430,8 +429,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xd5: NewOpCode(0xd5, "SET 2,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SET(cpu.regs.l, 2) }}),
 	0xd7: NewOpCode(0xd7, "SET 2,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SET(cpu.regs.a, 2) }}),
 	0xd6: NewOpCode(0xd6, "SET 2,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SET(e, 2)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SET(e, 2)) },
 	}),
 
 	0xd8: NewOpCode(0xd8, "SET 3,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = SET(cpu.regs.b, 3) }}),
@@ -442,8 +441,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xdd: NewOpCode(0xdd, "SET 3,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SET(cpu.regs.l, 3) }}),
 	0xdf: NewOpCode(0xdf, "SET 3,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SET(cpu.regs.a, 3) }}),
 	0xde: NewOpCode(0xde, "SET 3,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SET(e, 3)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SET(e, 3)) },
 	}),
 
 	0xe0: NewOpCode(0xe0, "SET 4,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = SET(cpu.regs.b, 4) }}),
@@ -454,8 +453,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xe5: NewOpCode(0xe5, "SET 4,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SET(cpu.regs.l, 4) }}),
 	0xe7: NewOpCode(0xe7, "SET 4,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SET(cpu.regs.a, 4) }}),
 	0xe6: NewOpCode(0xe6, "SET 4,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SET(e, 4)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SET(e, 4)) },
 	}),
 
 	0xe8: NewOpCode(0xe8, "SET 5,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = SET(cpu.regs.b, 5) }}),
@@ -466,8 +465,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xed: NewOpCode(0xed, "SET 5,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SET(cpu.regs.l, 5) }}),
 	0xef: NewOpCode(0xef, "SET 5,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SET(cpu.regs.a, 5) }}),
 	0xee: NewOpCode(0xee, "SET 5,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SET(e, 5)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SET(e, 5)) },
 	}),
 
 	0xf0: NewOpCode(0xf0, "SET 6,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = SET(cpu.regs.b, 6) }}),
@@ -478,8 +477,8 @@ var OpCodesCB = map[uint8]OpCode{
 	0xf5: NewOpCode(0xf5, "SET 6,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SET(cpu.regs.l, 6) }}),
 	0xf7: NewOpCode(0xf7, "SET 6,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SET(cpu.regs.a, 6) }}),
 	0xf6: NewOpCode(0xf6, "SET 6,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SET(e, 6)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SET(e, 6)) },
 	}),
 
 	0xf8: NewOpCode(0xf8, "SET 7,B", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = SET(cpu.regs.b, 7) }}),
@@ -490,7 +489,7 @@ var OpCodesCB = map[uint8]OpCode{
 	0xfd: NewOpCode(0xfd, "SET 7,L", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = SET(cpu.regs.l, 7) }}),
 	0xff: NewOpCode(0xff, "SET 7,A", 2, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = SET(cpu.regs.a, 7) }}),
 	0xfe: NewOpCode(0xfe, "SET 7,(HL)", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = memory.BusRead(cpu.regs.getHL()) },
-		func(cpu *CPU) { memory.BusWrite(cpu.regs.getHL(), SET(e, 7)) },
+		func(cpu *CPU) { e = cpu.bus.BusRead(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), SET(e, 7)) },
 	}),
 }

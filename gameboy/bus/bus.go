@@ -1,4 +1,4 @@
-package memory
+package bus
 
 import (
 	"fmt"
@@ -16,28 +16,38 @@ import (
 // 0xC000 - 0xCFFF : RAM Bank 0
 // 0xD000 - 0xDFFF : RAM Bank 1-7 - switchable - Color only
 // 0xE000 - 0xFDFF : Reserved - Echo RAM
-// 0xFE00 - 0xFE9F : Object Attribute Memory
+// 0xFE00 - 0xFE9F : Object Attribute Space
 // 0xFEA0 - 0xFEFF : Reserved - Unusable
 // 0xFF00 - 0xFF7F : I/O Registers
 // 0xFF80 - 0xFFFE : Zero Page
 
+type Bus struct {
+	cart *Cart
+}
+
 var vram = NewMemory(0x8000, 0x9FFF) // Video RAM
 var wramC = NewMemory(0xC000, 0xCFFF)
 var wramD = NewMemory(0xD000, 0xDFFF)
-var oam = NewMemory(0xFE00, 0xFE9F) // Object attribute memory
+var oam = NewMemory(0xFE00, 0xFE9F) // Object attribute bus
 var notUsable = NewMemory(0xFEA0, 0xFEFF)
 var ioRegs = NewMemory(0xFF00, 0xFF7F) // I/O Registers
 var hram = NewMemory(0xFF80, 0xFFFE)
 var ieReg uint8 = 0 //Interrupt Enable register
 
-func BusRead(address uint16) uint8 {
-	if address == 0xFF44 {
-		fmt.Printf("reading %02x from 0xff44 \n", ioRegs.read(address))
+func New() *Bus {
+	return &Bus{
+		cart: &Cart{},
 	}
+}
 
+func (b *Bus) LoadCart(romPath string, romName string) bool {
+	return b.cart.Load(romPath, romName)
+}
+
+func (b *Bus) BusRead(address uint16) uint8 {
 	if address < 0x8000 {
 		//ROM Data
-		return cartRead(address)
+		return b.cart.read(address)
 	}
 
 	// todo remove when implementing PPU
@@ -81,15 +91,16 @@ func BusRead(address uint16) uint8 {
 	return 0
 }
 
-func BusWrite(address uint16, value uint8) {
+func (b *Bus) BusWrite(address uint16, value uint8) {
 	// for testing with blargg's cpu_instrs roms
 	if address == 0xFF02 && value == 0x81 {
-		fmt.Printf("!!! %v\n", BusRead(0xFF01))
+		fmt.Printf("%02x ", b.BusRead(0xFF01))
 	}
 
 	if address < 0x8000 {
 		//ROM Data
-		cartWrite(address, value)
+		println("warning: writing to ROM")
+		b.cart.write(address, value)
 		return
 	}
 

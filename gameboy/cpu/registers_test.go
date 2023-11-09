@@ -43,6 +43,7 @@ func TestFlagSetAndRead(t *testing.T) {
 func TestRegisterBC(t *testing.T) {
 	register := NewRegisters()
 
+	register.setBC(0x00)
 	if register.getBC() != 0 {
 		t.Fatal("Should be 0")
 	}

@@ -1,7 +1,7 @@
 package main
 
-import "gogb/emulator"
+import "gogb/gameboy"
 
 func main() {
-	emulator.Run()
+	gameboy.Run(true)
 }

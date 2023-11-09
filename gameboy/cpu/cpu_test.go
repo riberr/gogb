@@ -3,7 +3,7 @@ package cpu
 import (
 	"bufio"
 	"fmt"
-	"gogb/emulator/memory"
+	bus2 "gogb/gameboy/bus"
 	"os"
 	"strings"
 	"testing"
@@ -24,18 +24,23 @@ func TestCpuOutput09(t *testing.T) {
 
 	log := bufio.NewReader(logFile)
 
-	if !memory.CartLoad("../../roms/cpu_instrs/individual/", "09-op r,r.gb") {
+	bus := bus2.New()
+	cpu := New(bus, false)
+
+	if !bus.LoadCart("../../roms/cpu_instrs/individual/", "09-op r,r.gb") {
 		t.Fatalf("error loading rom")
 	}
-	cpu := NewCPU(false)
 
 	nrOfLines := 243272
 	i := 1
 	for {
-		output := fmt.Sprintf("A: %02X F: %02X B: %02X C: %02X D: %02X E: %02X H: %02X L: %02X SP: %04X PC: 00:%04X (%02X %02X %02X %02X)\n",
-			cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
-			memory.BusRead(cpu.pc), memory.BusRead(cpu.pc+1), memory.BusRead(cpu.pc+2), memory.BusRead(cpu.pc+3),
-		)
+		/*
+			output := fmt.Sprintf("A: %02X F: %02X B: %02X C: %02X D: %02X E: %02X H: %02X L: %02X SP: %04X PC: 00:%04X (%02X %02X %02X %02X)\n",
+				cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
+				bus.BusRead(cpu.pc), bus.BusRead(cpu.pc+1), bus.BusRead(cpu.pc+2), bus.BusRead(cpu.pc+3),
+			)
+		*/
+		output := cpu.GetOutput()
 		cpu.Step()
 
 		logLine, _, err := log.ReadLine()

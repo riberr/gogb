@@ -1,4 +1,4 @@
-package memory
+package bus
 
 import (
 	"fmt"
@@ -160,9 +160,7 @@ func newHeader(data []uint8) header {
 	}
 }
 
-var cart = Cart{}
-
-func CartLoad(romPath string, romName string) bool {
+func (cart *Cart) Load(romPath string, romName string) bool {
 	// Read the file into a byte array
 	rom, err := os.ReadFile(romPath + romName)
 	if err != nil {
@@ -200,10 +198,10 @@ func CartLoad(romPath string, romName string) bool {
 	return true
 }
 
-func cartRead(address uint16) uint8 {
+func (cart *Cart) read(address uint16) uint8 {
 	return cart.data[address]
 }
 
-func cartWrite(address uint16, value uint8) {
-	//todo
+func (cart *Cart) write(address uint16, value uint8) {
+	panic("CARTWRITE NO IMPL")
 }

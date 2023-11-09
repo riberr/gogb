@@ -20,9 +20,9 @@ import (
 
 func TestCpuOutputBlargg01(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"01-special.gb",
-		"../../Gameboy-logs-master/Blargg1LYStubbed/EpicLog.txt",
+		"../../third_party/Gameboy-logs/Blargg1LYStubbed/EpicLog.txt",
 		true,
 		t,
 	)
@@ -30,9 +30,9 @@ func TestCpuOutputBlargg01(t *testing.T) {
 
 func TestCpuOutputBlargg02(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
-		"../../Gameboy-logs-master/Blargg2LYStubbed/EpicLog.txt",
+		"../../third_party/Gameboy-logs/Blargg2LYStubbed/EpicLog.txt",
 		false,
 		t,
 	)
@@ -40,9 +40,9 @@ func TestCpuOutputBlargg02(t *testing.T) {
 
 func TestCpuOutputBlargg03(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
-		"../../Gameboy-logs-master/Blargg3LYStubbed/EpicLog.txt",
+		"../../third_party/Gameboy-logs/Blargg3LYStubbed/EpicLog.txt",
 		true,
 		t,
 	)
@@ -50,9 +50,9 @@ func TestCpuOutputBlargg03(t *testing.T) {
 
 func TestCpuOutputBlargg04(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"04-op r,imm.gb",
-		"../../Gameboy-logs-master/Blargg4LYStubbed/Blargg4.txt",
+		"../../third_party/Gameboy-logs/Blargg4LYStubbed/Blargg4.txt",
 		true,
 		t,
 	)
@@ -60,9 +60,9 @@ func TestCpuOutputBlargg04(t *testing.T) {
 
 func TestCpuOutputBlargg05(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"05-op rp.gb",
-		"../../Gameboy-logs-master/Blargg5LYStubbed/Blargg5.txt",
+		"../../third_party/Gameboy-logs/Blargg5LYStubbed/Blargg5.txt",
 		true,
 		t,
 	)
@@ -70,9 +70,9 @@ func TestCpuOutputBlargg05(t *testing.T) {
 
 func TestCpuOutputBlargg06(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"06-ld r,r.gb",
-		"../../Gameboy-logs-master/Blargg6LYStubbed/EpicLog.txt",
+		"../../third_party/Gameboy-logs/Blargg6LYStubbed/EpicLog.txt",
 		false,
 		t,
 	)
@@ -80,9 +80,9 @@ func TestCpuOutputBlargg06(t *testing.T) {
 
 func TestCpuOutputBlargg07(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"07-jr,jp,call,ret,rst.gb",
-		"../../Gameboy-logs-master/Blargg7LYStubbed/Blargg7.txt",
+		"../../third_party/Gameboy-logs/Blargg7LYStubbed/Blargg7.txt",
 		true,
 		t,
 	)
@@ -90,9 +90,9 @@ func TestCpuOutputBlargg07(t *testing.T) {
 
 func TestCpuOutputBlargg08(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"08-misc instrs.gb",
-		"../../Gameboy-logs-master/Blargg8LYStubbed/EpicLog.txt",
+		"../../third_party/Gameboy-logs/Blargg8LYStubbed/EpicLog.txt",
 		true,
 		t,
 	)
@@ -100,9 +100,9 @@ func TestCpuOutputBlargg08(t *testing.T) {
 
 func TestCpuOutputBlargg09(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"09-op r,r.gb",
-		"../../Gameboy-logs-master/Blargg9LYStubbed/Blargg9.txt",
+		"../../third_party/Gameboy-logs/Blargg9LYStubbed/Blargg9.txt",
 		true,
 		t,
 	)
@@ -110,9 +110,9 @@ func TestCpuOutputBlargg09(t *testing.T) {
 
 func TestCpuOutputBlargg10(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"10-bit ops.gb",
-		"../../Gameboy-logs-master/Blargg10LYStubbed1/Blargg10LYStubbed/Blargg10.txt",
+		"../../third_party/Gameboy-logs/Blargg10LYStubbed1/Blargg10LYStubbed/Blargg10.txt",
 		true,
 		t,
 	)
@@ -120,9 +120,9 @@ func TestCpuOutputBlargg10(t *testing.T) {
 
 func TestCpuOutputBlargg11(t *testing.T) {
 	testRom(
-		"../../roms/cpu_instrs/individual/",
+		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"11-op a,(hl).gb",
-		"../../Gameboy-logs-master/Blargg11LYStubbed1/Blargg11LYStubbed/Blargg11.txt",
+		"../../third_party/Gameboy-logs/Blargg11LYStubbed1/Blargg11LYStubbed/Blargg11.txt",
 		true,
 		t,
 	)
@@ -161,12 +161,6 @@ func testRom(
 	// RUN TEST
 	i := 1
 	for {
-		/*
-			output := fmt.Sprintf("A: %02X F: %02X B: %02X C: %02X D: %02X E: %02X H: %02X L: %02X SP: %04X PC: 00:%04X (%02X %02X %02X %02X)\n",
-				cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
-				bus.BusRead(cpu.pc), bus.BusRead(cpu.pc+1), bus.BusRead(cpu.pc+2), bus.BusRead(cpu.pc+3),
-			)
-		*/
 		var output string
 		if outputBeforeStep {
 			output = cpu.GetOutput()

@@ -14,8 +14,8 @@ func Run(debug bool) {
 	bus := busPackage.New(sl)
 	cpu := cpuPackage.New(bus, debug)
 
-	romPath := "roms/cpu_instrs/individual/"
-	romName := "06-ld r,r.gb"
+	romPath := "third_party/gb-test-roms/instr_timing/"
+	romName := "instr_timing.gb"
 
 	//bus2.CartLoad(romPath, romName)
 	bus.LoadCart(romPath, romName)

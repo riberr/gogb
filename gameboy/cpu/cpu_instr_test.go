@@ -25,6 +25,7 @@ func TestCpuOutputBlargg01(t *testing.T) {
 		"01-special.gb",
 		"../../third_party/Gameboy-logs/Blargg1LYStubbed/EpicLog.txt",
 		true,
+		false,
 		t,
 	)
 }
@@ -34,6 +35,7 @@ func TestCpuOutputBlargg02(t *testing.T) {
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
 		"../../third_party/Gameboy-logs/Blargg2LYStubbed/EpicLog.txt",
+		false,
 		false,
 		t,
 	)
@@ -45,6 +47,7 @@ func TestCpuOutputBlargg03(t *testing.T) {
 		"03-op sp,hl.gb",
 		"../../third_party/Gameboy-logs/Blargg3LYStubbed/EpicLog.txt",
 		true,
+		false,
 		t,
 	)
 }
@@ -55,6 +58,7 @@ func TestCpuOutputBlargg04(t *testing.T) {
 		"04-op r,imm.gb",
 		"../../third_party/Gameboy-logs/Blargg4LYStubbed/Blargg4.txt",
 		true,
+		false,
 		t,
 	)
 }
@@ -65,6 +69,7 @@ func TestCpuOutputBlargg05(t *testing.T) {
 		"05-op rp.gb",
 		"../../third_party/Gameboy-logs/Blargg5LYStubbed/Blargg5.txt",
 		true,
+		false,
 		t,
 	)
 }
@@ -74,6 +79,7 @@ func TestCpuOutputBlargg06(t *testing.T) {
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"06-ld r,r.gb",
 		"../../third_party/Gameboy-logs/Blargg6LYStubbed/EpicLog.txt",
+		false,
 		false,
 		t,
 	)
@@ -85,6 +91,7 @@ func TestCpuOutputBlargg07(t *testing.T) {
 		"07-jr,jp,call,ret,rst.gb",
 		"../../third_party/Gameboy-logs/Blargg7LYStubbed/Blargg7.txt",
 		true,
+		false,
 		t,
 	)
 }
@@ -95,6 +102,7 @@ func TestCpuOutputBlargg08(t *testing.T) {
 		"08-misc instrs.gb",
 		"../../third_party/Gameboy-logs/Blargg8LYStubbed/EpicLog.txt",
 		true,
+		false,
 		t,
 	)
 }
@@ -105,6 +113,7 @@ func TestCpuOutputBlargg09(t *testing.T) {
 		"09-op r,r.gb",
 		"../../third_party/Gameboy-logs/Blargg9LYStubbed/Blargg9.txt",
 		true,
+		false,
 		t,
 	)
 }
@@ -115,6 +124,7 @@ func TestCpuOutputBlargg10(t *testing.T) {
 		"10-bit ops.gb",
 		"../../third_party/Gameboy-logs/Blargg10LYStubbed1/Blargg10LYStubbed/Blargg10.txt",
 		true,
+		false,
 		t,
 	)
 }
@@ -125,6 +135,7 @@ func TestCpuOutputBlargg11(t *testing.T) {
 		"11-op a,(hl).gb",
 		"../../third_party/Gameboy-logs/Blargg11LYStubbed1/Blargg11LYStubbed/Blargg11.txt",
 		true,
+		false,
 		t,
 	)
 }
@@ -134,6 +145,7 @@ func testRom(
 	romName string,
 	logPath string,
 	outputBeforeStep bool,
+	debug bool,
 	t *testing.T,
 ) {
 	// SETUP
@@ -148,7 +160,7 @@ func testRom(
 	timer := timer2.New()
 	sl := seriallink.New()
 	bus := bus2.New(timer, sl)
-	cpu := New(bus, false)
+	cpu := New(bus, debug)
 
 	if !bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")
@@ -190,6 +202,14 @@ func testRom(
 			t.Fatalf("%v/%v: not equal!\ngot: \n%vwant: \n%v", i, nrOfLines, output, string(logLine))
 		}
 		i++
+
+		/*
+			// print serial output
+			res := sl.GetLog()
+			if res != "" {
+				println(strings.Trim(res, "\n"))
+			}
+		*/
 	}
 
 	// ASSERT

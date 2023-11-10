@@ -6,6 +6,7 @@ import (
 	"fmt"
 	bus2 "gogb/gameboy/bus"
 	"gogb/gameboy/seriallink"
+	timer2 "gogb/gameboy/timer"
 	"io"
 	"os"
 	"strings"
@@ -144,8 +145,9 @@ func testRom(
 
 	log := bufio.NewReader(logFile)
 
+	timer := timer2.New()
 	sl := seriallink.New()
-	bus := bus2.New(sl)
+	bus := bus2.New(timer, sl)
 	cpu := New(bus, false)
 
 	if !bus.LoadCart(romPath, romName) {
@@ -163,13 +165,13 @@ func testRom(
 	for {
 		var output string
 		if outputBeforeStep {
-			output = cpu.GetOutput()
+			output = cpu.GetInternalState()
 		}
 
 		cpu.Step()
 
 		if !outputBeforeStep {
-			output = cpu.GetOutput()
+			output = cpu.GetInternalState()
 		}
 
 		logLine, _, err := log.ReadLine()

@@ -3,6 +3,7 @@ package cpu
 import (
 	bus2 "gogb/gameboy/bus"
 	"gogb/gameboy/seriallink"
+	timer2 "gogb/gameboy/timer"
 	"strings"
 	"testing"
 )
@@ -15,15 +16,24 @@ func TestTiming(t *testing.T) {
 	)
 }
 
+func TestTimingMooneye(t *testing.T) {
+	testTimingWithRom(
+		"../../third_party/mooneye/acceptance/timer/",
+		"tim00.gb",
+		t,
+	)
+}
+
 func testTimingWithRom(
 	romPath string,
 	romName string,
 	t *testing.T,
 ) {
 	// SETUP
+	timer := timer2.New()
 	sl := seriallink.New()
-	bus := bus2.New(sl)
-	cpu := New(bus, false)
+	bus := bus2.New(timer, sl)
+	cpu := New(bus, true)
 
 	if !bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")
@@ -32,11 +42,14 @@ func testTimingWithRom(
 	// RUN TEST
 	i := 1
 	for {
+		timer.Tick()
 		cpu.Step()
 		i++
 
 		res := sl.GetLog()
-		println(strings.Trim(res, "\n"))
+		if res != "" {
+			println(strings.Trim(res, "\n"))
+		}
 	}
 
 	// ASSERT

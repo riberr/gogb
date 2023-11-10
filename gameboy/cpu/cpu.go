@@ -73,8 +73,8 @@ func (cpu *CPU) Step() {
 	}
 }
 
-// GetOutput returns a string representing the internal state of the cpu
-func (cpu *CPU) GetOutput() string {
+// GetInternalState returns a string representing the internal state of the cpu
+func (cpu *CPU) GetInternalState() string {
 	return fmt.Sprintf("A: %02X F: %02X B: %02X C: %02X D: %02X E: %02X H: %02X L: %02X SP: %04X PC: 00:%04X (%02X %02X %02X %02X)\n",
 		cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
 		cpu.bus.BusRead(cpu.pc), cpu.bus.BusRead(cpu.pc+1), cpu.bus.BusRead(cpu.pc+2), cpu.bus.BusRead(cpu.pc+3),

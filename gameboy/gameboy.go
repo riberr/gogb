@@ -4,14 +4,16 @@ import (
 	busPackage "gogb/gameboy/bus"
 	cpuPackage "gogb/gameboy/cpu"
 	"gogb/gameboy/seriallink"
+	timer2 "gogb/gameboy/timer"
 	"time"
 )
 
 func Run(debug bool) {
 
 	// dependency injection
+	timer := timer2.New()
 	sl := seriallink.New()
-	bus := busPackage.New(sl)
+	bus := busPackage.New(timer, sl)
 	cpu := cpuPackage.New(bus, debug)
 
 	romPath := "third_party/gb-test-roms/instr_timing/"
@@ -22,6 +24,7 @@ func Run(debug bool) {
 	//fmt.Printf("%02x ", rom)
 
 	for {
+		timer.Tick()
 		cpu.Step()
 		time.Sleep(time.Millisecond * 100)
 	}

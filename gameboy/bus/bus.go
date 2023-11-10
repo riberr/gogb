@@ -2,6 +2,7 @@ package bus
 
 import (
 	"gogb/gameboy/seriallink"
+	"gogb/gameboy/timer"
 	"log"
 )
 
@@ -22,23 +23,27 @@ import (
 // 0xFF80 - 0xFFFE : Zero Page
 
 type Bus struct {
-	cart *Cart
-	sl   *seriallink.SerialLink
+	cart  *Cart
+	timer *timer.Timer
+	sl    *seriallink.SerialLink
 }
 
 var vram = NewMemory(0x8000, 0x9FFF) // Video RAM
+var eram = NewMemory(0xA000, 0xBFFF) // External RAM
 var wramC = NewMemory(0xC000, 0xCFFF)
 var wramD = NewMemory(0xD000, 0xDFFF)
+var echoRam = NewMemory(0xE000, 0xFDFF)
 var oam = NewMemory(0xFE00, 0xFE9F) // Object attribute bus
 var notUsable = NewMemory(0xFEA0, 0xFEFF)
 var ioRegs = NewMemory(0xFF00, 0xFF7F) // I/O Registers
 var hram = NewMemory(0xFF80, 0xFFFE)
 var ieReg uint8 = 0 //Interrupt Enable register
 
-func New(sl *seriallink.SerialLink) *Bus {
+func New(timer *timer.Timer, sl *seriallink.SerialLink) *Bus {
 	return &Bus{
-		cart: &Cart{},
-		sl:   sl,
+		cart:  &Cart{},
+		timer: timer,
+		sl:    sl,
 	}
 }
 
@@ -61,12 +66,20 @@ func (b *Bus) BusRead(address uint16) uint8 {
 		return vram.read(address)
 	}
 
+	if eram.has(address) {
+		return eram.read(address)
+	}
+
 	if wramC.has(address) {
 		return wramC.read(address)
 	}
 
 	if wramD.has(address) {
 		return wramD.read(address)
+	}
+
+	if echoRam.has(address) {
+		return echoRam.read(address)
 	}
 
 	if oam.has(address) {
@@ -86,6 +99,8 @@ func (b *Bus) BusRead(address uint16) uint8 {
 		return b.sl.GetSB()
 	case 0xFF02:
 		return b.sl.GetSC()
+	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
+		return b.timer.Read(address)
 	case 0xFFFF:
 		return ieReg
 	default:
@@ -111,6 +126,11 @@ func (b *Bus) BusWrite(address uint16, value uint8) {
 		return
 	}
 
+	if eram.has(address) {
+		eram.write(address, value)
+		return
+	}
+
 	if wramC.has(address) {
 		wramC.write(address, value)
 		return
@@ -118,6 +138,11 @@ func (b *Bus) BusWrite(address uint16, value uint8) {
 
 	if wramD.has(address) {
 		wramD.write(address, value)
+		return
+	}
+
+	if echoRam.has(address) {
+		echoRam.write(address, value)
 		return
 	}
 
@@ -142,6 +167,9 @@ func (b *Bus) BusWrite(address uint16, value uint8) {
 		return
 	case 0xFF02:
 		b.sl.SetSC(value)
+		return
+	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
+		b.timer.Write(address, value)
 		return
 	case 0xFFFF:
 		ieReg = value

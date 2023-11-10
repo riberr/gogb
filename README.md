@@ -26,6 +26,4 @@ https://github.com/wheremyfoodat/Gameboy-logs/tree/master   test rom logs
 
 https://bgb.bircd.org/  debugger
 
-TODO
-getting stuck on 0xFF44. Have to implement some basic PPU timing
-https://www.reddit.com/r/EmuDev/comments/rjh1ls/gameboy_emulator_stuck_in_loop/
+https://github.com/raddad772/jsmoo/blob/main/system/gb/gb.js

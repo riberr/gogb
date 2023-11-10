@@ -3,6 +3,7 @@ package cpu
 import (
 	bus2 "gogb/gameboy/bus"
 	"gogb/gameboy/seriallink"
+	timer2 "gogb/gameboy/timer"
 	"testing"
 )
 
@@ -17,8 +18,9 @@ func TestSBC(t *testing.T) {
 	*/
 
 	// setup
+	timer := timer2.New()
 	sl := seriallink.New()
-	bus := bus2.New(sl)
+	bus := bus2.New(timer, sl)
 	cpu := New(bus, false)
 
 	// preconditions

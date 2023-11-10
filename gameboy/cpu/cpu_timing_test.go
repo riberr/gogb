@@ -2,6 +2,7 @@ package cpu
 
 import (
 	bus2 "gogb/gameboy/bus"
+	interrupts2 "gogb/gameboy/interrupts"
 	"gogb/gameboy/seriallink"
 	timer2 "gogb/gameboy/timer"
 	"strings"
@@ -30,10 +31,11 @@ func testTimingWithRom(
 	t *testing.T,
 ) {
 	// SETUP
-	timer := timer2.New()
+	interrupts := interrupts2.New()
+	timer := timer2.New(interrupts)
 	sl := seriallink.New()
 	bus := bus2.New(timer, sl)
-	cpu := New(bus, true)
+	cpu := New(bus, interrupts, true)
 
 	if !bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")

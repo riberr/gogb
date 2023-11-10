@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	bus2 "gogb/gameboy/bus"
+	interrupts2 "gogb/gameboy/interrupts"
 	"gogb/gameboy/seriallink"
 	timer2 "gogb/gameboy/timer"
 	"io"
@@ -157,10 +158,11 @@ func testRom(
 
 	log := bufio.NewReader(logFile)
 
-	timer := timer2.New()
+	interrupts := interrupts2.New()
+	timer := timer2.New(interrupts)
 	sl := seriallink.New()
 	bus := bus2.New(timer, sl)
-	cpu := New(bus, debug)
+	cpu := New(bus, interrupts, debug)
 
 	if !bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")

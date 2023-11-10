@@ -3,11 +3,14 @@ package cpu
 import (
 	"fmt"
 	"gogb/gameboy/bus"
+	"gogb/gameboy/interrupts"
+	"gogb/utils"
 )
 
 type CPU struct {
-	bus   bus.Bus // di
-	debug bool    // debug print
+	bus        bus.Bus // di
+	interrupts interrupts.Interrupts
+	debug      bool // debug print
 
 	regs      Registers
 	curOpCode OpCode
@@ -16,13 +19,14 @@ type CPU struct {
 	cb        bool   // cb prefix
 }
 
-func New(bus *bus.Bus, debug bool) *CPU {
+func New(bus *bus.Bus, interrupts *interrupts.Interrupts, debug bool) *CPU {
 	cpu := CPU{
-		bus:   *bus,
-		regs:  NewRegisters(),
-		sp:    0xFFFE, //sp:   0x01,
-		pc:    0x100,
-		debug: debug,
+		bus:        *bus,
+		interrupts: *interrupts,
+		regs:       NewRegisters(),
+		sp:         0xFFFE, //sp:   0x01,
+		pc:         0x100,
+		debug:      debug,
 	}
 	return &cpu
 }
@@ -59,6 +63,39 @@ func (cpu *CPU) Step() {
 		for _, step := range cpu.curOpCode.steps {
 			step(cpu)
 		}
+	}
+
+	// interrupts
+	if cpu.interrupts.IsIME() {
+
+		flag := cpu.interrupts.GetEnabledFlaggedInterrupt()
+		if flag == -1 {
+
+		} else {
+			cpu.interrupts.DisableIME()
+			cpu.interrupts.ClearIF(flag)
+			cpu.sp--
+			cpu.bus.BusWrite(cpu.sp, utils.Msb(cpu.pc))
+			cpu.sp--
+			cpu.bus.BusWrite(cpu.sp, utils.Lsb(cpu.pc))
+			cpu.pc = interrupts.ISR_address[flag]
+		}
+		/*
+			switch {
+			case cpu.interrupts.IsIE(interrupts.VBLANK) && cpu.interrupts.IsIF(interrupts.VBLANK):
+			case cpu.interrupts.IsIE(interrupts.LCD) && cpu.interrupts.IsIF(interrupts.LCD):
+			case cpu.interrupts.IsIE(interrupts.TIMER) && cpu.interrupts.IsIF(interrupts.TIMER):
+				cpu.interrupts.DisableIME()
+				cpu.interrupts.ClearIF(interrupts.TIMER)
+				cpu.sp--
+				cpu.bus.BusWrite(cpu.sp, utils.Msb(cpu.pc))
+				cpu.sp--
+				cpu.bus.BusWrite(cpu.sp, utils.Lsb(cpu.pc))
+				cpu.pc = interrupts.ISR_address[interrupts.TIMER]
+			case cpu.interrupts.IsIE(interrupts.SERIAL_LINK) && cpu.interrupts.IsIF(interrupts.SERIAL_LINK):
+			case cpu.interrupts.IsIE(interrupts.JOYPAD) && cpu.interrupts.IsIF(interrupts.JOYPAD):
+			}
+		*/
 	}
 
 	pc := cpu.pc

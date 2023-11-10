@@ -3,6 +3,7 @@ package gameboy
 import (
 	busPackage "gogb/gameboy/bus"
 	cpuPackage "gogb/gameboy/cpu"
+	interrupts2 "gogb/gameboy/interrupts"
 	"gogb/gameboy/seriallink"
 	timer2 "gogb/gameboy/timer"
 	"time"
@@ -11,10 +12,11 @@ import (
 func Run(debug bool) {
 
 	// dependency injection
-	timer := timer2.New()
+	interrupts := interrupts2.New()
+	timer := timer2.New(interrupts)
 	sl := seriallink.New()
 	bus := busPackage.New(timer, sl)
-	cpu := cpuPackage.New(bus, debug)
+	cpu := cpuPackage.New(bus, interrupts, debug)
 
 	romPath := "third_party/gb-test-roms/instr_timing/"
 	romName := "instr_timing.gb"

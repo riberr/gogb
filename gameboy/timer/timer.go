@@ -1,7 +1,11 @@
 package timer
 
+import "gogb/gameboy/interrupts"
+
 // Timer is kinda ported from https://github.com/raddad772/jsmoo/blob/main/system/gb/gb_cpu.js
 type Timer struct {
+	interrupts interrupts.Interrupts
+
 	sysclk uint16
 	tima   uint8
 	tma    uint8
@@ -13,8 +17,10 @@ type Timer struct {
 	tmaReloadCycle   bool
 }
 
-func New() *Timer {
-	return &Timer{}
+func New(interrupts *interrupts.Interrupts) *Timer {
+	return &Timer{
+		interrupts: *interrupts,
+	}
 }
 
 func (t *Timer) Tick() {
@@ -24,7 +30,7 @@ func (t *Timer) Tick() {
 	if t.cyclesTilTimaIrq > 0 {
 		t.cyclesTilTimaIrq--
 		if t.cyclesTilTimaIrq == 0 {
-			//t.raiseIrq()
+			t.interrupts.SetIF(interrupts.TIMER)
 			t.tima = t.tma
 			t.timaReloadCycle = true
 		}

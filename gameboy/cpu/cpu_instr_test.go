@@ -287,7 +287,7 @@ func TestCpuOutput09(t *testing.T) {
 
 			//output := fmt.Sprintf("A: %02X F: %02X B: %02X C: %02X D: %02X E: %02X H: %02X L: %02X SP: %04X PC: 00:%04X (%02X %02X %02X %02X)\n",
 			//	cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
-		//	bus.BusRead(cpu.pc), bus.BusRead(cpu.pc+1), bus.BusRead(cpu.pc+2), bus.BusRead(cpu.pc+3),
+		//	bus.Read(cpu.pc), bus.Read(cpu.pc+1), bus.Read(cpu.pc+2), bus.Read(cpu.pc+3),
 		//	)
 
 output := cpu.GetLog()

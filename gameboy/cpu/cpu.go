@@ -40,17 +40,17 @@ func (cpu *CPU) Step() {
 			cpu.interrupts.DisableIME()
 			cpu.interrupts.ClearIF(flag)
 			cpu.sp--
-			cpu.bus.BusWrite(cpu.sp, utils.Msb(cpu.pc))
+			cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc))
 			cpu.sp--
-			cpu.bus.BusWrite(cpu.sp, utils.Lsb(cpu.pc))
+			cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc))
 			cpu.pc = interrupts.ISR_address[flag]
 		}
 	}
-	cpu.curOpCode = OpCodes[cpu.bus.BusRead(cpu.pc)]
+	cpu.curOpCode = OpCodes[cpu.bus.Read(cpu.pc)]
 
 	/*
 		fmt.Printf("%04X: (%02X %02X %02X) AF: %02X%02X BC: %02X%02X DE: %02X%02X HL: %02X%02X SP: %02X op-length: %v op: %v\n",
-			pc, bus.BusRead(pc), bus.BusRead(pc+1), bus.BusRead(pc+2),
+			pc, bus.Read(pc), bus.Read(pc+1), bus.Read(pc+2),
 			cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.curOpCode.length, cpu.curOpCode.label)
 	*/
 
@@ -59,7 +59,7 @@ func (cpu *CPU) Step() {
 	if cpu.debug {
 		fmt.Printf("A: %02X F: %02X B: %02X C: %02X D: %02X E: %02X H: %02X L: %02X SP: %04X PC: 00:%04X (%02X %02X %02X %02X) [Z: %t, N: %t, H: %t, C: %t] %v\n",
 			cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, pc,
-			cpu.bus.BusRead(pc), cpu.bus.BusRead(pc+1), cpu.bus.BusRead(pc+2), cpu.bus.BusRead(pc+3),
+			cpu.bus.Read(pc), cpu.bus.Read(pc+1), cpu.bus.Read(pc+2), cpu.bus.Read(pc+3),
 			cpu.regs.getFlag(FLAG_ZERO_Z_BIT), cpu.regs.getFlag(FLAG_SUBTRACTION_N_BIT), cpu.regs.getFlag(FLAG_HALF_CARRY_H_BIT), cpu.regs.getFlag(FLAG_CARRY_C_BIT),
 			cpu.curOpCode.label,
 		)
@@ -79,7 +79,7 @@ func (cpu *CPU) Step() {
 
 	// if prefix CB
 	if cpu.cb {
-		cpu.curOpCode = OpCodesCB[cpu.bus.BusRead(cpu.pc)]
+		cpu.curOpCode = OpCodesCB[cpu.bus.Read(cpu.pc)]
 		cpu.cb = false
 		cpu.pc++
 		for _, step := range cpu.curOpCode.steps {
@@ -92,6 +92,6 @@ func (cpu *CPU) Step() {
 func (cpu *CPU) GetInternalState() string {
 	return fmt.Sprintf("A:%02X F:%02X B:%02X C:%02X D:%02X E:%02X H:%02X L:%02X SP:%04X PC:%04X PCMEM:%02X,%02X,%02X,%02X\n",
 		cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
-		cpu.bus.BusRead(cpu.pc), cpu.bus.BusRead(cpu.pc+1), cpu.bus.BusRead(cpu.pc+2), cpu.bus.BusRead(cpu.pc+3),
+		cpu.bus.Read(cpu.pc), cpu.bus.Read(cpu.pc+1), cpu.bus.Read(cpu.pc+2), cpu.bus.Read(cpu.pc+3),
 	)
 }

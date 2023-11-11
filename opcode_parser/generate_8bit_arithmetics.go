@@ -73,10 +73,10 @@ func generate8bitArithmetics(opCodes *OpCodes) {
 	for _, opCode := range add {
 		switch {
 		case opCode.Name == "ADD A,(HL)":
-			instr := fmt.Sprintf("add(cpu, bus.BusRead(cpu.regs.getHL()))")
+			instr := fmt.Sprintf("add(cpu, bus.Read(cpu.regs.getHL()))")
 			writeCodeWithInstruction(opCode, output, instr)
 		case opCode.Name == "ADD A,u8":
-			instr := fmt.Sprintf("add(cpu, bus.BusRead(cpu.pc)); cpu.pc++")
+			instr := fmt.Sprintf("add(cpu, bus.Read(cpu.pc)); cpu.pc++")
 			writeCodeWithInstruction(opCode, output, instr)
 		default:
 			from := strings.ToLower(string(opCode.Name[6]))
@@ -90,10 +90,10 @@ func generate8bitArithmetics(opCodes *OpCodes) {
 	for _, opCode := range adc {
 		switch {
 		case opCode.Name == "ADC A,(HL)":
-			instr := fmt.Sprintf("adc(cpu, bus.BusRead(cpu.regs.getHL()))")
+			instr := fmt.Sprintf("adc(cpu, bus.Read(cpu.regs.getHL()))")
 			writeCodeWithInstruction(opCode, output, instr)
 		case opCode.Name == "ADC A,u8":
-			instr := fmt.Sprintf("adc(cpu, bus.BusRead(cpu.pc)); cpu.pc++")
+			instr := fmt.Sprintf("adc(cpu, bus.Read(cpu.pc)); cpu.pc++")
 			writeCodeWithInstruction(opCode, output, instr)
 		default:
 			from := strings.ToLower(string(opCode.Name[6]))
@@ -107,10 +107,10 @@ func generate8bitArithmetics(opCodes *OpCodes) {
 	for _, opCode := range sub {
 		switch {
 		case opCode.Name == "SUB A,(HL)":
-			instr := fmt.Sprintf("sub(cpu, bus.BusRead(cpu.regs.getHL()))")
+			instr := fmt.Sprintf("sub(cpu, bus.Read(cpu.regs.getHL()))")
 			writeCodeWithInstruction(opCode, output, instr)
 		case opCode.Name == "SUB A,u8":
-			instr := fmt.Sprintf("sub(cpu, bus.BusRead(cpu.pc)); cpu.pc++")
+			instr := fmt.Sprintf("sub(cpu, bus.Read(cpu.pc)); cpu.pc++")
 			writeCodeWithInstruction(opCode, output, instr)
 		default:
 			from := strings.ToLower(string(opCode.Name[6]))
@@ -124,10 +124,10 @@ func generate8bitArithmetics(opCodes *OpCodes) {
 	for _, opCode := range sbc {
 		switch {
 		case opCode.Name == "SBC A,(HL)":
-			instr := fmt.Sprintf("sbc(cpu, bus.BusRead(cpu.regs.getHL()))")
+			instr := fmt.Sprintf("sbc(cpu, bus.Read(cpu.regs.getHL()))")
 			writeCodeWithInstruction(opCode, output, instr)
 		case opCode.Name == "SBC A,u8":
-			instr := fmt.Sprintf("sbc(cpu, bus.BusRead(cpu.pc)); cpu.pc++")
+			instr := fmt.Sprintf("sbc(cpu, bus.Read(cpu.pc)); cpu.pc++")
 			writeCodeWithInstruction(opCode, output, instr)
 		default:
 			from := strings.ToLower(string(opCode.Name[6]))
@@ -141,10 +141,10 @@ func generate8bitArithmetics(opCodes *OpCodes) {
 	for _, opCode := range cp {
 		switch {
 		case opCode.Name == "CP A,(HL)":
-			instr := fmt.Sprintf("cp(cpu, bus.BusRead(cpu.regs.getHL()))")
+			instr := fmt.Sprintf("cp(cpu, bus.Read(cpu.regs.getHL()))")
 			writeCodeWithInstruction(opCode, output, instr)
 		case opCode.Name == "CP A,u8":
-			instr := fmt.Sprintf("cp(cpu, bus.BusRead(cpu.pc)); cpu.pc++")
+			instr := fmt.Sprintf("cp(cpu, bus.Read(cpu.pc)); cpu.pc++")
 			writeCodeWithInstruction(opCode, output, instr)
 		default:
 			from := strings.ToLower(string(opCode.Name[5]))
@@ -184,10 +184,10 @@ func generate8bitArithmetics(opCodes *OpCodes) {
 	for _, opCode := range and {
 		switch {
 		case opCode.Name == "AND A,(HL)":
-			instr := fmt.Sprintf("and(cpu, bus.BusRead(cpu.regs.getHL()))")
+			instr := fmt.Sprintf("and(cpu, bus.Read(cpu.regs.getHL()))")
 			writeCodeWithInstruction(opCode, output, instr)
 		case opCode.Name == "AND A,u8":
-			instr := fmt.Sprintf("and(cpu, bus.BusRead(cpu.pc)); cpu.pc++")
+			instr := fmt.Sprintf("and(cpu, bus.Read(cpu.pc)); cpu.pc++")
 			writeCodeWithInstruction(opCode, output, instr)
 		default:
 			from := strings.ToLower(string(opCode.Name[6]))
@@ -201,10 +201,10 @@ func generate8bitArithmetics(opCodes *OpCodes) {
 	for _, opCode := range or {
 		switch {
 		case opCode.Name == "OR A,(HL)":
-			instr := fmt.Sprintf("or(cpu, bus.BusRead(cpu.regs.getHL()))")
+			instr := fmt.Sprintf("or(cpu, bus.Read(cpu.regs.getHL()))")
 			writeCodeWithInstruction(opCode, output, instr)
 		case opCode.Name == "OR A,u8":
-			instr := fmt.Sprintf("or(cpu, bus.BusRead(cpu.pc)); cpu.pc++")
+			instr := fmt.Sprintf("or(cpu, bus.Read(cpu.pc)); cpu.pc++")
 			writeCodeWithInstruction(opCode, output, instr)
 		default:
 			from := strings.ToLower(string(opCode.Name[5]))
@@ -218,10 +218,10 @@ func generate8bitArithmetics(opCodes *OpCodes) {
 	for _, opCode := range xor {
 		switch {
 		case opCode.Name == "XOR A,(HL)":
-			instr := fmt.Sprintf("xor(cpu, bus.BusRead(cpu.regs.getHL()))")
+			instr := fmt.Sprintf("xor(cpu, bus.Read(cpu.regs.getHL()))")
 			writeCodeWithInstruction(opCode, output, instr)
 		case opCode.Name == "XOR A,u8":
-			instr := fmt.Sprintf("xor(cpu, bus.BusRead(cpu.pc)); cpu.pc++")
+			instr := fmt.Sprintf("xor(cpu, bus.Read(cpu.pc)); cpu.pc++")
 			writeCodeWithInstruction(opCode, output, instr)
 		default:
 			from := strings.ToLower(string(opCode.Name[6]))

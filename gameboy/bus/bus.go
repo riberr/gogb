@@ -55,7 +55,7 @@ func (b *Bus) LoadCart(romPath string, romName string) bool {
 	return b.cart.Load(romPath, romName)
 }
 
-func (b *Bus) BusRead(address uint16) uint8 {
+func (b *Bus) Read(address uint16) uint8 {
 	if address < 0x8000 {
 		//ROM Data
 		return b.cart.read(address)
@@ -119,7 +119,7 @@ func (b *Bus) BusRead(address uint16) uint8 {
 	return 0
 }
 
-func (b *Bus) BusWrite(address uint16, value uint8) {
+func (b *Bus) Write(address uint16, value uint8) {
 	if address < 0x8000 {
 		//ROM Data
 		b.cart.write(address, value)

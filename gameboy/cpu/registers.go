@@ -24,6 +24,7 @@ const (
 
 func NewRegisters() Registers {
 	return Registers{
+		// values post boot rom
 		a: 0x01,
 		b: 0,
 		c: 0x13,

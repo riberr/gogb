@@ -24,8 +24,8 @@ func New(bus *bus.Bus, interrupts *interrupts.Interrupts, debug bool) *CPU {
 		bus:        bus,
 		interrupts: interrupts,
 		regs:       NewRegisters(),
-		sp:         0xFFFE, //sp:   0x01,
-		pc:         0x100,
+		sp:         0xFFFE, // post boot rom
+		pc:         0x100,  // post boot rom
 		debug:      debug,
 	}
 }

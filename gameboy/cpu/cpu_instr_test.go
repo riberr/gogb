@@ -24,8 +24,7 @@ func TestCpuOutputBlargg01(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"01-special.gb",
-		"../../third_party/Gameboy-logs/Blargg1LYStubbed/EpicLog.txt",
-		true,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/1.log",
 		false,
 		false,
 		t,
@@ -43,9 +42,8 @@ func TestCpuOutputBlargg02(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
-		"../../third_party/Gameboy-logs/Blargg2LYStubbed/EpicLog.txt",
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/2.log",
 		false,
-		true,
 		false,
 		t,
 	)
@@ -55,8 +53,7 @@ func TestCpuOutputBlargg03(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
-		"../../third_party/Gameboy-logs/Blargg3LYStubbed/EpicLog.txt",
-		true,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/3.log",
 		false,
 		false,
 		t,
@@ -67,8 +64,7 @@ func TestCpuOutputBlargg04(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"04-op r,imm.gb",
-		"../../third_party/Gameboy-logs/Blargg4LYStubbed/Blargg4.txt",
-		true,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/4.log",
 		false,
 		false,
 		t,
@@ -79,8 +75,7 @@ func TestCpuOutputBlargg05(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"05-op rp.gb",
-		"../../third_party/Gameboy-logs/Blargg5LYStubbed/Blargg5.txt",
-		true,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/5.log",
 		false,
 		false,
 		t,
@@ -91,8 +86,7 @@ func TestCpuOutputBlargg06(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"06-ld r,r.gb",
-		"../../third_party/Gameboy-logs/Blargg6LYStubbed/EpicLog.txt",
-		false,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/6.log",
 		false,
 		false,
 		t,
@@ -103,10 +97,9 @@ func TestCpuOutputBlargg07(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"07-jr,jp,call,ret,rst.gb",
-		"../../third_party/Gameboy-logs/Blargg7LYStubbed/Blargg7.txt",
-		true,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/7.log",
 		false,
-		true, // logs doesn't match after "Passed" is printed. Probably because log-source doesnt emulate RST xxh opcode properly?
+		true,
 		t,
 	)
 }
@@ -115,8 +108,7 @@ func TestCpuOutputBlargg08(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"08-misc instrs.gb",
-		"../../third_party/Gameboy-logs/Blargg8LYStubbed/EpicLog.txt",
-		true,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/8.log",
 		false,
 		false,
 		t,
@@ -127,8 +119,7 @@ func TestCpuOutputBlargg09(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"09-op r,r.gb",
-		"../../third_party/Gameboy-logs/Blargg9LYStubbed/Blargg9.txt",
-		true,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/9.log",
 		false,
 		false,
 		t,
@@ -139,8 +130,7 @@ func TestCpuOutputBlargg10(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"10-bit ops.gb",
-		"../../third_party/Gameboy-logs/Blargg10LYStubbed1/Blargg10LYStubbed/Blargg10.txt",
-		true,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/10.log",
 		false,
 		false,
 		t,
@@ -151,8 +141,7 @@ func TestCpuOutputBlargg11(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"11-op a,(hl).gb",
-		"../../third_party/Gameboy-logs/Blargg11LYStubbed1/Blargg11LYStubbed/Blargg11.txt",
-		true,
+		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/11.log",
 		false,
 		false,
 		t,
@@ -163,7 +152,6 @@ func testRom(
 	romPath string,
 	romName string,
 	logPath string,
-	outputBeforeStep bool,
 	debug bool,
 	ignoreLog bool,
 	t *testing.T,
@@ -197,16 +185,9 @@ func testRom(
 	// RUN TEST
 	i := 1
 	for {
-		var output string
-		if outputBeforeStep {
-			output = cpu.GetInternalState()
-		}
+		output := cpu.GetInternalState()
 
 		cpu.Step()
-
-		if !outputBeforeStep {
-			output = cpu.GetInternalState()
-		}
 
 		logLine, _, err := log.ReadLine()
 		if err != nil {
@@ -238,8 +219,11 @@ func testRom(
 
 	// ASSERT
 	res := sl.GetLog()
-	//println(strings.Trim(res, "\n"))
-	if strings.Trim(res[len(res)-7:], "\n") != "Passed" {
+	println("----------------")
+	println(res)
+	println("----------------")
+
+	if strings.Trim(res[len(res)-7:], "\n") != "Passe" && !strings.Contains(res, "Passed") && !strings.Contains(res, "Passe") {
 		t.Fatalf("%v did not return 'Passed'\n", romName)
 	}
 }

@@ -120,7 +120,7 @@ var OpCodes8bitArithmeticsGenerated = map[uint8]OpCode{
 	0xee: NewOpCode(0xee, "XOR A,u8", 2, 8, []func(cpu *CPU){func(cpu *CPU) { xor(cpu, cpu.bus.BusRead(cpu.pc)); cpu.pc++ }}),
 
 	// CCF: Complement carry flag, SCF: Set carry flag, DAA: Decimal adjust accumulator, CPL: Complement accumulator
-	0x27: NewOpCode(0x27, "DAA todo", 1, 4, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0x27: NewOpCode(0x27, "DAA todo", 1, 4, []func(cpu *CPU){func(cpu *CPU) { daa(cpu) }}),
 	0x2f: NewOpCode(0x2f, "CPL", 1, 4, []func(cpu *CPU){
 		// flip all bits
 		func(cpu *CPU) {

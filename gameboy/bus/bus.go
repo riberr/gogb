@@ -122,7 +122,6 @@ func (b *Bus) BusRead(address uint16) uint8 {
 func (b *Bus) BusWrite(address uint16, value uint8) {
 	if address < 0x8000 {
 		//ROM Data
-		println("warning: writing to ROM")
 		b.cart.write(address, value)
 		return
 	}

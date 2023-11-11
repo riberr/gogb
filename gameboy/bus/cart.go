@@ -203,5 +203,6 @@ func (cart *Cart) read(address uint16) uint8 {
 }
 
 func (cart *Cart) write(address uint16, value uint8) {
-	panic("CARTWRITE NO IMPL")
+	println("warning: writing to ROM")
+	cart.data[address] = value
 }

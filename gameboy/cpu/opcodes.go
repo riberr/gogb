@@ -134,6 +134,27 @@ func xor(cpu *CPU, value uint8) {
 	cpu.regs.a = result
 }
 
+func daa(cpu *CPU) {
+	if cpu.regs.getFlag(FLAG_SUBTRACTION_N_BIT) {
+		if cpu.regs.getFlag(FLAG_CARRY_C_BIT) {
+			cpu.regs.a -= 0x60
+		}
+		if cpu.regs.getFlag(FLAG_HALF_CARRY_H_BIT) {
+			cpu.regs.a -= 0x6
+		}
+	} else {
+		if cpu.regs.getFlag(FLAG_CARRY_C_BIT) || cpu.regs.a > 0x99 {
+			cpu.regs.a += 0x60
+			cpu.regs.setFlag(FLAG_CARRY_C_BIT, true)
+		}
+		if cpu.regs.getFlag(FLAG_HALF_CARRY_H_BIT) || (cpu.regs.a&0xF) > 0x9 {
+			cpu.regs.a += 0x6
+		}
+	}
+	cpu.regs.setFlag(FLAG_ZERO_Z_BIT, cpu.regs.a == 0)
+	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, false)
+}
+
 var lsb, msb, e uint8 = 0, 0, 0 // temp values when executing opcodes
 var ee uint16 = 0               // temp value when executing opcodes
 var stop = false                // used for conditional jumps

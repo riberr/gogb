@@ -85,5 +85,5 @@ var OpCodes16bitLoadGenerated = map[uint8]OpCode{
 	0xf1: NewOpCode(0xf1, "POP AF", 1, 12, []func(cpu *CPU){
 		func(cpu *CPU) { lsb = cpu.bus.BusRead(cpu.sp); cpu.sp++ },
 		func(cpu *CPU) { msb = cpu.bus.BusRead(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.regs.setAF(utils.ToUint16(lsb, msb)) }}),
+		func(cpu *CPU) { cpu.regs.setAF(utils.ToUint16(lsb, msb) & 0xFFF0) }}), // lower 4 bits of F reg is always 0b0000
 }

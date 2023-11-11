@@ -12,7 +12,7 @@ var OpCodesControlFlow = map[uint8]OpCode{
 	// Relative jump
 	0x18: NewOpCode(0x18, "JR i8", 2, 12, []func(cpu *CPU){
 		func(cpu *CPU) { e = cpu.bus.Read(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(e)) }, // todo: correct casting? e = signed_8(read(PC++)); PC = PC + e
+		func(cpu *CPU) { cpu.pc = uint16(int(cpu.pc) + int(int8(e))) },
 	}),
 
 	// Jump

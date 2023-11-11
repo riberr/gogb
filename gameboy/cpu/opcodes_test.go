@@ -1,6 +1,7 @@
 package cpu
 
 import (
+	"fmt"
 	bus2 "gogb/gameboy/bus"
 	interrupts2 "gogb/gameboy/interrupts"
 	"gogb/gameboy/seriallink"
@@ -40,5 +41,31 @@ func TestSBC(t *testing.T) {
 
 	if cpu.regs.f != 0x70 {
 		t.Errorf("F: got %08b, want %08b", cpu.regs.f, 0x70)
+	}
+}
+
+func TestRelativeJumpOP(t *testing.T) {
+	// di
+	interrupts := interrupts2.New()
+	timer := timer2.New(interrupts)
+	sl := seriallink.New()
+	bus := bus2.New(interrupts, timer, sl)
+	cpu := New(bus, interrupts, false)
+
+	// preconditions
+	opcode := OpCodes[0x18]
+	cpu.pc = 0xc2cb
+	bus.Write(cpu.pc, 0xf4)
+
+	// test
+	for _, step := range opcode.steps {
+		step(cpu)
+	}
+
+	fmt.Printf("result: %02x \n", cpu.pc)
+
+	truth := uint16(0xC2C0)
+	if cpu.pc != truth {
+		t.Fatalf("Got %02x, expected %02x", cpu.pc, truth)
 	}
 }

@@ -15,7 +15,7 @@ func Run(debug bool) {
 	interrupts := interrupts2.New()
 	timer := timer2.New(interrupts)
 	sl := seriallink.New()
-	bus := busPackage.New(timer, sl)
+	bus := busPackage.New(interrupts, timer, sl)
 	cpu := cpuPackage.New(bus, interrupts, debug)
 
 	romPath := "third_party/gb-test-roms/instr_timing/"

@@ -4,7 +4,7 @@ import "gogb/gameboy/interrupts"
 
 // Timer is kinda ported from https://github.com/raddad772/jsmoo/blob/main/system/gb/gb_cpu.js
 type Timer struct {
-	interrupts interrupts.Interrupts
+	interrupts *interrupts.Interrupts
 
 	sysclk uint16
 	tima   uint8
@@ -19,7 +19,7 @@ type Timer struct {
 
 func New(interrupts *interrupts.Interrupts) *Timer {
 	return &Timer{
-		interrupts: *interrupts,
+		interrupts: interrupts,
 	}
 }
 

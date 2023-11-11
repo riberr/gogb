@@ -34,7 +34,7 @@ func testTimingWithRom(
 	interrupts := interrupts2.New()
 	timer := timer2.New(interrupts)
 	sl := seriallink.New()
-	bus := bus2.New(timer, sl)
+	bus := bus2.New(interrupts, timer, sl)
 	cpu := New(bus, interrupts, true)
 
 	if !bus.LoadCart(romPath, romName) {

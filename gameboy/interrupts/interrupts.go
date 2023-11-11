@@ -1,6 +1,8 @@
 package interrupts
 
-import "gogb/utils"
+import (
+	"gogb/utils"
+)
 
 // Bit position
 // 0   Vblank
@@ -34,7 +36,19 @@ const (
 )
 
 func New() *Interrupts {
-	return &Interrupts{}
+	return &Interrupts{
+		_ime: false,
+		_ie:  0,
+		_if:  0,
+	}
+}
+
+func (i *Interrupts) GetIF() uint8 {
+	return i._if
+}
+
+func (i *Interrupts) SetAllIF(value uint8) {
+	i._if = value
 }
 
 func (i *Interrupts) SetIF(flag Flag) {
@@ -47,6 +61,14 @@ func (i *Interrupts) ClearIF(flag Flag) {
 
 func (i *Interrupts) IsIF(flag Flag) bool {
 	return utils.HasBit(i._if, int(flag))
+}
+
+func (i *Interrupts) GetIE() uint8 {
+	return i._ie
+}
+
+func (i *Interrupts) SetAllIE(value uint8) {
+	i._ie = value
 }
 
 func (i *Interrupts) SetIE(flag Flag) {

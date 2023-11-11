@@ -8,8 +8,8 @@ import (
 )
 
 type CPU struct {
-	bus        bus.Bus // di
-	interrupts interrupts.Interrupts
+	bus        *bus.Bus
+	interrupts *interrupts.Interrupts
 	debug      bool // debug print
 
 	regs      Registers
@@ -20,15 +20,14 @@ type CPU struct {
 }
 
 func New(bus *bus.Bus, interrupts *interrupts.Interrupts, debug bool) *CPU {
-	cpu := CPU{
-		bus:        *bus,
-		interrupts: *interrupts,
+	return &CPU{
+		bus:        bus,
+		interrupts: interrupts,
 		regs:       NewRegisters(),
 		sp:         0xFFFE, //sp:   0x01,
 		pc:         0x100,
 		debug:      debug,
 	}
-	return &cpu
 }
 
 func (cpu *CPU) Step() {
@@ -67,7 +66,6 @@ func (cpu *CPU) Step() {
 
 	// interrupts
 	if cpu.interrupts.IsIME() {
-
 		flag := cpu.interrupts.GetEnabledFlaggedInterrupt()
 		if flag == -1 {
 

@@ -103,7 +103,7 @@ var OpCodes8bitLoadGenerated = map[uint8]OpCode{
 	0x32: NewOpCode(0x32, "LD (HL-),A", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), cpu.regs.a); cpu.regs.decHL() }}),
 	0x36: NewOpCode(0x36, "LD (HL),u8", 2, 12, []func(cpu *CPU){func(cpu *CPU) { lsb = cpu.bus.BusRead(cpu.pc); cpu.pc++ }, func(cpu *CPU) { cpu.bus.BusWrite(cpu.regs.getHL(), lsb) }}),
 	0x3a: NewOpCode(0x3a, "LD A,(HL-)", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = cpu.bus.BusRead(cpu.regs.getHL()); cpu.pc-- }}),
-	0xe0: NewOpCode(0xe0, "LD (FF00+u8),A", 2, 12, []func(cpu *CPU){
+	0xe0: NewOpCode(0xe0, "LD (FF00+u8),A", 2, 12, []func(cpu *CPU){ // // Put memory address $FF00+n into A
 		func(cpu *CPU) { lsb = cpu.bus.BusRead(cpu.pc); cpu.pc++ },
 		func(cpu *CPU) { cpu.bus.BusWrite(utils.ToUint16(lsb, 0xFF), cpu.regs.a) }}),
 	0xe2: NewOpCode(0xe2, "LD (FF00+C),A", 1, 8, []func(cpu *CPU){func(cpu *CPU) { cpu.bus.BusWrite(utils.ToUint16(cpu.regs.c, 0xFF), cpu.regs.a) }}),

@@ -1,6 +1,7 @@
 package bus
 
 import (
+	"gogb/gameboy/interrupts"
 	"gogb/gameboy/seriallink"
 	"gogb/gameboy/timer"
 	"log"
@@ -23,9 +24,10 @@ import (
 // 0xFF80 - 0xFFFE : Zero Page
 
 type Bus struct {
-	cart  *Cart
-	timer *timer.Timer
-	sl    *seriallink.SerialLink
+	cart       *Cart
+	interrupts *interrupts.Interrupts
+	timer      *timer.Timer
+	sl         *seriallink.SerialLink
 }
 
 var vram = NewMemory(0x8000, 0x9FFF) // Video RAM
@@ -37,13 +39,15 @@ var oam = NewMemory(0xFE00, 0xFE9F) // Object attribute bus
 var notUsable = NewMemory(0xFEA0, 0xFEFF)
 var ioRegs = NewMemory(0xFF00, 0xFF7F) // I/O Registers
 var hram = NewMemory(0xFF80, 0xFFFE)
-var ieReg uint8 = 0 //Interrupt Enable register
 
-func New(timer *timer.Timer, sl *seriallink.SerialLink) *Bus {
+//var ieReg uint8 = 0 //Interrupt Enable register
+
+func New(interrupts *interrupts.Interrupts, timer *timer.Timer, sl *seriallink.SerialLink) *Bus {
 	return &Bus{
-		cart:  &Cart{},
-		timer: timer,
-		sl:    sl,
+		cart:       &Cart{},
+		interrupts: interrupts,
+		timer:      timer,
+		sl:         sl,
 	}
 }
 
@@ -101,8 +105,10 @@ func (b *Bus) BusRead(address uint16) uint8 {
 		return b.sl.GetSC()
 	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
 		return b.timer.Read(address)
+	case 0xFF0F:
+		return b.interrupts.GetIF()
 	case 0xFFFF:
-		return ieReg
+		return b.interrupts.GetIE()
 	default:
 		if ioRegs.has(address) {
 			return ioRegs.read(address)
@@ -171,8 +177,12 @@ func (b *Bus) BusWrite(address uint16, value uint8) {
 	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
 		b.timer.Write(address, value)
 		return
+	case 0xFF0F:
+		b.interrupts.SetAllIF(value)
+		return
 	case 0xFFFF:
-		ieReg = value
+
+		b.interrupts.SetAllIE(value)
 		return
 	default:
 		if ioRegs.has(address) {

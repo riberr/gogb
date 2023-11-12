@@ -7,7 +7,7 @@ import (
 
 func TestTiming(t *testing.T) {
 	testTimingWithRom(
-		"../../third_party/gb-test-roms/instr_timing/",
+		"../third_party/gb-test-roms/instr_timing/",
 		"instr_timing.gb",
 		t,
 	)
@@ -15,7 +15,7 @@ func TestTiming(t *testing.T) {
 
 func TestTimingMooneye(t *testing.T) {
 	testTimingWithRom(
-		"../../third_party/mooneye/acceptance/timer/",
+		"../third_party/mooneye/acceptance/timer/",
 		"tim00.gb",
 		t,
 	)

@@ -19,9 +19,9 @@ var OpCodes16bitArithmeticsGenerated = map[uint8]OpCode{
 		func(cpu *CPU) { addHL(cpu, cpu.sp) },
 	}),
 	0xe8: NewOpCode(0xe8, "ADD SP,i8", 2, 16, []func(cpu *CPU){
-		func(cpu *CPU) { e = cpu.bus.Read(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) { ee = addSigned8(cpu, cpu.sp, e) },
-		func(cpu *CPU) { cpu.sp = ee },
+		func(cpu *CPU) { cpu.e = cpu.bus.Read(cpu.pc); cpu.pc++ },
+		func(cpu *CPU) { cpu.ee = addSigned8(cpu, cpu.sp, cpu.e) },
+		func(cpu *CPU) { cpu.sp = cpu.ee },
 	}),
 
 	// Increment (register), Increment SP

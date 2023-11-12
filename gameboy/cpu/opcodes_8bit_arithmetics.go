@@ -69,8 +69,8 @@ var OpCodes8bitArithmeticsGenerated = map[uint8]OpCode{
 	0x2c: NewOpCode(0x2c, "INC L", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = inc(cpu, cpu.regs.l) }}),
 	0x3c: NewOpCode(0x3c, "INC A", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = inc(cpu, cpu.regs.a) }}),
 	0x34: NewOpCode(0x34, "INC (HL)", 1, 12, []func(cpu *CPU){
-		func(cpu *CPU) { e = cpu.bus.Read(cpu.regs.getHL()) },
-		func(cpu *CPU) { cpu.bus.Write(cpu.regs.getHL(), inc(cpu, e)) },
+		func(cpu *CPU) { cpu.e = cpu.bus.Read(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.Write(cpu.regs.getHL(), inc(cpu, cpu.e)) },
 	}),
 
 	// Decrement (register), Decrement (indirect HL)
@@ -82,8 +82,8 @@ var OpCodes8bitArithmeticsGenerated = map[uint8]OpCode{
 	0x2d: NewOpCode(0x2d, "DEC L", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.l = dec(cpu, cpu.regs.l) }}),
 	0x3d: NewOpCode(0x3d, "DEC A", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.a = dec(cpu, cpu.regs.a) }}),
 	0x35: NewOpCode(0x35, "DEC (HL)", 1, 12, []func(cpu *CPU){
-		func(cpu *CPU) { e = cpu.bus.Read(cpu.regs.getHL()) },
-		func(cpu *CPU) { cpu.bus.Write(cpu.regs.getHL(), dec(cpu, e)) },
+		func(cpu *CPU) { cpu.e = cpu.bus.Read(cpu.regs.getHL()) },
+		func(cpu *CPU) { cpu.bus.Write(cpu.regs.getHL(), dec(cpu, cpu.e)) },
 	}),
 
 	// Bitwise AND (register), Bitwise AND (indirect HL), Bitwise AND (immediate)

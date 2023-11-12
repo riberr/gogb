@@ -170,10 +170,6 @@ func daa(cpu *CPU) {
 	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, false)
 }
 
-var lsb, msb, e uint8 = 0, 0, 0 // temp values when executing opcodes
-var ee uint16 = 0               // temp value when executing opcodes
-var stop = false                // used for conditional jumps
-
 var OpCodes = merge(
 	OpCodes8bitLoadGenerated,
 	OpCodes16bitLoadGenerated,

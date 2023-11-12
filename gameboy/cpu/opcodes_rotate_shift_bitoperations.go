@@ -23,5 +23,13 @@ var OpCodesRotateShiftBitoperations = map[uint8]OpCode{
 	}),
 
 	// Increment (register), Increment SP
-	0xcb: NewOpCode(0xcb, "PREFIX CB", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.cb = true }}),
+	0xcb: NewOpCode(0xcb, "PREFIX CB", 1, 4, []func(cpu *CPU){
+		func(cpu *CPU) {
+			opCodeCB := OpCodesCB[cpu.bus.Read(cpu.pc)]
+			cpu.pc++
+			for _, step := range opCodeCB.steps {
+				step(cpu)
+			}
+		},
+	}),
 }

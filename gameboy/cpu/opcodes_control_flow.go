@@ -132,10 +132,10 @@ var OpCodesControlFlow = map[uint8]OpCode{
 		func(cpu *CPU) { msb = cpu.bus.Read(cpu.sp); cpu.sp++ },
 		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) },
 	}),
-	0xd9: NewOpCode(0xd9, "RETI /*todo*/", 1, 16, []func(cpu *CPU){
+	0xd9: NewOpCode(0xd9, "RETI", 1, 16, []func(cpu *CPU){
 		func(cpu *CPU) { lsb = cpu.bus.Read(cpu.sp); cpu.sp++ },
 		func(cpu *CPU) { msb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb) /*todo intManager.IME = true;*/ },
+		func(cpu *CPU) { cpu.pc = utils.ToUint16(lsb, msb); cpu.interrupts.EnableIME() },
 	}),
 
 	// Restart / Call function (implied)
@@ -149,7 +149,7 @@ var OpCodesControlFlow = map[uint8]OpCode{
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
 		func(cpu *CPU) { cpu.pc = 0x08 },
 	}),
-	0xd7: NewOpCode(0xd7, "RST 10h /*todo*/", 1, 16, []func(cpu *CPU){
+	0xd7: NewOpCode(0xd7, "RST 10h", 1, 16, []func(cpu *CPU){
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc)) },
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
 		func(cpu *CPU) { cpu.pc = 0x10 },

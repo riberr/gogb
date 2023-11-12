@@ -6,10 +6,10 @@ var OpCodesMisc = map[uint8]OpCode{
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	// Halt system clock
-	0x76: NewOpCode(0x76, "HALT /*todo*/", 1, 4, []func(cpu *CPU){func(cpu *CPU) { /*todo*/ }}),
+	0x76: NewOpCode(0x76, "HALT /*todo*/", 1, 4, []func(cpu *CPU){func(cpu *CPU) { panic("HALT") }}),
 
 	// Stop system and main clocks
-	0x10: NewOpCode(0x10, "STOP /*todo*/", 1, 4, []func(cpu *CPU){func(cpu *CPU) { /*panic("STOP")*/ }}),
+	0x10: NewOpCode(0x10, "STOP /*todo*/", 1, 4, []func(cpu *CPU){func(cpu *CPU) { panic("STOP") }}),
 
 	// Disable interrupts
 	0xf3: NewOpCode(0xf3, "DI", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.interrupts.DisableIME() }}),

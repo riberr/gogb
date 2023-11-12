@@ -27,6 +27,7 @@ func TestCpuOutputBlargg01(t *testing.T) {
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/1.log",
 		false,
 		false,
+		false,
 		t,
 	)
 }
@@ -36,15 +37,18 @@ func TestCpuOutputBlargg01(t *testing.T) {
 
 # EI
 
-Fail
+Failed #2
 */
 func TestCpuOutputBlargg02(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/2.log",
+		// https://github.com/robert/gameboy-doctor/pull/11
+		//"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/2.log",
+		"../../third_party/Blargg2LYStubbed/EpicLogReformat.txt",
+		true,
 		false,
-		false,
+		true,
 		t,
 	)
 }
@@ -54,6 +58,7 @@ func TestCpuOutputBlargg03(t *testing.T) {
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/3.log",
+		false,
 		false,
 		false,
 		t,
@@ -67,6 +72,7 @@ func TestCpuOutputBlargg04(t *testing.T) {
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/4.log",
 		false,
 		false,
+		false,
 		t,
 	)
 }
@@ -76,6 +82,7 @@ func TestCpuOutputBlargg05(t *testing.T) {
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"05-op rp.gb",
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/5.log",
+		false,
 		false,
 		false,
 		t,
@@ -89,6 +96,7 @@ func TestCpuOutputBlargg06(t *testing.T) {
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/6.log",
 		false,
 		false,
+		false,
 		t,
 	)
 }
@@ -100,6 +108,7 @@ func TestCpuOutputBlargg07(t *testing.T) {
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/7.log",
 		false,
 		true,
+		false,
 		t,
 	)
 }
@@ -109,6 +118,7 @@ func TestCpuOutputBlargg08(t *testing.T) {
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"08-misc instrs.gb",
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/8.log",
+		false,
 		false,
 		false,
 		t,
@@ -122,6 +132,7 @@ func TestCpuOutputBlargg09(t *testing.T) {
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/9.log",
 		false,
 		false,
+		false,
 		t,
 	)
 }
@@ -131,6 +142,7 @@ func TestCpuOutputBlargg10(t *testing.T) {
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"10-bit ops.gb",
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/10.log",
+		false,
 		false,
 		false,
 		t,
@@ -144,6 +156,7 @@ func TestCpuOutputBlargg11(t *testing.T) {
 		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/11.log",
 		false,
 		false,
+		false,
 		t,
 	)
 }
@@ -154,6 +167,7 @@ func testRom(
 	logPath string,
 	debug bool,
 	ignoreLog bool,
+	logAfterExecution bool,
 	t *testing.T,
 ) {
 	// SETUP
@@ -185,9 +199,14 @@ func testRom(
 	// RUN TEST
 	i := 1
 	for {
-		output := cpu.GetInternalState()
-
+		var output string
+		if !logAfterExecution {
+			output = cpu.GetInternalState()
+		}
 		cpu.Step()
+		if logAfterExecution {
+			output = cpu.GetInternalState()
+		}
 
 		logLine, _, err := log.ReadLine()
 		if err != nil {
@@ -253,68 +272,41 @@ func lineCounter(path string) (int, error) {
 	}
 }
 
-/*
-func TestCpuOutput09(t *testing.T) {
+// https://github.com/robert/gameboy-doctor/pull/11
+func GenerateReformatedLogFor02Interrupt(t *testing.T) {
 	// SETUP
-	logFile, err := os.Open("../../Gameboy-logs-master/Blargg9LYStubbed/Blargg9.txt")
+	logFile, err := os.Open("../../third_party/Blargg2LYStubbed/EpicLog.txt")
 	if err != nil {
 		t.Fatalf("Error opening file: %v", err)
 	}
 	defer logFile.Close()
-
 	log := bufio.NewReader(logFile)
 
-	sl := seriallink.New()
-	bus := bus2.New(sl)
-	cpu := New(bus, false)
-
-	romName := "09-op r,r.gb"
-	if !bus.LoadCart("../../roms/cpu_instrs/individual/", romName) {
-		t.Fatalf("error loading rom")
-	}
-
-	nrOfLines, err := lineCounter("../../Gameboy-logs-master/Blargg9LYStubbed/Blargg9.txt")
-	nrOfLines++ // first line is line 1
+	output, err := os.Create("../../third_party/Blargg2LYStubbed/EpicLogReformat.txt")
 	if err != nil {
-		t.Fatal(err)
+		fmt.Println("Error creating file:", err)
+		return
 	}
-	println(nrOfLines)
+	defer output.Close()
 
-	// RUN TEST
-
-	i := 1
 	for {
+		logLine, _, err := log.ReadLine()
+		if err != nil {
 
-			//output := fmt.Sprintf("A: %02X F: %02X B: %02X C: %02X D: %02X E: %02X H: %02X L: %02X SP: %04X PC: 00:%04X (%02X %02X %02X %02X)\n",
-			//	cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
-		//	bus.Read(cpu.pc), bus.Read(cpu.pc+1), bus.Read(cpu.pc+2), bus.Read(cpu.pc+3),
-		//	)
+			if err.Error() == "EOF" {
+				fmt.Printf("\n")
+				break
+			}
 
-output := cpu.GetLog()
-cpu.Step()
+			fmt.Println("Error reading line:", err)
+			return
+		}
 
-logLine, _, err := log.ReadLine()
-if err != nil {
-
-if err.Error() == "EOF" {
-fmt.Printf("\n")
-break
+		//println(string(logLine))
+		out := fmt.Sprintf("A:%s F:%s B:%s C:%s D:%s E:%s H:%s L:%s SP:%s PC:%s PCMEM:%s,%s,%s,%s\n",
+			logLine[3:5], logLine[9:11], logLine[15:17], logLine[21:23], logLine[27:29], logLine[33:35], logLine[39:41], logLine[45:47], logLine[52:56], logLine[64:68],
+			logLine[70:72], logLine[73:75], logLine[76:78], logLine[79:81],
+		)
+		output.WriteString(out)
+	}
 }
-
-fmt.Println("Error reading line:", err)
-return
-}
-
-if strings.Trim(string(logLine), "\n") != strings.Trim(output, "\n") {
-t.Fatalf("%v/%v: not equal!\ngot: \n%vwant: \n%v", i, nrOfLines, output, string(logLine))
-}
-i++
-}
-
-// ASSERT
-res := sl.GetLog()
-if strings.Trim(res[len(res)-7:], "\n") != "Passed" {
-t.Fatalf("%v did not return 'Passed'\n", romName)
-}
-}
-*/

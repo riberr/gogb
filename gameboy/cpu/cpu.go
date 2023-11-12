@@ -31,21 +31,6 @@ func New(bus *bus.Bus, interrupts *interrupts.Interrupts, debug bool) *CPU {
 }
 
 func (cpu *CPU) Step() {
-	// interrupts
-	if cpu.interrupts.IsIME() {
-		flag := cpu.interrupts.GetEnabledFlaggedInterrupt()
-		if flag == -1 {
-
-		} else {
-			cpu.interrupts.DisableIME()
-			cpu.interrupts.ClearIF(flag)
-			cpu.sp--
-			cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc))
-			cpu.sp--
-			cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc))
-			cpu.pc = interrupts.ISR_address[flag]
-		}
-	}
 	cpu.curOpCode = OpCodes[cpu.bus.Read(cpu.pc)]
 
 	/*
@@ -84,6 +69,22 @@ func (cpu *CPU) Step() {
 		cpu.pc++
 		for _, step := range cpu.curOpCode.steps {
 			step(cpu)
+		}
+	}
+
+	// interrupts
+	if cpu.interrupts.IsIME() {
+		flag := cpu.interrupts.GetEnabledFlaggedInterrupt()
+		if flag == -1 {
+
+		} else {
+			cpu.interrupts.DisableIME()
+			cpu.interrupts.ClearIF(flag)
+			cpu.sp--
+			cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc))
+			cpu.sp--
+			cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc))
+			cpu.pc = interrupts.ISR_address[flag]
 		}
 	}
 }

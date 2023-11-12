@@ -1,13 +1,9 @@
-package cpu
+package gameboy
 
 import (
 	"bufio"
 	"bytes"
 	"fmt"
-	bus2 "gogb/gameboy/bus"
-	interrupts2 "gogb/gameboy/interrupts"
-	"gogb/gameboy/seriallink"
-	timer2 "gogb/gameboy/timer"
 	"io"
 	"os"
 	"strings"
@@ -22,9 +18,9 @@ import (
 
 func TestCpuOutputBlargg01(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"01-special.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/1.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/1.log",
 		false,
 		false,
 		false,
@@ -39,10 +35,10 @@ Fails at "timer doesn't work". Probably need to have proper timing
 */
 func TestCpuOutputBlargg02(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
 		// https://github.com/robert/gameboy-doctor/pull/11
-		"../../third_party/Blargg2LYStubbed/EpicLogReformat.txt",
+		"../third_party/Blargg2LYStubbed/EpicLogReformat.txt",
 		false,
 		false,
 		true,
@@ -52,9 +48,9 @@ func TestCpuOutputBlargg02(t *testing.T) {
 
 func TestCpuOutputBlargg03(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/3.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/3.log",
 		false,
 		false,
 		false,
@@ -64,9 +60,9 @@ func TestCpuOutputBlargg03(t *testing.T) {
 
 func TestCpuOutputBlargg04(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"04-op r,imm.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/4.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/4.log",
 		false,
 		false,
 		false,
@@ -76,9 +72,9 @@ func TestCpuOutputBlargg04(t *testing.T) {
 
 func TestCpuOutputBlargg05(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"05-op rp.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/5.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/5.log",
 		false,
 		false,
 		false,
@@ -88,9 +84,9 @@ func TestCpuOutputBlargg05(t *testing.T) {
 
 func TestCpuOutputBlargg06(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"06-ld r,r.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/6.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/6.log",
 		false,
 		false,
 		false,
@@ -100,9 +96,9 @@ func TestCpuOutputBlargg06(t *testing.T) {
 
 func TestCpuOutputBlargg07(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"07-jr,jp,call,ret,rst.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/7.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/7.log",
 		false,
 		true,
 		false,
@@ -112,9 +108,9 @@ func TestCpuOutputBlargg07(t *testing.T) {
 
 func TestCpuOutputBlargg08(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"08-misc instrs.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/8.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/8.log",
 		false,
 		false,
 		false,
@@ -124,9 +120,9 @@ func TestCpuOutputBlargg08(t *testing.T) {
 
 func TestCpuOutputBlargg09(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"09-op r,r.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/9.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/9.log",
 		false,
 		false,
 		false,
@@ -136,9 +132,9 @@ func TestCpuOutputBlargg09(t *testing.T) {
 
 func TestCpuOutputBlargg10(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"10-bit ops.gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/10.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/10.log",
 		false,
 		false,
 		false,
@@ -148,9 +144,9 @@ func TestCpuOutputBlargg10(t *testing.T) {
 
 func TestCpuOutputBlargg11(t *testing.T) {
 	testRom(
-		"../../third_party/gb-test-roms/cpu_instrs/individual/",
+		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"11-op a,(hl).gb",
-		"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/11.log",
+		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/11.log",
 		false,
 		false,
 		false,
@@ -176,14 +172,9 @@ func testRom(
 
 	log := bufio.NewReader(logFile)
 
-	// DI
-	interrupts := interrupts2.New()
-	timer := timer2.New(interrupts)
-	sl := seriallink.New()
-	bus := bus2.New(interrupts, timer, sl)
-	cpu := New(bus, interrupts, debug)
+	gb := New(false)
 
-	if !bus.LoadCart(romPath, romName) {
+	if !gb.Bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")
 	}
 
@@ -198,11 +189,11 @@ func testRom(
 	for {
 		var output string
 		if !logAfterExecution {
-			output = cpu.GetInternalState()
+			output = gb.Cpu.GetInternalState()
 		}
-		cpu.Step()
+		gb.Step()
 		if logAfterExecution {
-			output = cpu.GetInternalState()
+			output = gb.Cpu.GetInternalState()
 		}
 
 		logLine, _, err := log.ReadLine()
@@ -234,7 +225,7 @@ func testRom(
 	}
 
 	// ASSERT
-	res := sl.GetLog()
+	res := gb.SerialLink.GetLog()
 	println("----------------")
 	println(res)
 	println("----------------")

@@ -1,10 +1,6 @@
-package cpu
+package gameboy
 
 import (
-	bus2 "gogb/gameboy/bus"
-	interrupts2 "gogb/gameboy/interrupts"
-	"gogb/gameboy/seriallink"
-	timer2 "gogb/gameboy/timer"
 	"strings"
 	"testing"
 )
@@ -31,31 +27,26 @@ func testTimingWithRom(
 	t *testing.T,
 ) {
 	// SETUP
-	interrupts := interrupts2.New()
-	timer := timer2.New(interrupts)
-	sl := seriallink.New()
-	bus := bus2.New(interrupts, timer, sl)
-	cpu := New(bus, interrupts, true)
+	gb := New(false)
 
-	if !bus.LoadCart(romPath, romName) {
+	if !gb.Bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")
 	}
 
 	// RUN TEST
 	i := 1
 	for {
-		timer.Tick()
-		cpu.Step()
+		gb.Step()
 		i++
 
-		res := sl.GetLog()
+		res := gb.SerialLink.GetLog()
 		if res != "" {
 			println(strings.Trim(res, "\n"))
 		}
 	}
 
 	// ASSERT
-	res := sl.GetLog()
+	res := gb.SerialLink.GetLog()
 	if strings.Trim(res[len(res)-7:], "\n") != "Passed" {
 		t.Fatalf("%v did not return 'Passed'\n", romName)
 	}

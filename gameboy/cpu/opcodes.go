@@ -47,7 +47,7 @@ func addSigned8(cpu *CPU, value16 uint16, value8 uint8) uint16 {
 	cpu.regs.setFlag(FLAG_SUBTRACTION_N_BIT, false)
 	cpu.regs.setFlag(FLAG_HALF_CARRY_H_BIT, ((value16&0xF)+(uint16(value8)&0xF)) > 0xF)
 	cpu.regs.setFlag(FLAG_CARRY_C_BIT, ((int(value16)+int(value8))>>8) != 0)
-	return uint16(int(value16) + int(value8)) // todo: correct casting?? see opcode 0x18
+	return uint16(int(value16) + int(int8(value8)))
 }
 
 func adc(cpu *CPU, value uint8) {

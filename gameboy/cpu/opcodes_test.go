@@ -62,10 +62,36 @@ func TestRelativeJumpOP(t *testing.T) {
 		step(cpu)
 	}
 
-	fmt.Printf("result: %02x \n", cpu.pc)
-
 	truth := uint16(0xC2C0)
 	if cpu.pc != truth {
+		t.Fatalf("Got %02x, expected %02x", cpu.pc, truth)
+	}
+}
+
+// LD HL,SP+i8
+func Test0xF8(t *testing.T) {
+	// di
+	interrupts := interrupts2.New()
+	timer := timer2.New(interrupts)
+	sl := seriallink.New()
+	bus := bus2.New(interrupts, timer, sl)
+	cpu := New(bus, interrupts, false)
+
+	// preconditions
+	opcode := OpCodes[0xF8]
+	cpu.pc = 0xC2C5
+	cpu.sp = 0xDFFD
+	bus.Write(cpu.pc, 0xfe)
+
+	// test
+	for _, step := range opcode.steps {
+		step(cpu)
+	}
+
+	fmt.Printf("result: %02x \n", cpu.regs.getHL())
+
+	truth := uint16(0xDFFB)
+	if cpu.regs.getHL() != truth {
 		t.Fatalf("Got %02x, expected %02x", cpu.pc, truth)
 	}
 }

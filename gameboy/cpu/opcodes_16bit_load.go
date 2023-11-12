@@ -1,7 +1,6 @@
 package cpu
 
 import (
-	"fmt"
 	"gogb/utils"
 )
 
@@ -38,13 +37,9 @@ var OpCodes16bitLoadGenerated = map[uint8]OpCode{
 	0xf9: NewOpCode(0xf9, "LD SP,HL", 1, 8, []func(cpu *CPU){
 		func(cpu *CPU) { cpu.sp = cpu.regs.getHL() },
 	}),
-	0xf8: NewOpCode(0xf8, "LD HL,SP+i8 /*todo*/", 2, 12, []func(cpu *CPU){
+	0xf8: NewOpCode(0xf8, "LD HL,SP+i8", 2, 12, []func(cpu *CPU){
 		func(cpu *CPU) { e = cpu.bus.Read(cpu.pc); cpu.pc++ },
-		func(cpu *CPU) {
-			fmt.Printf("sp: %02x e: %02x\n", cpu.sp, e)
-			println(e)
-			cpu.regs.setHL(addSigned8(cpu, cpu.sp, e))
-		},
+		func(cpu *CPU) { cpu.regs.setHL(addSigned8(cpu, cpu.sp, e)) },
 	}),
 	// Push to stack
 	0xc5: NewOpCode(0xc5, "PUSH BC", 1, 16, []func(cpu *CPU){

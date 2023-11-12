@@ -33,20 +33,17 @@ func TestCpuOutputBlargg01(t *testing.T) {
 }
 
 /*
-02-interrupts
+Fails at "timer doesn't work". Probably need to have proper timing
 
-# EI
-
-Failed #2
+// VALUE AT FF05 SHOULD BE 04, not 00. 04 is interrupt bit 2 TIMER
 */
 func TestCpuOutputBlargg02(t *testing.T) {
 	testRom(
 		"../../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
 		// https://github.com/robert/gameboy-doctor/pull/11
-		//"../../third_party/gameboy-doctor/truth/zipped/cpu_instrs/2.log",
 		"../../third_party/Blargg2LYStubbed/EpicLogReformat.txt",
-		true,
+		false,
 		false,
 		true,
 		t,

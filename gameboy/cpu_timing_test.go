@@ -1,6 +1,7 @@
 package gameboy
 
 import (
+	"gogb/gameboy/cpu"
 	"strings"
 	"testing"
 )
@@ -15,8 +16,8 @@ func TestTiming(t *testing.T) {
 
 func TestTimingMooneye(t *testing.T) {
 	testTimingWithRom(
-		"../third_party/mooneye/acceptance/timer/",
-		"tim00.gb",
+		"../third_party/mooneye/acceptance/interrupts/",
+		"ie_push.gb",
 		t,
 	)
 }
@@ -35,13 +36,18 @@ func testTimingWithRom(
 
 	// RUN TEST
 	i := 1
+	lastLog := ""
 	for {
 		gb.Step()
 		i++
 
 		res := gb.SerialLink.GetLog()
-		if res != "" {
+		if res != lastLog {
 			println(strings.Trim(res, "\n"))
+		}
+		lastLog = res
+		if gb.Cpu.GetState() == cpu.FetchOpCode && gb.Cpu.Cycle == 3 {
+			print(gb.Cpu.GetInternalState())
 		}
 	}
 

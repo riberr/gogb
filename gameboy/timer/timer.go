@@ -43,14 +43,13 @@ func (t *Timer) updateSysClk(newValue uint16) {
 	var thisBit uint8
 	switch t.tac & 0b11 {
 	case 0b00: // 4096Hz, CPU Clock/1024
-		//fmt.Printf("%02x \n", (t.sysclk>>6)&0xFF)
-		thisBit = uint8(t.sysclk>>7) & 1
+		thisBit = uint8(t.sysclk>>9) & 1
 	case 0b01: // 262144Hz CPU Clock/16
-		thisBit = uint8(t.sysclk>>1) & 1
-	case 0b10: // 65536Hz, CPU Clock/64
 		thisBit = uint8(t.sysclk>>3) & 1
-	case 0b11: // 16384Hz, CPU Clock/256
+	case 0b10: // 65536Hz, CPU Clock/64
 		thisBit = uint8(t.sysclk>>5) & 1
+	case 0b11: // 16384Hz, CPU Clock/256
+		thisBit = uint8(t.sysclk>>7) & 1
 	default:
 		panic("illegal clockSelect")
 	}
@@ -73,7 +72,7 @@ func (t *Timer) detectEdge(before uint8, after uint8) {
 func (t *Timer) Read(address uint16) uint8 {
 	switch address {
 	case 0xFF04: // DIV, bits 6-13 of SYSCLK	// todo: should be upper 8 bits of sysclk?
-		return uint8((t.sysclk >> 6) & 0xFF)
+		return uint8((t.sysclk >> 8) & 0xFF)
 	case 0xFF05:
 		return t.tima
 	case 0xFF06:

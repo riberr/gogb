@@ -102,7 +102,8 @@ func (b *Bus) Read(address uint16) uint8 {
 	case 0xFF01:
 		return b.sl.GetSB()
 	case 0xFF02:
-		return b.sl.GetSC()
+		return 0xFF // TODO REMOVE!!
+		//return b.sl.GetSC()
 	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
 		return b.timer.Read(address)
 	case 0xFF0F:

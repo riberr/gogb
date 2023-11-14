@@ -24,7 +24,6 @@ func TestCpuOutputBlargg01(t *testing.T) {
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/1.log",
 		false,
 		false,
-		false,
 		t,
 	)
 }
@@ -42,7 +41,6 @@ func TestCpuOutputBlargg02(t *testing.T) {
 		"../third_party/Blargg2LYStubbed/EpicLogReformat.txt",
 		false,
 		false,
-		true,
 		t,
 	)
 }
@@ -52,7 +50,6 @@ func TestCpuOutputBlargg03(t *testing.T) {
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/3.log",
-		false,
 		false,
 		false,
 		t,
@@ -66,7 +63,6 @@ func TestCpuOutputBlargg04(t *testing.T) {
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/4.log",
 		false,
 		false,
-		false,
 		t,
 	)
 }
@@ -76,7 +72,6 @@ func TestCpuOutputBlargg05(t *testing.T) {
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"05-op rp.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/5.log",
-		false,
 		false,
 		false,
 		t,
@@ -90,7 +85,6 @@ func TestCpuOutputBlargg06(t *testing.T) {
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/6.log",
 		false,
 		false,
-		false,
 		t,
 	)
 }
@@ -102,7 +96,6 @@ func TestCpuOutputBlargg07(t *testing.T) {
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/7.log",
 		false,
 		true,
-		false,
 		t,
 	)
 }
@@ -112,7 +105,6 @@ func TestCpuOutputBlargg08(t *testing.T) {
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"08-misc instrs.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/8.log",
-		false,
 		false,
 		false,
 		t,
@@ -126,7 +118,6 @@ func TestCpuOutputBlargg09(t *testing.T) {
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/9.log",
 		false,
 		false,
-		false,
 		t,
 	)
 }
@@ -136,7 +127,6 @@ func TestCpuOutputBlargg10(t *testing.T) {
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"10-bit ops.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/10.log",
-		false,
 		false,
 		false,
 		t,
@@ -150,7 +140,6 @@ func TestCpuOutputBlargg11(t *testing.T) {
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/11.log",
 		false,
 		false,
-		false,
 		t,
 	)
 }
@@ -161,7 +150,6 @@ func testRom(
 	logPath string,
 	debug bool,
 	ignoreLog bool,
-	logAfterExecution bool,
 	t *testing.T,
 ) {
 	// SETUP
@@ -173,7 +161,7 @@ func testRom(
 
 	log := bufio.NewReader(logFile)
 
-	gb := New(true)
+	gb := New(debug)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")
@@ -187,43 +175,22 @@ func testRom(
 
 	// RUN TEST
 	i := 1
+	// loop until we reach end of log file
 	for {
-		/*
-			var output string
-			if !logAfterExecution {
-				output = gb.Cpu.GetInternalState()
-			}
-		*/
-		//gb.Step()
-
-		/*
-			fpsCycles := 0
-			for fpsCycles < 69905 {
-
-				fpsCycles += gb.Step()
-
-			}
-		*/
-
 		var output string
-		gb.Step()
 
-		// grab cpu internal state whenever cpu does a new fetch
-		if gb.Cpu.GetState() != cpu.FetchOpCode && gb.Cpu.Cycle == 4 {
-			if gb.Cpu.GetState() == cpu.FetchOpCode {
+		// step cpu until we reach the next fetch
+		for {
+			gb.Step()
+
+			if gb.Cpu.GetState() == cpu.FetchOpCode && gb.Cpu.Cycle == 3 {
 				output = gb.Cpu.GetInternalState()
+				break
 			}
 		}
 
-		/*
-			if logAfterExecution {
-				output = gb.Cpu.GetInternalState()
-			}
-		*/
-
 		logLine, _, err := log.ReadLine()
 		if err != nil {
-
 			if err.Error() == "EOF" {
 				println(i)
 				fmt.Printf("\n")
@@ -235,7 +202,7 @@ func testRom(
 		}
 
 		if !ignoreLog {
-			if output != "" && strings.Trim(string(logLine), "\n") != strings.Trim(output, "\n") {
+			if strings.Trim(string(logLine), "\n") != strings.Trim(output, "\n") {
 				t.Fatalf("%v/%v: not equal!\ngot: \n%vwant: \n%v", i, nrOfLines, output, string(logLine))
 			}
 		}
@@ -253,9 +220,6 @@ func testRom(
 
 	// ASSERT
 	res := gb.SerialLink.GetLog()
-	println("----------------")
-	println(res)
-	println("----------------")
 
 	if strings.Trim(res[len(res)-7:], "\n") != "Passe" && !strings.Contains(res, "Passed") && !strings.Contains(res, "Passe") {
 		t.Fatalf("%v did not return 'Passed'\n", romName)

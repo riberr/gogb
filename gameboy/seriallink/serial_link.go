@@ -34,7 +34,7 @@ func (sl *SerialLink) GetSC() uint8 {
 
 func (sl *SerialLink) SetSC(value uint8) {
 	sl.sc = value
-
+	println("hej")
 	if value == 0x81 {
 		sl.log = append(sl.log, sl.sb)
 	}

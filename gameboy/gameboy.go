@@ -30,9 +30,10 @@ func New(debug bool) *GameBoy {
 	}
 }
 
-func (gb *GameBoy) Step() {
+func (gb *GameBoy) Step() int {
 	gb.Timer.Tick()
 	gb.Cpu.Step()
+	return 1
 }
 
 func Run() {

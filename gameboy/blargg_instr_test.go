@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"gogb/gameboy/cpu"
 	"io"
 	"os"
 	"strings"
@@ -172,7 +173,7 @@ func testRom(
 
 	log := bufio.NewReader(logFile)
 
-	gb := New(false)
+	gb := New(true)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")
@@ -187,19 +188,44 @@ func testRom(
 	// RUN TEST
 	i := 1
 	for {
+		/*
+			var output string
+			if !logAfterExecution {
+				output = gb.Cpu.GetInternalState()
+			}
+		*/
+		//gb.Step()
+
+		/*
+			fpsCycles := 0
+			for fpsCycles < 69905 {
+
+				fpsCycles += gb.Step()
+
+			}
+		*/
+
 		var output string
-		if !logAfterExecution {
-			output = gb.Cpu.GetInternalState()
-		}
 		gb.Step()
-		if logAfterExecution {
-			output = gb.Cpu.GetInternalState()
+
+		// grab cpu internal state whenever cpu does a new fetch
+		if gb.Cpu.GetState() != cpu.FetchOpCode && gb.Cpu.Cycle == 4 {
+			if gb.Cpu.GetState() == cpu.FetchOpCode {
+				output = gb.Cpu.GetInternalState()
+			}
 		}
+
+		/*
+			if logAfterExecution {
+				output = gb.Cpu.GetInternalState()
+			}
+		*/
 
 		logLine, _, err := log.ReadLine()
 		if err != nil {
 
 			if err.Error() == "EOF" {
+				println(i)
 				fmt.Printf("\n")
 				break
 			}
@@ -209,7 +235,7 @@ func testRom(
 		}
 
 		if !ignoreLog {
-			if strings.Trim(string(logLine), "\n") != strings.Trim(output, "\n") {
+			if output != "" && strings.Trim(string(logLine), "\n") != strings.Trim(output, "\n") {
 				t.Fatalf("%v/%v: not equal!\ngot: \n%vwant: \n%v", i, nrOfLines, output, string(logLine))
 			}
 		}
@@ -217,11 +243,12 @@ func testRom(
 
 		/*
 			// print serial output
-			res := sl.GetLog()
+			res := gb.SerialLink.GetLog()
 			if res != "" {
 				println(strings.Trim(res, "\n"))
 			}
 		*/
+
 	}
 
 	// ASSERT

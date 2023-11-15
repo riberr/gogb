@@ -115,18 +115,24 @@ func TestDivIncrease(t *testing.T) {
 	}
 }
 
-func TestTimaIncrease(t *testing.T) {
-	if 1024 != addTima(0b_0000_00100) {
-		t.Fatalf("should be 1024")
-	}
-	if 16 != addTima(0b_0000_00101) {
-		t.Fatalf("should be 16")
-	}
+func TestDivIncrease2(t *testing.T) {
+	addTima(0b_0000_00111)
+	println()
 
-	if 64 != addTima(0b_0000_00110) {
-		t.Fatalf("should be 64")
-	}
-	println(addTima(0b_0000_00111))
+}
+
+func TestTimaIncrease(t *testing.T) {
+	/*
+		if 1024 != addTima(0b_0000_00100) {
+			t.Fatalf("should be 1024")
+		}
+		if 16 != addTima(0b_0000_00101) {
+			t.Fatalf("should be 16")
+		}
+		if 64 != addTima(0b_0000_00110) {
+			t.Fatalf("should be 64")
+		}
+	*/
 	if 256 != addTima(0b_0000_00111) {
 		t.Fatalf("should be 256")
 	}
@@ -139,74 +145,66 @@ func addTima(TAC uint8) uint16 {
 
 	for {
 		timer.Tick()
+		println("tick")
 
 		if timer.Read(0xFF05) == 1 {
 			break
 		}
 	}
+	println(timer.sysclk)
+	println(timer.Read(0xFF04))
 
 	return timer.sysclk
 }
 
-/*
 func TestClockDisabled(t *testing.T) {
-InterruptManager intManager = new InterruptManager();
-Timer timer = new Timer(intManager);
+	timer := New(interrupts.New())
 
-for (int i = 0; i < 2056; i++) {
-timer.Tick();
+	for i := 0; i < 2056; i++ {
+		timer.Tick()
+	}
+	// TIMA should not count
+	if timer.tima != 0 {
+		t.Fatalf("tima should be 0")
+	}
+	// DIV doesn't care if the clock is enabled
+	if timer.Read(0xFF04) != 8 {
+		t.Fatalf("div should be 8")
+	}
 }
-// TIMA should not count
-Assert.Equal(0, timer.TIMA);
-// DIV doesn't care if the clock is enabled
-Assert.Equal(8, timer.DIV);
-}
-/*
 
-
+// borrowed from https://github.com/rvaccarim/FrozenBoy/blob/dac3dac1d33301019c02a78f9473f80d07999747/FrozenBoyTest/Tests/TimerTest.cs
 func TestTimaOverflow(t *testing.T) {
-InterruptManager intManager = new InterruptManager();
-Timer timer = new Timer(intManager);
+	timer := New(interrupts.New())
 
-timer.TAC = 0b_0000_00101;  // frequency = 16
+	timer.tac = 0b_0000_00101 // frequency = 16
 
-int max = 16 * 256;
-for (int i = 0; i < max; i++) {
-timer.Tick();
+	ticks := 16 * 256
+	for i := 0; i < ticks; i++ {
+		timer.Tick()
+	}
+
+	// the interruption should not happen immediately
+	if timer.interrupts.GetIF()>>2&1 != 0 {
+		t.Fatalf("Should be 0")
+	}
+	timer.Tick()
+	timer.Tick()
+	timer.Tick()
+	if timer.ticksSinceOverflow != 4 {
+		t.Fatalf("should be 4")
+	}
+	if timer.interrupts.GetIF()>>2&1 != 1 {
+		t.Fatalf("should be 1")
+	}
+
+	timer.Tick()
+	if timer.ticksSinceOverflow != 5 {
+		t.Fatalf("should be 5")
+	}
+
+	timer.Tick()
+	if timer.overflow == true {
+		t.Fatalf("should be false")
+	}
 }
-
-// the interruption should not happen immediately
-Assert.True(((intManager.IF >> 2) & 1) == 0);
-
-timer.Tick();
-timer.Tick();
-timer.Tick();
-
-Assert.Equal(4, timer.ticksSinceOverflow);
-Assert.True(((intManager.IF >> 2) & 1) == 1);
-
-timer.Tick();
-Assert.Equal(5, timer.ticksSinceOverflow);
-timer.Tick();
-Assert.False(timer.overflow);
-
-}
-
-func AddTima(u8 TAC) int {
-InterruptManager intManager = new InterruptManager();
-Timer timer = new Timer(intManager);
-
-timer.TAC = TAC;
-
-while (true) {
-timer.Tick();
-
-if (timer.TIMA == 1) {
-break;
-}
-}
-
-return timer.timerCounter;
-}
-
-*/

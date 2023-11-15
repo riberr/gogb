@@ -4,3 +4,6 @@
 [submodule "third_party/gameboy-doctor"]
 	path = third_party/gameboy-doctor
 	url = https://github.com/robert/gameboy-doctor.git
+[submodule "third_party/gbmicrotest"]
+	path = third_party/gbmicrotest
+	url = https://github.com/aappleby/gbmicrotest.git

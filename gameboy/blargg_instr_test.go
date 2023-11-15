@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"gogb/gameboy/cpu"
 	"io"
 	"os"
 	"strings"
@@ -50,7 +49,7 @@ func TestCpuOutputBlargg03(t *testing.T) {
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/3.log",
-		false,
+		true,
 		false,
 		t,
 	)
@@ -149,7 +148,7 @@ func testRom(
 	romName string,
 	logPath string,
 	debug bool,
-	ignoreLog bool,
+	ignoreLogResult bool,
 	t *testing.T,
 ) {
 	// SETUP
@@ -161,7 +160,7 @@ func testRom(
 
 	log := bufio.NewReader(logFile)
 
-	gb := New(debug)
+	gb := New(false)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")
@@ -176,37 +175,44 @@ func testRom(
 	// RUN TEST
 	i := 1
 	// loop until we reach end of log file
+
+	//var output string
+
+	// step cpu until we reach the next fetch
 	for {
-		var output string
+		gb.Step()
+		if gb.Cpu.NewLog {
+			gb.Cpu.NewLog = false
 
-		// step cpu until we reach the next fetch
-		for {
-			gb.Step()
+			/*
+				if gb.Cpu.GetState() == cpu.FetchOpCode && gb.Cpu.Cycle == 0 {
+					//output = gb.Cpu.GetInternalString()
+					break
+				}
+			*/
 
-			if gb.Cpu.GetState() == cpu.FetchOpCode && gb.Cpu.Cycle == 3 {
-				output = gb.Cpu.GetInternalState()
-				break
+			logLine, _, err := log.ReadLine()
+			if err != nil {
+				if err.Error() == "EOF" {
+					println(i)
+					fmt.Printf("\n")
+					break
+				}
+
+				fmt.Println("Error reading line:", err)
+				return
 			}
-		}
 
-		logLine, _, err := log.ReadLine()
-		if err != nil {
-			if err.Error() == "EOF" {
-				println(i)
-				fmt.Printf("\n")
-				break
+			if debug {
+				println(strings.Trim(gb.Cpu.Log, "\n"))
 			}
-
-			fmt.Println("Error reading line:", err)
-			return
-		}
-
-		if !ignoreLog {
-			if strings.Trim(string(logLine), "\n") != strings.Trim(output, "\n") {
-				t.Fatalf("%v/%v: not equal!\ngot: \n%vwant: \n%v", i, nrOfLines, output, string(logLine))
+			if !ignoreLogResult {
+				if strings.Trim(string(logLine), "\n") != strings.Trim(gb.Cpu.Log, "\n") {
+					t.Fatalf("%v/%v: not equal!\ngot: \n%v\nwant: \n%v", i, nrOfLines, gb.Cpu.Log, string(logLine))
+				}
 			}
+			i++
 		}
-		i++
 
 		/*
 			// print serial output
@@ -220,7 +226,6 @@ func testRom(
 
 	// ASSERT
 	res := gb.SerialLink.GetLog()
-
 	if strings.Trim(res[len(res)-7:], "\n") != "Passe" && !strings.Contains(res, "Passed") && !strings.Contains(res, "Passe") {
 		t.Fatalf("%v did not return 'Passed'\n", romName)
 	}

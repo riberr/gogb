@@ -42,6 +42,9 @@ func New() *Interrupts {
 		_if:  0,
 	}
 }
+func (i *Interrupts) IsInterruptsRequested() bool {
+	return i._if&i._ie != 0
+}
 
 func (i *Interrupts) GetIF() uint8 {
 	return i._if

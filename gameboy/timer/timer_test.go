@@ -87,10 +87,6 @@ func TestTIMAClockDEnabled(t *testing.T) {
 	}
 	steppedTima := timer.Read(0xFF05)
 
-	println(initialTima)
-	println(steppedTima)
-	println(cycles)
-
 	if initialTima == steppedTima {
 		t.Fatalf("tima should increment as timer is enabled")
 	}
@@ -122,17 +118,15 @@ func TestDivIncrease2(t *testing.T) {
 }
 
 func TestTimaIncrease(t *testing.T) {
-	/*
-		if 1024 != addTima(0b_0000_00100) {
-			t.Fatalf("should be 1024")
-		}
-		if 16 != addTima(0b_0000_00101) {
-			t.Fatalf("should be 16")
-		}
-		if 64 != addTima(0b_0000_00110) {
-			t.Fatalf("should be 64")
-		}
-	*/
+	if 1024 != addTima(0b_0000_00100) {
+		t.Fatalf("should be 1024")
+	}
+	if 16 != addTima(0b_0000_00101) {
+		t.Fatalf("should be 16")
+	}
+	if 64 != addTima(0b_0000_00110) {
+		t.Fatalf("should be 64")
+	}
 	if 256 != addTima(0b_0000_00111) {
 		t.Fatalf("should be 256")
 	}
@@ -145,7 +139,6 @@ func addTima(TAC uint8) uint16 {
 
 	for {
 		timer.Tick()
-		println("tick")
 
 		if timer.Read(0xFF05) == 1 {
 			break

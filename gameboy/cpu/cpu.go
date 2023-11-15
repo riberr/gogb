@@ -21,10 +21,13 @@ type CPU struct {
 	lsb, msb, e uint8  // temp values when executing opcodes
 	ee          uint16 // temp value when executing opcodes
 
-	state      state
-	currOpcode OpCode
-	currStep   int
-	Cycle      int
+	state         state
+	currOpcode    OpCode
+	currStep      int
+	Cycle         int
+	interruptFlag interrupts.Flag
+	Log           string
+	NewLog        bool
 }
 
 type state int
@@ -41,9 +44,7 @@ const (
 	InterruptPushPCLow
 	InterruptCall
 
-	// Useful combinations
-	Interruptable     = FetchOpCode | Halted | Stopped
-	HandlingInterrupt = InterruptWait0 | InterruptWait1 | InterruptPushPCHigh | InterruptPushPCLow | InterruptCall
+	Interruptable = FetchOpCode | Halted | Stopped
 )
 
 func New(bus *bus.Bus, interrupts *interrupts.Interrupts, debug bool) *CPU {
@@ -71,17 +72,23 @@ func (cpu *CPU) Step() {
 	}
 	cpu.Cycle = 0
 
-	// handle interrupts
-	if cpu.state == Interruptable {
-		// todo
+	if (cpu.state&Interruptable != 0) && cpu.interrupts.IsIME() && cpu.interrupts.GetEnabledFlaggedInterrupt() != -1 {
+		cpu.state = InterruptWait0
 	}
 
-	// exit HALT even if IME is not set
-	// todo
+	if (cpu.state == Halted) && cpu.interrupts.GetEnabledFlaggedInterrupt() != -1 {
+		cpu.state = FetchOpCode
+	}
 
 	switch cpu.state {
+	case Halted, Stopped:
+		// do nothing
+		cpu.Log = fmt.Sprintf("A:%02X F:%02X B:%02X C:%02X D:%02X E:%02X H:%02X L:%02X SP:%04X PC:%04X PCMEM:%02X,%02X,%02X,%02X",
+			cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
+			cpu.bus.Read(cpu.pc), cpu.bus.Read(cpu.pc+1), cpu.bus.Read(cpu.pc+2), cpu.bus.Read(cpu.pc+3))
+		cpu.NewLog = true
+		return
 	case FetchOpCode:
-		//println("FetchOpCode")
 		cpu.currOpcode = OpCodes[cpu.bus.Read(cpu.pc)]
 
 		if cpu.debug {
@@ -93,16 +100,23 @@ func (cpu *CPU) Step() {
 				cpu.currOpcode.label,
 			)
 		}
+		cpu.Log = fmt.Sprintf("A:%02X F:%02X B:%02X C:%02X D:%02X E:%02X H:%02X L:%02X SP:%04X PC:%04X PCMEM:%02X,%02X,%02X,%02X",
+			cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
+			cpu.bus.Read(cpu.pc), cpu.bus.Read(cpu.pc+1), cpu.bus.Read(cpu.pc+2), cpu.bus.Read(cpu.pc+3))
+		cpu.NewLog = true
 
 		cpu.pc++
 		if cpu.currOpcode.mCycles == 1 {
+			if cpu.currOpcode.value == 0x76 {
+				cpu.state = Halted
+				return
+			}
 			cpu.currOpcode.steps[0](cpu)
 		} else {
 			cpu.currStep = 0
 			cpu.state = Execute
 		}
 	case Execute:
-		//println("Execute")
 		cpu.jumpStop = false
 		cpu.currOpcode.steps[cpu.currStep](cpu)
 		cpu.currStep++
@@ -110,37 +124,34 @@ func (cpu *CPU) Step() {
 		if cpu.jumpStop || cpu.currStep == len(cpu.currOpcode.steps) { // fetch takes one m_cycle
 			cpu.state = FetchOpCode
 		}
-
-		/*
-			for _, step := range cpu.currOpcode.steps {
-				step(cpu)
-
-				if cpu.jumpStop {
-					break
-				}
-			}
-		*/
-	}
-
-	// interrupts
-	if cpu.interrupts.IsIME() {
-		flag := cpu.interrupts.GetEnabledFlaggedInterrupt()
-		if flag == -1 {
-
+	case InterruptWait0:
+		// [TCAGBD:4.9] mentions a 2-cycle idle upon handling interrupt request.
+		cpu.state = InterruptWait1
+	case InterruptWait1:
+		cpu.interruptFlag = cpu.interrupts.GetEnabledFlaggedInterrupt()
+		if cpu.interruptFlag == -1 {
+			cpu.state = FetchOpCode
 		} else {
 			cpu.interrupts.DisableIME()
-			cpu.interrupts.ClearIF(flag)
-			cpu.sp--
-			cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc))
-			cpu.sp--
-			cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc))
-			cpu.pc = interrupts.ISR_address[flag]
+			cpu.interrupts.ClearIF(cpu.interruptFlag)
+			cpu.state = InterruptPushPCHigh
 		}
+	case InterruptPushPCHigh:
+		cpu.sp--
+		cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc))
+		cpu.state = InterruptPushPCLow
+	case InterruptPushPCLow:
+		cpu.sp--
+		cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc))
+		cpu.state = InterruptCall
+	case InterruptCall:
+		cpu.pc = interrupts.ISR_address[cpu.interruptFlag]
+		cpu.state = FetchOpCode
 	}
 }
 
-// GetInternalState returns a string representing the internal state of the cpu
-func (cpu *CPU) GetInternalState() string {
+// GetInternalString returns a string representing the internal state of the cpu
+func (cpu *CPU) GetInternalString() string {
 	return fmt.Sprintf("A:%02X F:%02X B:%02X C:%02X D:%02X E:%02X H:%02X L:%02X SP:%04X PC:%04X PCMEM:%02X,%02X,%02X,%02X\n",
 		cpu.regs.a, cpu.regs.f, cpu.regs.b, cpu.regs.c, cpu.regs.d, cpu.regs.e, cpu.regs.h, cpu.regs.l, cpu.sp, cpu.pc,
 		cpu.bus.Read(cpu.pc), cpu.bus.Read(cpu.pc+1), cpu.bus.Read(cpu.pc+2), cpu.bus.Read(cpu.pc+3))

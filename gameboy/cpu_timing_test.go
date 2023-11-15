@@ -1,7 +1,6 @@
 package gameboy
 
 import (
-	"gogb/gameboy/cpu"
 	"strings"
 	"testing"
 )
@@ -35,20 +34,20 @@ func testTimingWithRom(
 	}
 
 	// RUN TEST
-	i := 1
 	lastLog := ""
 	for {
 		gb.Step()
-		i++
 
 		res := gb.SerialLink.GetLog()
+
+		//
 		if res != lastLog {
+
 			println(strings.Trim(res, "\n"))
+			println(gb.Timer.Read(0xFF05))
 		}
+		//println(strings.Trim(gb.Cpu.Log, "\n"))
 		lastLog = res
-		if gb.Cpu.GetState() == cpu.FetchOpCode && gb.Cpu.Cycle == 3 {
-			print(gb.Cpu.GetInternalState())
-		}
 	}
 
 	// ASSERT

@@ -28,17 +28,16 @@ type Bus struct {
 	interrupts *interrupts.Interrupts
 	timer      *timer.Timer
 	sl         *seriallink.SerialLink
+	vram       Space
+	eram       Space
+	wramC      Space
+	wramD      Space
+	echoRam    Space
+	oam        Space
+	notUsable  Space
+	ioRegs     Space
+	hram       Space
 }
-
-var vram = NewMemory(0x8000, 0x9FFF) // Video RAM
-var eram = NewMemory(0xA000, 0xBFFF) // External RAM
-var wramC = NewMemory(0xC000, 0xCFFF)
-var wramD = NewMemory(0xD000, 0xDFFF)
-var echoRam = NewMemory(0xE000, 0xFDFF)
-var oam = NewMemory(0xFE00, 0xFE9F) // Object attribute bus
-var notUsable = NewMemory(0xFEA0, 0xFEFF)
-var ioRegs = NewMemory(0xFF00, 0xFF7F) // I/O Registers
-var hram = NewMemory(0xFF80, 0xFFFE)
 
 //var ieReg uint8 = 0 //Interrupt Enable register
 
@@ -48,6 +47,15 @@ func New(interrupts *interrupts.Interrupts, timer *timer.Timer, sl *seriallink.S
 		interrupts: interrupts,
 		timer:      timer,
 		sl:         sl,
+		vram:       NewSpace(0x8000, 0x9FFF), // Video RAM
+		eram:       NewSpace(0xA000, 0xBFFF), // External RAM
+		wramC:      NewSpace(0xC000, 0xCFFF),
+		wramD:      NewSpace(0xD000, 0xDFFF),
+		echoRam:    NewSpace(0xE000, 0xFDFF),
+		oam:        NewSpace(0xFE00, 0xFE9F), // Object attribute bus
+		notUsable:  NewSpace(0xFEA0, 0xFEFF),
+		ioRegs:     NewSpace(0xFF00, 0xFF7F), // I/O Registers
+		hram:       NewSpace(0xFF80, 0xFFFE),
 	}
 }
 
@@ -66,36 +74,36 @@ func (b *Bus) Read(address uint16) uint8 {
 		return 0x90
 	}
 
-	if vram.has(address) {
-		return vram.read(address)
+	if b.vram.has(address) {
+		return b.vram.read(address)
 	}
 
-	if eram.has(address) {
-		return eram.read(address)
+	if b.eram.has(address) {
+		return b.eram.read(address)
 	}
 
-	if wramC.has(address) {
-		return wramC.read(address)
+	if b.wramC.has(address) {
+		return b.wramC.read(address)
 	}
 
-	if wramD.has(address) {
-		return wramD.read(address)
+	if b.wramD.has(address) {
+		return b.wramD.read(address)
 	}
 
-	if echoRam.has(address) {
-		return echoRam.read(address)
+	if b.echoRam.has(address) {
+		return b.echoRam.read(address)
 	}
 
-	if oam.has(address) {
-		return oam.read(address)
+	if b.oam.has(address) {
+		return b.oam.read(address)
 	}
 
-	if notUsable.has(address) {
-		return notUsable.read(address)
+	if b.notUsable.has(address) {
+		return b.notUsable.read(address)
 	}
 
-	if hram.has(address) {
-		return hram.read(address)
+	if b.hram.has(address) {
+		return b.hram.read(address)
 	}
 
 	switch address {
@@ -111,8 +119,8 @@ func (b *Bus) Read(address uint16) uint8 {
 	case 0xFFFF:
 		return b.interrupts.GetIE()
 	default:
-		if ioRegs.has(address) {
-			return ioRegs.read(address)
+		if b.ioRegs.has(address) {
+			return b.ioRegs.read(address)
 		}
 	}
 
@@ -127,43 +135,43 @@ func (b *Bus) Write(address uint16, value uint8) {
 		return
 	}
 
-	if vram.has(address) {
-		vram.write(address, value)
+	if b.vram.has(address) {
+		b.vram.write(address, value)
 		return
 	}
 
-	if eram.has(address) {
-		eram.write(address, value)
+	if b.eram.has(address) {
+		b.eram.write(address, value)
 		return
 	}
 
-	if wramC.has(address) {
-		wramC.write(address, value)
+	if b.wramC.has(address) {
+		b.wramC.write(address, value)
 		return
 	}
 
-	if wramD.has(address) {
-		wramD.write(address, value)
+	if b.wramD.has(address) {
+		b.wramD.write(address, value)
 		return
 	}
 
-	if echoRam.has(address) {
-		echoRam.write(address, value)
+	if b.echoRam.has(address) {
+		b.echoRam.write(address, value)
 		return
 	}
 
-	if oam.has(address) {
-		oam.write(address, value)
+	if b.oam.has(address) {
+		b.oam.write(address, value)
 		return
 	}
 
-	if notUsable.has(address) {
-		notUsable.write(address, value)
+	if b.notUsable.has(address) {
+		b.notUsable.write(address, value)
 		return
 	}
 
-	if hram.has(address) {
-		hram.write(address, value)
+	if b.hram.has(address) {
+		b.hram.write(address, value)
 		return
 	}
 
@@ -185,8 +193,8 @@ func (b *Bus) Write(address uint16, value uint8) {
 		b.interrupts.SetAllIE(value)
 		return
 	default:
-		if ioRegs.has(address) {
-			ioRegs.write(address, value)
+		if b.ioRegs.has(address) {
+			b.ioRegs.write(address, value)
 			return
 		}
 	}

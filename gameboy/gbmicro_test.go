@@ -1,50 +1,104 @@
 package gameboy
 
 import (
+	"errors"
+	"fmt"
+	"log"
+	"os"
+	"strings"
 	"testing"
 )
 
-func TestGbMicro(t *testing.T) {
-	testGbMicro(
+type test struct {
+	rom string
+}
+
+func TestOneRom(t *testing.T) {
+	got, want, _ := testGbMicro(
 		"../third_party/gbmicrotest/bin/",
-		"halt_bug.gb",
-		t,
+		"int_timer_halt.gb",
 	)
+
+	if got != want {
+		t.Fatalf("Got %d, Want %d\n", got, want)
+	}
+	fmt.Printf("Correct result: %d\n", got)
+}
+
+func TestTimer(t *testing.T) {
+	roms := getRoms("../third_party/gbmicrotest/bin/", "timer_")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			//t.Parallel()
+			got, want, err := testGbMicro("../third_party/gbmicrotest/bin/", test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if got != want {
+				t.Errorf("got %d, want %d", got, want)
+			}
+			fmt.Printf("Correct result: %d\n", got)
+		})
+	}
+}
+
+func TestInterruptsTimer(t *testing.T) {
+	roms := getRoms("../third_party/gbmicrotest/bin/", "int_timer")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			//t.Parallel()
+			got, want, err := testGbMicro("../third_party/gbmicrotest/bin/", test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if got != want {
+				t.Errorf("got %d, want %d", got, want)
+			}
+			fmt.Printf("Correct result: %d\n", got)
+		})
+	}
 }
 
 func testGbMicro(
 	romPath string,
 	romName string,
-	t *testing.T,
-) {
+	// t *testing.T,
+) (uint8, uint8, error) {
 	// SETUP
-	gb := New(false)
+	gb := New(true)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
-		t.Fatalf("error loading rom")
+		return 0, 0, errors.New("could not load rom")
 	}
 
 	// RUN TEST
-	lastLog := ""
 	for {
 		gb.Step()
 
-		res := gb.Cpu.Log
-
-		//
-		if res != lastLog {
-			println(res)
-		}
-		lastLog = res
-
 		if gb.Bus.Read(0xFF82) != 0 {
-			println(gb.Bus.Read(0xFF80))
-			println(gb.Bus.Read(0xFF81))
-			println(gb.Bus.Read(0xFF82))
-			break
+			if gb.Bus.Read(0xFF80) != gb.Bus.Read(0xFF81) {
+				fmt.Printf("%v: Did not pass: test result: %v, expected result: %v",
+					romName, gb.Bus.Read(0xFF80), gb.Bus.Read(0xFF81))
+			}
+			return gb.Bus.Read(0xFF80), gb.Bus.Read(0xFF81), nil
 		}
 	}
-	if gb.Bus.Read(0xFF82) != 1 {
-		t.Fatalf("did not pass")
+}
+
+func getRoms(path string, filterHasPrefix string) []test {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	var res []test
+	for _, e := range entries {
+		if strings.HasPrefix(e.Name(), filterHasPrefix) {
+			res = append(res, test{rom: e.Name()})
+		}
+	}
+
+	return res
 }

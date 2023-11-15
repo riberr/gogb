@@ -49,7 +49,7 @@ func TestCpuOutputBlargg03(t *testing.T) {
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/3.log",
-		true,
+		false,
 		false,
 		t,
 	)

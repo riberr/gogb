@@ -116,6 +116,7 @@ func (cpu *CPU) Step() {
 				if cpu.interrupts.IsHaltBug() {
 					cpu.haltBug = true
 				} else {
+					println("halted")
 					cpu.state = Halted
 				}
 				return

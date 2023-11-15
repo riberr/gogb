@@ -6,7 +6,7 @@ func TestMemoryHas(t *testing.T) {
 	const from = 0xC000
 	const to = 0xCFFF
 
-	mem := NewMemory(from, to)
+	mem := NewSpace(from, to)
 
 	if mem.has(from) == false {
 		t.Fatal("should be true")
@@ -29,7 +29,7 @@ func TestMemoryAddressRange(t *testing.T) {
 	const from = 0xC000
 	const to = 0xCFFF
 
-	mem := NewMemory(from, to)
+	mem := NewSpace(from, to)
 
 	if mem.read(from) != 0 {
 		t.Fatal("should be 0")

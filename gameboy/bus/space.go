@@ -7,7 +7,7 @@ type Space struct {
 	data []uint8
 }
 
-func NewMemory(from uint16, to uint16) Space {
+func NewSpace(from uint16, to uint16) Space {
 	size := to - from + 1
 	mem := Space{
 		from: from,

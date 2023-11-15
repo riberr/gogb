@@ -39,7 +39,7 @@ func New() *Interrupts {
 	return &Interrupts{
 		_ime: false,
 		_ie:  0,
-		_if:  0,
+		_if:  0, //0xE1??
 	}
 }
 func (i *Interrupts) IsInterruptsRequested() bool {
@@ -47,6 +47,7 @@ func (i *Interrupts) IsInterruptsRequested() bool {
 }
 
 func (i *Interrupts) IsHaltBug() bool {
+	println("yo")
 	return (i._ie&i._if&0x1F) != 0 && !i._ime
 }
 

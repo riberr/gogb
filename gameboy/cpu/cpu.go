@@ -26,6 +26,7 @@ type CPU struct {
 	currStep      int
 	Cycle         int
 	interruptFlag interrupts.Flag
+	haltBug       bool
 	Log           string
 	NewLog        bool
 }
@@ -105,10 +106,18 @@ func (cpu *CPU) Step() {
 			cpu.bus.Read(cpu.pc), cpu.bus.Read(cpu.pc+1), cpu.bus.Read(cpu.pc+2), cpu.bus.Read(cpu.pc+3))
 		cpu.NewLog = true
 
-		cpu.pc++
+		if cpu.haltBug {
+			cpu.haltBug = false
+		} else {
+			cpu.pc++
+		}
 		if cpu.currOpcode.mCycles == 1 {
 			if cpu.currOpcode.value == 0x76 {
-				cpu.state = Halted
+				if cpu.interrupts.IsHaltBug() {
+					cpu.haltBug = true
+				} else {
+					cpu.state = Halted
+				}
 				return
 			}
 			cpu.currOpcode.steps[0](cpu)

@@ -46,6 +46,10 @@ func (i *Interrupts) IsInterruptsRequested() bool {
 	return i._if&i._ie != 0
 }
 
+func (i *Interrupts) IsHaltBug() bool {
+	return (i._ie&i._if&0x1F) != 0 && !i._ime
+}
+
 func (i *Interrupts) GetIF() uint8 {
 	return i._if
 }

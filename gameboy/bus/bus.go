@@ -188,6 +188,9 @@ func (b *Bus) Write(address uint16, value uint8) {
 	case 0xFF0F:
 		b.interrupts.SetAllIF(value)
 		return
+	case 0xFF46:
+		b.doDMATransfer(value)
+		return
 	case 0xFFFF:
 
 		b.interrupts.SetAllIE(value)
@@ -200,4 +203,11 @@ func (b *Bus) Write(address uint16, value uint8) {
 	}
 
 	log.Panicf("WRITE NO IMPL (%02x)", address)
+}
+
+func (b *Bus) doDMATransfer(value uint8) {
+	address := uint16(value) << 8 // source address is data * 100
+	for i := uint16(0); i < 0xA0; i++ {
+		b.Write(uint16(0xFE00)+i, b.Read(address+i))
+	}
 }

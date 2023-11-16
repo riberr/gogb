@@ -4,5 +4,6 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/third_party/gameboy-doctor" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/third_party/gb-test-roms" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/third_party/gbmicrotest" vcs="Git" />
   </component>
 </project>

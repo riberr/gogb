@@ -10,7 +10,7 @@ var OpCodes8bitLoadGenerated = map[uint8]OpCode{
 	// ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 	//  Load register (register)
-	0x40: NewOpCode(0x40, "LD B,B", 1, 4, []func(cpu *CPU){func(cpu *CPU) {}}),
+	0x40: NewOpCode(0x40, "LD B,B", 1, 4, []func(cpu *CPU){func(cpu *CPU) { panic("yo") }}),
 	0x41: NewOpCode(0x41, "LD B,C", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = cpu.regs.c }}),
 	0x42: NewOpCode(0x42, "LD B,D", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = cpu.regs.d }}),
 	0x43: NewOpCode(0x43, "LD B,E", 1, 4, []func(cpu *CPU){func(cpu *CPU) { cpu.regs.b = cpu.regs.e }}),

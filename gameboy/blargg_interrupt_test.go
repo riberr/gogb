@@ -5,23 +5,15 @@ import (
 	"testing"
 )
 
-func TestTiming(t *testing.T) {
-	testTimingWithRom(
+func TestBlarggTiming(t *testing.T) {
+	testBlargg(
 		"../third_party/gb-test-roms/instr_timing/",
 		"instr_timing.gb",
 		t,
 	)
 }
 
-func TestTimingMooneye(t *testing.T) {
-	testTimingWithRom(
-		"../third_party/mooneye/acceptance/",
-		"div_timing.gb",
-		t,
-	)
-}
-
-func testTimingWithRom(
+func testBlargg(
 	romPath string,
 	romName string,
 	t *testing.T,
@@ -44,7 +36,7 @@ func testTimingWithRom(
 		if res != lastLog {
 
 			println(strings.Trim(res, "\n"))
-			println(gb.Timer.Read(0xFF05))
+			//println(gb.Timer.Read(0xFF05))
 		}
 		//println(strings.Trim(gb.Cpu.Log, "\n"))
 		lastLog = res

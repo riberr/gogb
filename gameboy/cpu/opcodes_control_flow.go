@@ -183,7 +183,10 @@ var OpCodesControlFlow = map[uint8]OpCode{
 	0xd9: NewOpCode(0xd9, "RETI", 1, 16, []func(cpu *CPU){
 		func(cpu *CPU) { cpu.lsb = cpu.bus.Read(cpu.sp); cpu.sp++ },
 		func(cpu *CPU) { cpu.msb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.pc = utils.ToUint16(cpu.lsb, cpu.msb); cpu.interrupts.EnableIME() },
+		func(cpu *CPU) {
+			cpu.pc = utils.ToUint16(cpu.lsb, cpu.msb)
+			cpu.interrupts.SetIMEEnabling(true) /*cpu.interrupts.EnableIME()*/
+		},
 	}),
 
 	// Restart / Call function (implied)

@@ -27,9 +27,13 @@ var OpCodesRotateShiftBitoperations = map[uint8]OpCode{
 		func(cpu *CPU) {
 			opCodeCB := OpCodesCB[cpu.bus.Read(cpu.pc)]
 			cpu.pc++
+
+			ticks := 4 // fetch counts as 4 t cycles
 			for _, step := range opCodeCB.steps {
 				step(cpu)
+				ticks += 4
 			}
+			cpu.thisCpuTicks += ticks
 		},
 	}),
 }

@@ -12,9 +12,10 @@ import (
 // 4   Joypad
 
 type Interrupts struct {
-	_ime bool  // IME: Interrupt master enable flag [write only]
-	_ie  uint8 // FFFF — IE: Interrupt enable
-	_if  uint8 // FF0F — IF: Interrupt flag
+	ime         bool // IME: Interrupt master enable flag [write only]
+	imeEnabling bool
+	_ie         uint8 // FFFF — IE: Interrupt enable
+	_if         uint8 // FF0F — IF: Interrupt flag
 }
 
 var ISR_address = []uint16{
@@ -37,18 +38,19 @@ const (
 
 func New() *Interrupts {
 	return &Interrupts{
-		_ime: false,
-		_ie:  0,
-		_if:  0, //0xE1??
+		ime: false,
+		_ie: 0,
+		_if: 0, //0xE1??
 	}
 }
+
 func (i *Interrupts) IsInterruptsRequested() bool {
 	return i._if&i._ie != 0
 }
 
 func (i *Interrupts) IsHaltBug() bool {
-	println("yo")
-	return (i._ie&i._if&0x1F) != 0 && !i._ime
+	println("is haltbug!")
+	return (i._ie&i._if&0x1F) != 0 && !i.ime
 }
 
 func (i *Interrupts) GetIF() uint8 {
@@ -104,14 +106,22 @@ func (i *Interrupts) GetEnabledFlaggedInterrupt() Flag {
 	}
 }
 
+func (i *Interrupts) GetIMEEnabling() bool {
+	return i.imeEnabling
+}
+
+func (i *Interrupts) SetIMEEnabling(value bool) {
+	i.imeEnabling = value
+}
+
 func (i *Interrupts) DisableIME() {
-	i._ime = false
+	i.ime = false
 }
 
 func (i *Interrupts) EnableIME() {
-	i._ime = true
+	i.ime = true
 }
 
 func (i *Interrupts) IsIME() bool {
-	return i._ime
+	return i.ime
 }

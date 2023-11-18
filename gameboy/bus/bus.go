@@ -27,6 +27,7 @@ type Bus struct {
 	cart       *Cart
 	interrupts *interrupts.Interrupts
 	timer      *timer.Timer
+	timer2     *timer.Timer2
 	sl         *seriallink.SerialLink
 	vram       Space
 	eram       Space
@@ -41,11 +42,12 @@ type Bus struct {
 
 //var ieReg uint8 = 0 //Interrupt Enable register
 
-func New(interrupts *interrupts.Interrupts, timer *timer.Timer, sl *seriallink.SerialLink) *Bus {
+func New(interrupts *interrupts.Interrupts, timer *timer.Timer, timer2 *timer.Timer2, sl *seriallink.SerialLink) *Bus {
 	return &Bus{
 		cart:       &Cart{},
 		interrupts: interrupts,
 		timer:      timer,
+		timer2:     timer2,
 		sl:         sl,
 		vram:       NewSpace(0x8000, 0x9FFF), // Video RAM
 		eram:       NewSpace(0xA000, 0xBFFF), // External RAM
@@ -112,8 +114,12 @@ func (b *Bus) Read(address uint16) uint8 {
 	case 0xFF02:
 		return 0xFF // TODO REMOVE!!
 		//return b.sl.GetSC()
+		/*
+			case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
+				return b.timer.Read(address)
+		*/
 	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
-		return b.timer.Read(address)
+		return b.timer2.Read(address)
 	case 0xFF0F:
 		return b.interrupts.GetIF()
 	case 0xFFFF:
@@ -182,9 +188,15 @@ func (b *Bus) Write(address uint16, value uint8) {
 	case 0xFF02:
 		b.sl.SetSC(value)
 		return
+	/*
+		case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
+			b.timer.Write(address, value)
+			return
+	*/
 	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
-		b.timer.Write(address, value)
+		b.timer2.Write(address, value)
 		return
+
 	case 0xFF0F:
 		b.interrupts.SetAllIF(value)
 		return

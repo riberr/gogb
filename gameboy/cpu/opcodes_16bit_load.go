@@ -78,19 +78,30 @@ var OpCodes16bitLoadGenerated = map[uint8]OpCode{
 	// Pop from stack
 	0xc1: NewOpCode(0xc1, "POP BC", 1, 12, []func(cpu *CPU){
 		func(cpu *CPU) { cpu.lsb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.msb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.regs.setBC(utils.ToUint16(cpu.lsb, cpu.msb)) },
-	}),
+		func(cpu *CPU) {
+			cpu.msb = cpu.bus.Read(cpu.sp)
+			cpu.sp++
+			cpu.regs.setBC(utils.ToUint16(cpu.lsb, cpu.msb))
+		}}),
 	0xd1: NewOpCode(0xd1, "POP DE", 1, 12, []func(cpu *CPU){
 		func(cpu *CPU) { cpu.lsb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.msb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.regs.setDE(utils.ToUint16(cpu.lsb, cpu.msb)) }}),
+		func(cpu *CPU) {
+			cpu.msb = cpu.bus.Read(cpu.sp)
+			cpu.sp++
+			cpu.regs.setDE(utils.ToUint16(cpu.lsb, cpu.msb))
+		}}),
 	0xe1: NewOpCode(0xe1, "POP HL", 1, 12, []func(cpu *CPU){
 		func(cpu *CPU) { cpu.lsb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.msb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.regs.setHL(utils.ToUint16(cpu.lsb, cpu.msb)) }}),
+		func(cpu *CPU) {
+			cpu.msb = cpu.bus.Read(cpu.sp)
+			cpu.sp++
+			cpu.regs.setHL(utils.ToUint16(cpu.lsb, cpu.msb))
+		}}),
 	0xf1: NewOpCode(0xf1, "POP AF", 1, 12, []func(cpu *CPU){
 		func(cpu *CPU) { cpu.lsb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.msb = cpu.bus.Read(cpu.sp); cpu.sp++ },
-		func(cpu *CPU) { cpu.regs.setAF(utils.ToUint16(cpu.lsb, cpu.msb) & 0xFFF0) }}), // lower 4 bits of F reg is always 0b0000
+		func(cpu *CPU) {
+			cpu.msb = cpu.bus.Read(cpu.sp)
+			cpu.sp++
+			cpu.regs.setAF(utils.ToUint16(cpu.lsb, cpu.msb) & 0xFFF0)
+		}}), // lower 4 bits of F reg is always 0b0000
 }

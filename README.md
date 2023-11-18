@@ -18,7 +18,9 @@
 - https://github.com/wheremyfoodat/Gameboy-logs/tree/master   test rom logs
 - https://bgb.bircd.org/  debugger
 - https://github.com/raddad772/jsmoo/blob/main/system/gb/gb.js
-
+- https://github.com/Humpheh/goboy/tree/master  main go inspiration
+- https://github.com/guigzzz/GoGB/blob/master/backend/cpu.go#L62  go
+- https://github.com/theinternetftw/dmgo/blob/master/dmgo.go#L492 go
 ## timing related:
 
 - http://blog.rekawek.eu/2017/02/09/coffee-gb/#cpu-timing

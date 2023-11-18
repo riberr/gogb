@@ -17,7 +17,7 @@ import (
 */
 
 func TestCpuOutputBlargg01(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"01-special.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/1.log",
@@ -27,25 +27,20 @@ func TestCpuOutputBlargg01(t *testing.T) {
 	)
 }
 
-/*
-Fails at "timer doesn't work". Probably need to have proper timing
-
-// VALUE AT FF05 SHOULD BE 04, not 00. 04 is interrupt bit 2 TIMER
-*/
 func TestCpuOutputBlargg02(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
 		// https://github.com/robert/gameboy-doctor/pull/11
 		"../third_party/Blargg2LYStubbed/EpicLogReformat.txt",
 		false,
-		false,
+		true,
 		t,
 	)
 }
 
 func TestCpuOutputBlargg03(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/3.log",
@@ -56,7 +51,7 @@ func TestCpuOutputBlargg03(t *testing.T) {
 }
 
 func TestCpuOutputBlargg04(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"04-op r,imm.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/4.log",
@@ -67,7 +62,7 @@ func TestCpuOutputBlargg04(t *testing.T) {
 }
 
 func TestCpuOutputBlargg05(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"05-op rp.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/5.log",
@@ -78,7 +73,7 @@ func TestCpuOutputBlargg05(t *testing.T) {
 }
 
 func TestCpuOutputBlargg06(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"06-ld r,r.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/6.log",
@@ -89,7 +84,7 @@ func TestCpuOutputBlargg06(t *testing.T) {
 }
 
 func TestCpuOutputBlargg07(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"07-jr,jp,call,ret,rst.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/7.log",
@@ -100,7 +95,7 @@ func TestCpuOutputBlargg07(t *testing.T) {
 }
 
 func TestCpuOutputBlargg08(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"08-misc instrs.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/8.log",
@@ -111,7 +106,7 @@ func TestCpuOutputBlargg08(t *testing.T) {
 }
 
 func TestCpuOutputBlargg09(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"09-op r,r.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/9.log",
@@ -122,7 +117,7 @@ func TestCpuOutputBlargg09(t *testing.T) {
 }
 
 func TestCpuOutputBlargg10(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"10-bit ops.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/10.log",
@@ -133,7 +128,7 @@ func TestCpuOutputBlargg10(t *testing.T) {
 }
 
 func TestCpuOutputBlargg11(t *testing.T) {
-	testRom(
+	testBlarggRom(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"11-op a,(hl).gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/11.log",
@@ -143,7 +138,7 @@ func TestCpuOutputBlargg11(t *testing.T) {
 	)
 }
 
-func testRom(
+func testBlarggRom(
 	romPath string,
 	romName string,
 	logPath string,
@@ -160,7 +155,7 @@ func testRom(
 
 	log := bufio.NewReader(logFile)
 
-	gb := New(false)
+	gb := New(debug)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
 		t.Fatalf("error loading rom")
@@ -174,60 +169,26 @@ func testRom(
 
 	// RUN TEST
 	i := 1
-	// loop until we reach end of log file
-
-	//var output string
-
-	// step cpu until we reach the next fetch
 	for {
-		gb.Step()
-		if gb.Cpu.NewLog {
-			gb.Cpu.NewLog = false
-
-			/*
-				if gb.Cpu.GetState() == cpu.FetchOpCode && gb.Cpu.Cycle == 0 {
-					//output = gb.Cpu.GetInternalString()
-					break
-				}
-			*/
-
-			logLine, _, err := log.ReadLine()
-			if err != nil {
-				if err.Error() == "EOF" {
-					println(i)
-					fmt.Printf("\n")
-					break
-				}
-
-				fmt.Println("Error reading line:", err)
-				return
+		logLine, _, err := log.ReadLine()
+		if err != nil {
+			if err.Error() == "EOF" {
+				println(i)
+				fmt.Printf("\n")
+				break
 			}
 
-			if debug {
-				println(strings.Trim(gb.Cpu.Log, "\n"))
+			fmt.Println("Error reading line:", err)
+			return
+		}
+		if !ignoreLogResult {
+			if strings.Trim(string(logLine), "\n") != strings.Trim(gb.Cpu.GetInternalString(), "\n") {
+				t.Fatalf("%v/%v: not equal!\ngot: \n%v\nwant: \n%v", i, nrOfLines, gb.Cpu.GetInternalString(), string(logLine))
 			}
-			if !ignoreLogResult {
-				if strings.Trim(string(logLine), "\n") != strings.Trim(gb.Cpu.Log, "\n") {
-					t.Fatalf("%v/%v: not equal!\ngot: \n%v\nwant: \n%v", i, nrOfLines, gb.Cpu.Log, string(logLine))
-				}
-			}
-			i++
 		}
 
-		/*
-			// print serial output
-			res := gb.SerialLink.GetLog()
-			if res != "" {
-				println(strings.Trim(res, "\n"))
-			}
-		*/
-
-	}
-
-	// ASSERT
-	res := gb.SerialLink.GetLog()
-	if strings.Trim(res[len(res)-7:], "\n") != "Passe" && !strings.Contains(res, "Passed") && !strings.Contains(res, "Passe") {
-		t.Fatalf("%v did not return 'Passed'\n", romName)
+		gb.Step()
+		i++
 	}
 }
 

@@ -9,7 +9,9 @@ import (
 )
 
 type GameBoy struct {
+	Interrupts *interrupts2.Interrupts
 	Timer      *timerPackage.Timer
+	timer2     *timerPackage.Timer2
 	SerialLink *seriallink.SerialLink
 	Bus        *busPackage.Bus
 	Cpu        *cpuPackage.CPU
@@ -18,12 +20,15 @@ type GameBoy struct {
 func New(debug bool) *GameBoy {
 	interrupts := interrupts2.New()
 	timer := timerPackage.New(interrupts)
+	timer2 := timerPackage.NewTimer2(interrupts)
 	sl := seriallink.New()
-	bus := busPackage.New(interrupts, timer, sl)
+	bus := busPackage.New(interrupts, timer, timer2, sl)
 	cpu := cpuPackage.New(bus, interrupts, debug)
 
 	return &GameBoy{
+		Interrupts: interrupts,
 		Timer:      timer,
+		timer2:     timer2,
 		SerialLink: sl,
 		Bus:        bus,
 		Cpu:        cpu,
@@ -31,9 +36,25 @@ func New(debug bool) *GameBoy {
 }
 
 func (gb *GameBoy) Step() int {
-	gb.Timer.Tick()
-	gb.Cpu.Step()
-	return 1
+	cycles := 0
+	cyclesOp := 0
+
+	cyclesOp = gb.Cpu.Step()
+
+	cycles += cyclesOp
+
+	/*
+		for i := 0; i < cyclesOp; i++ {
+			gb.Timer.Tick()
+		}
+	*/
+	gb.timer2.UpdateTimers(cyclesOp)
+
+	//gb.updateGraphics(cyclesOp)
+	cycles += gb.Cpu.DoInterrupts()
+
+	//gb.Sound.Buffer(cyclesOp, gb.getSpeed())
+	return cycles
 }
 
 func Run() {

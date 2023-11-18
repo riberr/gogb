@@ -43,12 +43,7 @@ func (gb *GameBoy) Step() int {
 
 	cycles += cyclesOp
 
-	/*
-		for i := 0; i < cyclesOp; i++ {
-			gb.Timer.Tick()
-		}
-	*/
-	gb.timer2.UpdateTimers(cyclesOp)
+	gb.Timer.UpdateTimers(cyclesOp)
 
 	//gb.updateGraphics(cyclesOp)
 	cycles += gb.Cpu.DoInterrupts()

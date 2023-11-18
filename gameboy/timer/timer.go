@@ -24,6 +24,12 @@ func New(interrupts *interrupts.Interrupts) *Timer {
 	}
 }
 
+func (t *Timer) UpdateTimers(cycles int) {
+	for i := 0; i < cycles; i++ {
+		t.Tick()
+	}
+}
+
 func (t *Timer) Tick() {
 	t.updateSysClk((t.sysclk + 1) & 0xFFFF)
 	if !t.overflow {

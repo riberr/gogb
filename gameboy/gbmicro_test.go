@@ -27,6 +27,7 @@ func TestOneRom(t *testing.T) {
 	fmt.Printf("Correct result: %d\n", got)
 }
 
+// Passes all except 3: timer_tima_write_a, timer_tima_write_c, timer_tima_write_e. Very close though.
 func TestTimer(t *testing.T) {
 	roms := getRoms(romsPath, "timer_")
 
@@ -45,6 +46,7 @@ func TestTimer(t *testing.T) {
 	}
 }
 
+// passes 2/7. GoBoy passes 3 (diff is int_timer_incs.gb)
 func TestInterruptsTimer(t *testing.T) {
 	roms := getRoms(romsPath, "int_timer")
 
@@ -63,6 +65,7 @@ func TestInterruptsTimer(t *testing.T) {
 	}
 }
 
+// passes 5/7. not dma_basic nor dma_timing_a
 func TestDma(t *testing.T) {
 	roms := getRoms(romsPath, "dma_")
 
@@ -81,6 +84,7 @@ func TestDma(t *testing.T) {
 	}
 }
 
+// passes 0. GoBoy passes halt_op_dupe and halt_op_dupe_delay
 func TestHalt(t *testing.T) {
 	roms := getRoms(romsPath, "halt_")
 
@@ -105,7 +109,7 @@ func testGbMicro(
 	// t *testing.T,
 ) (uint8, uint8, error) {
 	// SETUP
-	gb := New(true)
+	gb := New(false)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
 		return 0, 0, errors.New("could not load rom")

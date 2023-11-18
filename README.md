@@ -30,3 +30,7 @@
 - https://github.com/rvaccarim/FrozenBoy/blob/dac3dac1d33301019c02a78f9473f80d07999747/FrozenBoyCore/Processor/CPU.cs#L65
 - https://github.com/lazy-stripes/goholint/blob/657eaca119e2215dd5bd69b9dd2168ae3a280cd2/cpu/cpu.go#L58
 - https://github.com/trekawek/coffee-gb/blob/fb24b380da437890e0447d8b93d11b09d126f38f/src/main/java/eu/rekawek/coffeegb/cpu/Cpu.java#L66
+
+Notes
+- GoBoy passes the same gbmicrotests, at least for timer and interrupts
+- Mooneye test requires graphics to be implemented or else they just "time out"

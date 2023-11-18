@@ -114,12 +114,9 @@ func (b *Bus) Read(address uint16) uint8 {
 	case 0xFF02:
 		return 0xFF // TODO REMOVE!!
 		//return b.sl.GetSC()
-		/*
-			case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
-				return b.timer.Read(address)
-		*/
+
 	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
-		return b.timer2.Read(address)
+		return b.timer.Read(address)
 	case 0xFF0F:
 		return b.interrupts.GetIF()
 	case 0xFFFF:
@@ -188,15 +185,10 @@ func (b *Bus) Write(address uint16, value uint8) {
 	case 0xFF02:
 		b.sl.SetSC(value)
 		return
-	/*
-		case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
-			b.timer.Write(address, value)
-			return
-	*/
-	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
-		b.timer2.Write(address, value)
-		return
 
+	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
+		b.timer.Write(address, value)
+		return
 	case 0xFF0F:
 		b.interrupts.SetAllIF(value)
 		return

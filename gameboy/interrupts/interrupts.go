@@ -40,7 +40,7 @@ func New() *Interrupts {
 	return &Interrupts{
 		ime: false,
 		_ie: 0,
-		_if: 0, //0xE1??
+		_if: 0xE1, //0xE1??
 	}
 }
 

@@ -1,7 +1,7 @@
 package interrupts
 
 import (
-	"gogb/utils"
+	"gogb/gameboy/utils"
 )
 
 // Bit position

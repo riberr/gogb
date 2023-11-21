@@ -2,7 +2,7 @@ package timer
 
 import (
 	interrupts2 "gogb/gameboy/interrupts"
-	"gogb/utils"
+	"gogb/gameboy/utils"
 )
 
 // Not used. Implementation taken from GoBoy

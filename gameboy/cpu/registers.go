@@ -1,6 +1,8 @@
 package cpu
 
-import "gogb/utils"
+import (
+	"gogb/gameboy/utils"
+)
 
 type Registers struct {
 	a uint8

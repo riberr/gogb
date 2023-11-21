@@ -2,8 +2,10 @@ package bus
 
 import (
 	"gogb/gameboy/interrupts"
+	"gogb/gameboy/ppu"
 	"gogb/gameboy/seriallink"
 	"gogb/gameboy/timer"
+	"gogb/gameboy/utils"
 	"log"
 )
 
@@ -29,35 +31,37 @@ type Bus struct {
 	timer      *timer.Timer
 	timer2     *timer.Timer2
 	sl         *seriallink.SerialLink
-	vram       Space
-	eram       Space
-	wramC      Space
-	wramD      Space
-	echoRam    Space
-	oam        Space
-	notUsable  Space
-	ioRegs     Space
-	hram       Space
+	ppu        *ppu.PPU
+	//vram       Space
+	eram    utils.Space
+	wramC   utils.Space
+	wramD   utils.Space
+	echoRam utils.Space
+	//oam        Space
+	notUsable utils.Space
+	ioRegs    utils.Space
+	hram      utils.Space
 }
 
 //var ieReg uint8 = 0 //Interrupt Enable register
 
-func New(interrupts *interrupts.Interrupts, timer *timer.Timer, timer2 *timer.Timer2, sl *seriallink.SerialLink) *Bus {
+func New(interrupts *interrupts.Interrupts, timer *timer.Timer, timer2 *timer.Timer2, sl *seriallink.SerialLink, ppu *ppu.PPU) *Bus {
 	return &Bus{
 		cart:       &Cart{},
 		interrupts: interrupts,
 		timer:      timer,
 		timer2:     timer2,
 		sl:         sl,
-		vram:       NewSpace(0x8000, 0x9FFF), // Video RAM
-		eram:       NewSpace(0xA000, 0xBFFF), // External RAM
-		wramC:      NewSpace(0xC000, 0xCFFF),
-		wramD:      NewSpace(0xD000, 0xDFFF),
-		echoRam:    NewSpace(0xE000, 0xFDFF),
-		oam:        NewSpace(0xFE00, 0xFE9F), // Object attribute bus
-		notUsable:  NewSpace(0xFEA0, 0xFEFF),
-		ioRegs:     NewSpace(0xFF00, 0xFF7F), // I/O Registers
-		hram:       NewSpace(0xFF80, 0xFFFE),
+		ppu:        ppu,
+		//vram:       NewSpace(0x8000, 0x9FFF), // Video RAM
+		eram:    utils.NewSpace(0xA000, 0xBFFF), // External RAM
+		wramC:   utils.NewSpace(0xC000, 0xCFFF),
+		wramD:   utils.NewSpace(0xD000, 0xDFFF),
+		echoRam: utils.NewSpace(0xE000, 0xFDFF),
+		//oam:        NewSpace(0xFE00, 0xFE9F), // Object attribute bus
+		notUsable: utils.NewSpace(0xFEA0, 0xFEFF),
+		ioRegs:    utils.NewSpace(0xFF00, 0xFF7F), // I/O Registers
+		hram:      utils.NewSpace(0xFF80, 0xFFFE),
 	}
 }
 
@@ -76,36 +80,38 @@ func (b *Bus) Read(address uint16) uint8 {
 		return 0x90
 	}
 
-	if b.vram.has(address) {
-		return b.vram.read(address)
+	if b.ppu.Vram.Has(address) {
+		//println("reading from vram")
+		return b.ppu.Vram.Read(address)
 	}
 
-	if b.eram.has(address) {
-		return b.eram.read(address)
+	if b.eram.Has(address) {
+		return b.eram.Read(address)
 	}
 
-	if b.wramC.has(address) {
-		return b.wramC.read(address)
+	if b.wramC.Has(address) {
+		return b.wramC.Read(address)
 	}
 
-	if b.wramD.has(address) {
-		return b.wramD.read(address)
+	if b.wramD.Has(address) {
+		return b.wramD.Read(address)
 	}
 
-	if b.echoRam.has(address) {
-		return b.echoRam.read(address)
+	if b.echoRam.Has(address) {
+		return b.echoRam.Read(address)
 	}
 
-	if b.oam.has(address) {
-		return b.oam.read(address)
+	if b.ppu.Oam.Has(address) {
+		//println("reading from vram")
+		return b.ppu.Oam.Read(address)
 	}
 
-	if b.notUsable.has(address) {
-		return b.notUsable.read(address)
+	if b.notUsable.Has(address) {
+		return b.notUsable.Read(address)
 	}
 
-	if b.hram.has(address) {
-		return b.hram.read(address)
+	if b.hram.Has(address) {
+		return b.hram.Read(address)
 	}
 
 	switch address {
@@ -122,8 +128,8 @@ func (b *Bus) Read(address uint16) uint8 {
 	case 0xFFFF:
 		return b.interrupts.GetIE()
 	default:
-		if b.ioRegs.has(address) {
-			return b.ioRegs.read(address)
+		if b.ioRegs.Has(address) {
+			return b.ioRegs.Read(address)
 		}
 	}
 
@@ -138,43 +144,45 @@ func (b *Bus) Write(address uint16, value uint8) {
 		return
 	}
 
-	if b.vram.has(address) {
-		b.vram.write(address, value)
+	if b.ppu.Vram.Has(address) {
+		println("writing to vram")
+		b.ppu.Vram.Write(address, value)
 		return
 	}
 
-	if b.eram.has(address) {
-		b.eram.write(address, value)
+	if b.eram.Has(address) {
+		b.eram.Write(address, value)
 		return
 	}
 
-	if b.wramC.has(address) {
-		b.wramC.write(address, value)
+	if b.wramC.Has(address) {
+		b.wramC.Write(address, value)
 		return
 	}
 
-	if b.wramD.has(address) {
-		b.wramD.write(address, value)
+	if b.wramD.Has(address) {
+		b.wramD.Write(address, value)
 		return
 	}
 
-	if b.echoRam.has(address) {
-		b.echoRam.write(address, value)
+	if b.echoRam.Has(address) {
+		b.echoRam.Write(address, value)
 		return
 	}
 
-	if b.oam.has(address) {
-		b.oam.write(address, value)
+	if b.ppu.Oam.Has(address) {
+		println("writing to oam")
+		b.ppu.Oam.Write(address, value)
 		return
 	}
 
-	if b.notUsable.has(address) {
-		b.notUsable.write(address, value)
+	if b.notUsable.Has(address) {
+		b.notUsable.Write(address, value)
 		return
 	}
 
-	if b.hram.has(address) {
-		b.hram.write(address, value)
+	if b.hram.Has(address) {
+		b.hram.Write(address, value)
 		return
 	}
 
@@ -200,8 +208,8 @@ func (b *Bus) Write(address uint16, value uint8) {
 		b.interrupts.SetAllIE(value)
 		return
 	default:
-		if b.ioRegs.has(address) {
-			b.ioRegs.write(address, value)
+		if b.ioRegs.Has(address) {
+			b.ioRegs.Write(address, value)
 			return
 		}
 	}
@@ -210,6 +218,7 @@ func (b *Bus) Write(address uint16, value uint8) {
 }
 
 func (b *Bus) doDMATransfer(value uint8) {
+	println("DMADMADMA")
 	address := uint16(value) << 8 // source address is data * 100
 	for i := uint16(0); i < 0xA0; i++ {
 		b.Write(uint16(0xFE00)+i, b.Read(address+i))

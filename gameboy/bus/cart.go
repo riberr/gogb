@@ -2,7 +2,7 @@ package bus
 
 import (
 	"fmt"
-	"gogb/utils"
+	"gogb/gameboy/utils"
 	"os"
 )
 

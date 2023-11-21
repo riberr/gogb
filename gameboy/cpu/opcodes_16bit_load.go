@@ -1,7 +1,7 @@
 package cpu
 
 import (
-	"gogb/utils"
+	"gogb/gameboy/utils"
 )
 
 var OpCodes16bitLoadGenerated = map[uint8]OpCode{

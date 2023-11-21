@@ -1,7 +1,7 @@
 package cpu
 
 import (
-	"gogb/utils"
+	"gogb/gameboy/utils"
 )
 
 var OpCodesControlFlow = map[uint8]OpCode{

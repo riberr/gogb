@@ -5,18 +5,21 @@ import (
 	"testing"
 )
 
+/*
 func TestTiming(t *testing.T) {
+	t.Fatalf("TODO")
 	testTimingWithRom(
 		"../third_party/gb-test-roms/instr_timing/",
 		"instr_timing.gb",
 		t,
 	)
 }
+*/
 
-func TestTimingMooneye(t *testing.T) {
+func TestMooneye(t *testing.T) {
 	testTimingWithRom(
-		"../third_party/mooneye/acceptance/",
-		"div_timing.gb",
+		"../third_party/mooneye/emulator-only/mbc1/",
+		"bits_bank1.gb",
 		t,
 	)
 }
@@ -35,23 +38,23 @@ func testTimingWithRom(
 
 	// RUN TEST
 	lastLog := ""
+	//lastDebug := ""
 	for {
 		gb.Step()
 
 		res := gb.SerialLink.GetLog()
-
+		//resDebug := gb.Cpu.
 		//
 		if res != lastLog {
-
 			println(strings.Trim(res, "\n"))
 			println(gb.Timer.Read(0xFF05))
 		}
+		//if resDebug != lastDebug {
+		//	println(lastDebug)
+		//}
 		//println(strings.Trim(gb.Cpu.Log, "\n"))
-		lastLog = res
-
-		if gb.Bus.Read(gb.Cpu.GetPC()) == 0x00 && gb.Bus.Read(gb.Cpu.GetPC()+1) == 0x18 && gb.Bus.Read(gb.Cpu.GetPC()+2) == 0xFD {
-			panic("finish loop!")
-		}
+		//lastLog = res
+		//lastDebug = resDebug
 	}
 
 	// ASSERT

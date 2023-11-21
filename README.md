@@ -3,6 +3,7 @@
 - https://robertovaccari.com/blog/2020_09_26_gameboy/
 - https://rylev.github.io/DMG-01/public/book/cpu/registers.html
 - https://github.com/rockytriton/LLD_gbemu/blob/main/part2-3/include/cart.h
+- http://www.codeslinger.co.uk/pages/projects/gameboy/lcd.html
 
 ## docs:
 

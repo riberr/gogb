@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"gogb/gameboy/bus"
 	"gogb/gameboy/interrupts"
-	"gogb/utils"
+	"gogb/gameboy/utils"
 )
 
 type CPU struct {
@@ -88,7 +88,8 @@ func (cpu *CPU) Step() int {
 			}
 		}
 	*/
-	fmt.Printf("ticks %v jumpstop %v\n", cpu.thisCpuTicks, cpu.jumpStop)
+
+	//fmt.Printf("ticks %v jumpstop %v\n", cpu.thisCpuTicks, cpu.jumpStop)
 	return cpu.thisCpuTicks
 }
 

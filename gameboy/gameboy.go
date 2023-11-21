@@ -4,6 +4,7 @@ import (
 	busPackage "gogb/gameboy/bus"
 	cpuPackage "gogb/gameboy/cpu"
 	interrupts2 "gogb/gameboy/interrupts"
+	ppu2 "gogb/gameboy/ppu"
 	"gogb/gameboy/seriallink"
 	timerPackage "gogb/gameboy/timer"
 )
@@ -22,7 +23,8 @@ func New(debug bool) *GameBoy {
 	timer := timerPackage.New(interrupts)
 	timer2 := timerPackage.NewTimer2(interrupts)
 	sl := seriallink.New()
-	bus := busPackage.New(interrupts, timer, timer2, sl)
+	ppu := ppu2.New()
+	bus := busPackage.New(interrupts, timer, timer2, sl, ppu)
 	cpu := cpuPackage.New(bus, interrupts, debug)
 
 	return &GameBoy{

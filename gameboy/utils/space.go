@@ -1,4 +1,4 @@
-package bus
+package utils
 
 type Space struct {
 	from uint16
@@ -19,15 +19,15 @@ func NewSpace(from uint16, to uint16) Space {
 	return mem
 }
 
-func (m *Space) write(address uint16, value uint8) {
+func (m *Space) Write(address uint16, value uint8) {
 	m.data[address-m.from] = value
 }
 
-func (m *Space) read(address uint16) uint8 {
+func (m *Space) Read(address uint16) uint8 {
 	return m.data[address-m.from]
 }
 
-func (m *Space) has(address uint16) bool {
+func (m *Space) Has(address uint16) bool {
 	if m.from <= address && address <= m.to {
 		return true
 	} else {

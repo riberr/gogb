@@ -41,6 +41,7 @@ type Bus struct {
 	notUsable utils.Space
 	ioRegs    utils.Space
 	hram      utils.Space
+	ly        uint8 // todo remove when impl ppu
 }
 
 //var ieReg uint8 = 0 //Interrupt Enable register
@@ -62,6 +63,7 @@ func New(interrupts *interrupts.Interrupts, timer *timer.Timer, timer2 *timer.Ti
 		notUsable: utils.NewSpace(0xFEA0, 0xFEFF),
 		ioRegs:    utils.NewSpace(0xFF00, 0xFF7F), // I/O Registers
 		hram:      utils.NewSpace(0xFF80, 0xFFFE),
+		ly:        0, // todo remove when impl ppu
 	}
 }
 
@@ -75,9 +77,10 @@ func (b *Bus) Read(address uint16) uint8 {
 		return b.cart.read(address)
 	}
 
-	// todo remove when implementing PPU
+	// todo remove when impl ppu
 	if address == 0xFF44 {
-		return 0x90
+		b.ly++
+		return b.ly
 	}
 
 	if b.ppu.Vram.Has(address) {
@@ -115,6 +118,8 @@ func (b *Bus) Read(address uint16) uint8 {
 	}
 
 	switch address {
+	case 0xFF00: //joypad
+		return 0xFF
 	case 0xFF01:
 		return b.sl.GetSB()
 	case 0xFF02:
@@ -145,7 +150,6 @@ func (b *Bus) Write(address uint16, value uint8) {
 	}
 
 	if b.ppu.Vram.Has(address) {
-		println("writing to vram")
 		b.ppu.Vram.Write(address, value)
 		return
 	}
@@ -171,7 +175,6 @@ func (b *Bus) Write(address uint16, value uint8) {
 	}
 
 	if b.ppu.Oam.Has(address) {
-		println("writing to oam")
 		b.ppu.Oam.Write(address, value)
 		return
 	}

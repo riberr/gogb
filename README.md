@@ -22,6 +22,7 @@
 - https://github.com/Humpheh/goboy/tree/master  main go inspiration
 - https://github.com/guigzzz/GoGB/blob/master/backend/cpu.go#L62  go
 - https://github.com/theinternetftw/dmgo/blob/master/dmgo.go#L492 go
+- https://github.com/duysqubix/gobc go (pixel)
 ## timing related:
 
 - http://blog.rekawek.eu/2017/02/09/coffee-gb/#cpu-timing
@@ -35,3 +36,4 @@
 Notes
 - GoBoy passes the same gbmicrotests, at least for timer and interrupts
 - Mooneye test requires graphics to be implemented or else they just "time out"
+- pixel on windows: https://github.com/gopxl/pixel/wiki/Building-Pixel-on-Windows

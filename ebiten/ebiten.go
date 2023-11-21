@@ -6,62 +6,33 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 	"gogb/gameboy"
-	"image"
 	"image/color"
 	"log"
 )
 
+type Game struct {
+	gb *gameboy.GameBoy
+}
+
 const (
-	screenWidth  = 320
-	screenHeight = 240
+	screenWidth    = 1024
+	screenHeight   = 768
+	scale          = 4
+	cyclesPerFrame = 69905
+	debugWidth     = (16 * 8 * scale) + (16 * scale)
+	debugHeight    = (24 * 8 * scale) + (24 * scale)
 )
 
-type rand struct {
-	x, y, z, w uint32
-}
-
-func (r *rand) next() uint32 {
-	// math/rand is too slow to keep 60 FPS on web browsers.
-	// Use Xorshift instead: http://en.wikipedia.org/wiki/Xorshift
-	t := r.x ^ (r.x << 11)
-	r.x, r.y, r.z = r.y, r.z, r.w
-	r.w = (r.w ^ (r.w >> 19)) ^ (t ^ (t >> 8))
-	return r.w
-}
-
-var theRand = &rand{12345678, 4185243, 776511, 45411}
-
-type Game struct {
-	noiseImage *image.RGBA
-	gb         *gameboy.GameBoy
-}
-
-const CYCLES = 69905
-
 func (g *Game) Update() error {
-	// Generate the noise with random RGB values.
-	const l = screenWidth * screenHeight
-	for i := 0; i < l; i++ {
-		x := theRand.next()
-		g.noiseImage.Pix[4*i] = uint8(x >> 24)
-		g.noiseImage.Pix[4*i+1] = uint8(x >> 16)
-		g.noiseImage.Pix[4*i+2] = uint8(x >> 8)
-		g.noiseImage.Pix[4*i+3] = 0xff
-	}
-
 	cyclesThisUpdate := 0
-	for cyclesThisUpdate < CYCLES {
+	for cyclesThisUpdate < cyclesPerFrame {
 		cyclesThisUpdate += g.gb.Step()
 	}
 	return nil
 }
 
-const scale = 4
-
 // https://github.com/rockytriton/LLD_gbemu/blob/main/part11/lib/ui.c
 func (g *Game) drawTile(screen *ebiten.Image, startLocation uint16, tileNum uint16, x int, y int) {
-	//rc := ebiten.NewImage(scale, scale)
-	//var colors = int[]{0xFFFFFFFF, 0xFFAAAAAA, 0xFF555555, 0xFF000000}
 	colors := []color.RGBA{
 		{R: 0xFF, G: 0xFF, B: 0xFF, A: 0xFF},
 		{R: 0xAA, G: 0xAA, B: 0xAA, A: 0xFF},
@@ -98,7 +69,7 @@ func (g *Game) drawTile(screen *ebiten.Image, startLocation uint16, tileNum uint
 			rcw := scale
 			rch := scale
 
-			fmt.Printf("%v, %v, %v, %v, %v\n", rcx, rcy, rcw, rch, colors[c])
+			//fmt.Printf("%v, %v, %v, %v, %v\n", rcx, rcy, rcw, rch, colors[c])
 
 			vector.DrawFilledRect(screen, float32(rcx), float32(rcy), float32(rcw), float32(rch), colors[c], false)
 		}
@@ -107,11 +78,6 @@ func (g *Game) drawTile(screen *ebiten.Image, startLocation uint16, tileNum uint
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-
-	//screen.WritePixels(g.noiseImage.Pix)
-	//dst := ebiten.Image{}
-	vector.DrawFilledRect(screen, 0, 0, 100, 100, color.White, false)
-
 	xDraw := 0
 	yDraw := 0
 	tileNum := uint16(0)
@@ -135,33 +101,19 @@ func (g *Game) Draw(screen *ebiten.Image) {
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return screenWidth, screenHeight
+	return outsideWidth, outsideHeight
 }
 
 func New(gb *gameboy.GameBoy) *Game {
 	return &Game{
-		noiseImage: image.NewRGBA(image.Rect(0, 0, screenWidth, screenHeight)),
-		gb:         gb,
+		gb: gb,
 	}
 }
 
 func (g *Game) Run() {
-	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
+	ebiten.SetWindowSize(debugWidth, debugHeight)
 	ebiten.SetWindowTitle("Noise (Ebitengine Demo)")
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}
 }
-
-/*
-func Run() {
-	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
-	ebiten.SetWindowTitle("Noise (Ebitengine Demo)")
-	g := &Game{
-		noiseImage: image.NewRGBA(image.Rect(0, 0, screenWidth, screenHeight)),
-	}
-	if err := ebiten.RunGame(g); err != nil {
-		log.Fatal(err)
-	}
-}
-*/

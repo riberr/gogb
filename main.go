@@ -6,11 +6,11 @@ import (
 )
 
 func main() {
-	//romPath := "third_party/games/"
-	//romName := "Tetris.gb"
+	romPath := "third_party/games/"
+	romName := "Tetris.gb"
 
-	romPath := "third_party/gb-test-roms/cpu_instrs/individual/"
-	romName := "01-special.gb"
+	//romPath := "third_party/gb-test-roms/cpu_instrs/individual/"
+	//romName := "01-special.gb"
 
 	gb := gameboy.New(false)
 	if !gb.Bus.LoadCart(romPath, romName) {

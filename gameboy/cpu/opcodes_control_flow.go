@@ -191,43 +191,43 @@ var OpCodesControlFlow = map[uint8]OpCode{
 
 	// Restart / Call function (implied)
 	0xc7: NewOpCode(0xc7, "RST 00h", 1, 16, []func(cpu *CPU){
+		func(cpu *CPU) {}, // internal delay
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc)) },
-		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
-		func(cpu *CPU) { cpu.pc = 0x00 },
+		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)); cpu.pc = 0x00 },
 	}),
 	0xcf: NewOpCode(0xcf, "RST 08h", 1, 16, []func(cpu *CPU){
+		func(cpu *CPU) {},
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc)) },
-		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
-		func(cpu *CPU) { cpu.pc = 0x08 },
+		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)); cpu.pc = 0x08 },
 	}),
 	0xd7: NewOpCode(0xd7, "RST 10h", 1, 16, []func(cpu *CPU){
+		func(cpu *CPU) {},
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc)) },
-		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
-		func(cpu *CPU) { cpu.pc = 0x10 },
+		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)); cpu.pc = 0x10 },
 	}),
 	0xdf: NewOpCode(0xdf, "RST 18h", 1, 16, []func(cpu *CPU){
+		func(cpu *CPU) {},
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc)) },
-		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
-		func(cpu *CPU) { cpu.pc = 0x18 },
+		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)); cpu.pc = 0x18 },
 	}),
 	0xe7: NewOpCode(0xe7, "RST 20h", 1, 16, []func(cpu *CPU){
+		func(cpu *CPU) {},
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc)) },
-		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
-		func(cpu *CPU) { cpu.pc = 0x20 },
+		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)); cpu.pc = 0x20 },
 	}),
 	0xef: NewOpCode(0xef, "RST 28h", 1, 16, []func(cpu *CPU){
+		func(cpu *CPU) {},
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc)) },
-		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
-		func(cpu *CPU) { cpu.pc = 0x28 },
+		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)); cpu.pc = 0x28 },
 	}),
 	0xf7: NewOpCode(0xf7, "RST 30h", 1, 16, []func(cpu *CPU){
+		func(cpu *CPU) {},
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc)) },
-		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
-		func(cpu *CPU) { cpu.pc = 0x30 },
+		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)); cpu.pc = 0x30 },
 	}),
 	0xff: NewOpCode(0xff, "RST 38h", 1, 16, []func(cpu *CPU){
+		func(cpu *CPU) {},
 		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc)) },
-		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)) },
-		func(cpu *CPU) { cpu.pc = 0x38 },
+		func(cpu *CPU) { cpu.sp--; cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc)); cpu.pc = 0x38 },
 	}),
 }

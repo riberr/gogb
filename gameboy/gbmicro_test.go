@@ -13,11 +13,11 @@ type test struct {
 	rom string
 }
 
-const romsPath = "../third_party/gbmicrotest/bin/"
+const romsPathGbMicro = "../third_party/gbmicrotest/bin/"
 
 func TestOneRom(t *testing.T) {
 	got, want, _ := testGbMicro(
-		romsPath,
+		romsPathGbMicro,
 		"int_timer_halt.gb",
 	)
 
@@ -29,12 +29,12 @@ func TestOneRom(t *testing.T) {
 
 // Passes all except 3: timer_tima_write_a, timer_tima_write_c, timer_tima_write_e. Very close though.
 func TestTimer(t *testing.T) {
-	roms := getRoms(romsPath, "timer_")
+	roms := getRoms(romsPathGbMicro, "timer_")
 
 	for _, test := range roms {
 		t.Run(test.rom, func(t *testing.T) {
 			//t.Parallel()
-			got, want, err := testGbMicro(romsPath, test.rom)
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
 			if err != nil {
 				t.Fatalf("error: %v", err)
 			}
@@ -48,12 +48,12 @@ func TestTimer(t *testing.T) {
 
 // passes 2/7. GoBoy passes 3 (diff is int_timer_incs.gb)
 func TestInterruptsTimer(t *testing.T) {
-	roms := getRoms(romsPath, "int_timer")
+	roms := getRoms(romsPathGbMicro, "int_timer")
 
 	for _, test := range roms {
 		t.Run(test.rom, func(t *testing.T) {
 			//t.Parallel()
-			got, want, err := testGbMicro(romsPath, test.rom)
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
 			if err != nil {
 				t.Fatalf("error: %v", err)
 			}
@@ -67,12 +67,12 @@ func TestInterruptsTimer(t *testing.T) {
 
 // passes 0. GoBoy passes halt_op_dupe and halt_op_dupe_delay
 func TestHalt(t *testing.T) {
-	roms := getRoms(romsPath, "halt_")
+	roms := getRoms(romsPathGbMicro, "halt_")
 
 	for _, test := range roms {
 		t.Run(test.rom, func(t *testing.T) {
 			//t.Parallel()
-			got, want, err := testGbMicro(romsPath, test.rom)
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
 			if err != nil {
 				t.Fatalf("error: %v", err)
 			}
@@ -86,12 +86,12 @@ func TestHalt(t *testing.T) {
 
 // passes 5/7. not dma_basic nor dma_timing_a
 func TestDma(t *testing.T) {
-	roms := getRoms(romsPath, "dma_")
+	roms := getRoms(romsPathGbMicro, "dma_")
 
 	for _, test := range roms {
 		t.Run(test.rom, func(t *testing.T) {
 			//t.Parallel()
-			got, want, err := testGbMicro(romsPath, test.rom)
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
 			if err != nil {
 				t.Fatalf("error: %v", err)
 			}
@@ -104,12 +104,12 @@ func TestDma(t *testing.T) {
 }
 
 func TestVram(t *testing.T) {
-	roms := getRoms(romsPath, "vram")
+	roms := getRoms(romsPathGbMicro, "vram")
 
 	for _, test := range roms {
 		t.Run(test.rom, func(t *testing.T) {
 			//t.Parallel()
-			got, want, err := testGbMicro(romsPath, test.rom)
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
 			if err != nil {
 				t.Fatalf("error: %v", err)
 			}
@@ -122,12 +122,12 @@ func TestVram(t *testing.T) {
 }
 
 func TestOam(t *testing.T) {
-	roms := getRoms(romsPath, "oam_write")
+	roms := getRoms(romsPathGbMicro, "oam_write")
 
 	for _, test := range roms {
 		t.Run(test.rom, func(t *testing.T) {
 			//t.Parallel()
-			got, want, err := testGbMicro(romsPath, test.rom)
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
 			if err != nil {
 				t.Fatalf("error: %v", err)
 			}
@@ -173,7 +173,7 @@ func getRoms(path string, filterHasPrefix string) []test {
 
 	var res []test
 	for _, e := range entries {
-		if strings.HasPrefix(e.Name(), filterHasPrefix) {
+		if strings.HasPrefix(e.Name(), filterHasPrefix) && strings.HasSuffix(e.Name(), ".gb") {
 			res = append(res, test{rom: e.Name()})
 		}
 	}

@@ -9,7 +9,7 @@ const cpuFreq = 4194304
 
 func TestDIVSecond(t *testing.T) {
 	// SETUP
-	timer := NewTimer2(interrupts.New())
+	timer := New(interrupts.New())
 	var cycles = 0
 
 	// 1 second

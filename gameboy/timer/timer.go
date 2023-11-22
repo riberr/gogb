@@ -3,6 +3,7 @@ package timer
 import "gogb/gameboy/interrupts"
 
 // Timer is kinda ported from https://github.com/raddad772/jsmoo/blob/main/system/gb/gb_cpu.js
+// and https://github.com/rvaccarim/FrozenBoy/blob/master/FrozenBoyCore/Processor/Timer.cs
 type Timer struct {
 	interrupts *interrupts.Interrupts
 
@@ -67,9 +68,10 @@ func (t *Timer) updateSysClk(newValue uint16) {
 }
 
 func (t *Timer) UpdateTima() {
-	t.tima = (t.tima + 1) & 0xFF // Increment TIMA
+	//t.tima = (t.tima + 1) & 0xFF // Increment TIMA
 
-	if t.tima == 0 {
+	t.tima++
+	if t.tima == 0 { // or == 0xFF?
 		t.overflow = true
 		t.ticksSinceOverflow = 0
 	}

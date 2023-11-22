@@ -1,65 +1,113 @@
 package gameboy
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 	"testing"
 )
 
-/*
-func TestTiming(t *testing.T) {
-	t.Fatalf("TODO")
-	testTimingWithRom(
-		"../third_party/gb-test-roms/instr_timing/",
-		"instr_timing.gb",
-		t,
+func TestOneMooneye(t *testing.T) {
+	res, err := testMooneye(
+		"../third_party/mooneye/acceptance/timer/",
+		"div_write.gb",
 	)
-}
-*/
-
-func TestMooneye(t *testing.T) {
-	testTimingWithRom(
-		"../third_party/mooneye/emulator-only/mbc1/",
-		"bits_bank1.gb",
-		t,
-	)
+	if err != nil {
+		t.Fatalf("error: %v", err)
+	}
+	if !res {
+		t.Errorf("Failed")
+	}
 }
 
-func testTimingWithRom(
+func TestMooneyeTimer(t *testing.T) {
+	path := "../third_party/mooneye/acceptance/timer/"
+	roms := getRoms(path, "")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			result, err := testMooneye(path, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if !result {
+				t.Errorf("Failed")
+			}
+		})
+	}
+}
+
+func TestMooneyeInterrupts(t *testing.T) {
+	path := "../third_party/mooneye/acceptance/interrupts/"
+	roms := getRoms(path, "")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			result, err := testMooneye(path, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if !result {
+				t.Errorf("Failed")
+			}
+		})
+	}
+}
+
+func TestMooneyeTimingAndVarious(t *testing.T) {
+	path := "../third_party/mooneye/acceptance/"
+	roms := getRoms(path, "")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			result, err := testMooneye(path, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if !result {
+				t.Errorf("Failed")
+			}
+		})
+	}
+}
+
+func testMooneye(
 	romPath string,
 	romName string,
-	t *testing.T,
-) {
-	// SETUP
+) (bool, error) {
 	gb := New(false)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
-		t.Fatalf("error loading rom")
+		return false, errors.New("could not load rom")
 	}
 
-	// RUN TEST
-	lastLog := ""
-	//lastDebug := ""
-	for {
+	// iterate until detecting finish loop or until max iterations
+	for i := 0; i < 10000000; i++ {
 		gb.Step()
-
-		res := gb.SerialLink.GetLog()
-		//resDebug := gb.Cpu.
-		//
-		if res != lastLog {
-			println(strings.Trim(res, "\n"))
-			println(gb.Timer.Read(0xFF05))
+		if inFinishLoop(gb) {
+			println("finish loop")
+			break
 		}
-		//if resDebug != lastDebug {
-		//	println(lastDebug)
-		//}
-		//println(strings.Trim(gb.Cpu.Log, "\n"))
-		//lastLog = res
-		//lastDebug = resDebug
 	}
 
-	// ASSERT
-	res := gb.SerialLink.GetLog()
-	if strings.Trim(res[len(res)-7:], "\n") != "Passed" {
-		t.Fatalf("%v did not return 'Passed'\n", romName)
+	if !didPass(gb) {
+		fmt.Printf("registers not fibonacci: %v", gb.Cpu.GetInternalString())
+		return false, nil
 	}
+
+	return true, nil
+}
+
+func inFinishLoop(gb *GameBoy) bool {
+	return gb.Bus.Read(gb.Cpu.GetPC()) == 0x00 &&
+		gb.Bus.Read(gb.Cpu.GetPC()+1) == 0x18 &&
+		gb.Bus.Read(gb.Cpu.GetPC()+2) == 0xFD
+}
+
+func didPass(gb *GameBoy) bool {
+	regs := gb.Cpu.GetInternalString()
+	if strings.HasPrefix(regs, "A:00 F:C0 B:03 C:05 D:08 E:0D H:15 L:22") {
+		return true
+	}
+	return false
 }

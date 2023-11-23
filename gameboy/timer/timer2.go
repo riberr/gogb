@@ -46,7 +46,7 @@ func (t *Timer2) UpdateTimers(cycles int) {
 }
 
 func (t *Timer2) isClockEnabled() bool {
-	return utils.HasBit(t.tac, 2)
+	return utils.TestBit(t.tac, 2)
 }
 
 func (t *Timer2) GetClockFreq() byte {

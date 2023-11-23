@@ -70,7 +70,7 @@ func (i *Interrupts) ClearIF(flag Flag) {
 }
 
 func (i *Interrupts) IsIF(flag Flag) bool {
-	return utils.HasBit(i._if, int(flag))
+	return utils.TestBit(i._if, int(flag))
 }
 
 func (i *Interrupts) GetIE() uint8 {
@@ -86,7 +86,7 @@ func (i *Interrupts) SetIE(flag Flag) {
 }
 
 func (i *Interrupts) IsIE(flag Flag) bool {
-	return utils.HasBit(i._ie, int(flag))
+	return utils.TestBit(i._ie, int(flag))
 }
 
 func (i *Interrupts) GetEnabledFlaggedInterrupt() Flag {

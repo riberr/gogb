@@ -41,7 +41,7 @@ type Bus struct {
 	notUsable utils.Space
 	ioRegs    utils.Space
 	hram      utils.Space
-	ly        uint8 // todo remove when impl ppu
+	//ly        uint8 // todo remove when impl ppu
 }
 
 //var ieReg uint8 = 0 //Interrupt Enable register
@@ -63,7 +63,7 @@ func New(interrupts *interrupts.Interrupts, timer *timer.Timer, timer2 *timer.Ti
 		notUsable: utils.NewSpace(0xFEA0, 0xFEFF),
 		ioRegs:    utils.NewSpace(0xFF00, 0xFF7F), // I/O Registers
 		hram:      utils.NewSpace(0xFF80, 0xFFFE),
-		ly:        0, // todo remove when impl ppu
+		//ly:        0, // todo remove when impl ppu
 	}
 }
 
@@ -77,12 +77,14 @@ func (b *Bus) Read(address uint16) uint8 {
 		return b.cart.read(address)
 	}
 
-	// todo remove when impl ppu
-	if address == 0xFF44 {
-		b.ly++
-		return b.ly
-		//return 0xff
-	}
+	/*
+		// todo remove when impl ppu
+		if address == 0xFF44 {
+			b.ly++
+			return b.ly
+			//return 0xff
+		}
+	*/
 
 	if b.ppu.Vram.Has(address) {
 		//println("reading from vram")
@@ -124,12 +126,13 @@ func (b *Bus) Read(address uint16) uint8 {
 	case 0xFF01:
 		return b.sl.GetSB()
 	case 0xFF02:
-		//return 0xFF // TODO REMOVE!!
 		return b.sl.GetSC()
 	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
 		return b.timer.Read(address)
 	case 0xFF0F:
 		return b.interrupts.GetIF()
+	case 0xFF40, 0xFF41, 0xFF44, 0xFF45:
+		return b.ppu.Read(address)
 	case 0xFFFF:
 		return b.interrupts.GetIE()
 	default:
@@ -202,6 +205,9 @@ func (b *Bus) Write(address uint16, value uint8) {
 		return
 	case 0xFF0F:
 		b.interrupts.SetAllIF(value)
+		return
+	case 0xFF40, 0xFF41, 0xFF44, 0xFF45:
+		b.ppu.Write(address, value)
 		return
 	case 0xFF46:
 		b.doDMATransfer(value)

@@ -39,7 +39,7 @@ func NewRegisters() Registers {
 }
 
 func (r *Registers) getFlag(flag Flag) bool {
-	return utils.HasBit(r.f, int(flag))
+	return utils.TestBit(r.f, int(flag))
 }
 
 func (r *Registers) setFlag(flag Flag, value bool) {

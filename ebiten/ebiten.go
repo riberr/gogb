@@ -4,17 +4,19 @@ import (
 	"fmt"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"gogb/gameboy"
 	"log"
 )
 
 type Game struct {
-	gb *gameboy.GameBoy
+	gb           *gameboy.GameBoy
+	activeScreen int
 }
 
 const (
-	screenWidth    = 1024
-	screenHeight   = 768
+	screenWidth    = 160 * Scale
+	screenHeight   = 144 * Scale
 	Scale          = 4
 	CyclesPerFrame = 69905
 	DebugWidth     = (16 * 8 * Scale) + (16 * Scale)
@@ -22,6 +24,15 @@ const (
 )
 
 func (g *Game) Update() error {
+	switch {
+	case inpututil.IsKeyJustPressed(ebiten.KeyDigit1):
+		g.activeScreen = 1
+		ebiten.SetWindowSize(screenWidth, screenHeight)
+	case inpututil.IsKeyJustPressed(ebiten.KeyDigit2):
+		g.activeScreen = 2
+		ebiten.SetWindowSize(DebugWidth, DebugHeight)
+	}
+
 	cyclesThisUpdate := 0
 	// 4194304 (cpuFreq) / 60 (targetFPS) = 69905
 	for cyclesThisUpdate < CyclesPerFrame {
@@ -32,8 +43,22 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.WritePixels(g.gb.Ppu.FbVram.Pix)
+
+	switch g.activeScreen {
+	case 1:
+	case 2:
+		// this is to catch the panic that is thrown when switching window size
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Println("Recovered from panic:", r)
+			}
+		}()
+		screen.WritePixels(g.gb.Ppu.FbVram.Pix) // dunno which one is faster
+		//screen.DrawImage(ebiten.NewImageFromImage(g.gb.Ppu.FbVram), nil)
+
+	}
 	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f\nFPS: %0.2f", ebiten.ActualTPS(), ebiten.ActualFPS()))
+
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
@@ -42,7 +67,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 
 func New(gb *gameboy.GameBoy) *Game {
 	return &Game{
-		gb: gb,
+		gb:           gb,
+		activeScreen: 2,
 	}
 }
 

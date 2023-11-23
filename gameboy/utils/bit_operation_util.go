@@ -13,8 +13,8 @@ func ClearBit(n uint8, pos int) uint8 {
 	return n
 }
 
-// HasBit checks whether a bit is set
-func HasBit(n uint8, pos int) bool {
+// TestBit checks whether a bit is set
+func TestBit(n uint8, pos int) bool {
 	val := n & (1 << pos)
 	return val > 0
 }

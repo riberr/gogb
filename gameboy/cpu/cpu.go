@@ -26,8 +26,6 @@ type CPU struct {
 	thisCpuTicks int
 }
 
-type state int
-
 func New(bus *bus.Bus, interrupts *interrupts.Interrupts, debug bool) *CPU {
 	return &CPU{
 		bus:        bus,

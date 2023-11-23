@@ -4,7 +4,7 @@ import (
 	busPackage "gogb/gameboy/bus"
 	cpuPackage "gogb/gameboy/cpu"
 	interrupts2 "gogb/gameboy/interrupts"
-	ppu2 "gogb/gameboy/ppu"
+	ppuPackage "gogb/gameboy/ppu"
 	"gogb/gameboy/seriallink"
 	timerPackage "gogb/gameboy/timer"
 )
@@ -16,6 +16,7 @@ type GameBoy struct {
 	SerialLink *seriallink.SerialLink
 	Bus        *busPackage.Bus
 	Cpu        *cpuPackage.CPU
+	Ppu        *ppuPackage.PPU
 }
 
 func New(debug bool) *GameBoy {
@@ -23,7 +24,7 @@ func New(debug bool) *GameBoy {
 	timer := timerPackage.New(interrupts)
 	timer2 := timerPackage.NewTimer2(interrupts)
 	sl := seriallink.New()
-	ppu := ppu2.New()
+	ppu := ppuPackage.New()
 	bus := busPackage.New(interrupts, timer, timer2, sl, ppu)
 	cpu := cpuPackage.New(bus, interrupts, debug)
 
@@ -34,6 +35,7 @@ func New(debug bool) *GameBoy {
 		SerialLink: sl,
 		Bus:        bus,
 		Cpu:        cpu,
+		Ppu:        ppu,
 	}
 }
 
@@ -48,10 +50,15 @@ func (gb *GameBoy) Step() int {
 	gb.Timer.UpdateTimers(cyclesOp)
 
 	//gb.updateGraphics(cyclesOp)
+
 	cycles += gb.Cpu.DoInterrupts()
 
 	//gb.Sound.Buffer(cyclesOp, gb.getSpeed())
 	return cycles
+}
+
+func (gb *GameBoy) GenerateGraphics() {
+	gb.Ppu.GenerateGraphics()
 }
 
 func Run() {

@@ -46,6 +46,13 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	switch g.activeScreen {
 	case 1:
+		// this is to catch the panic that is thrown when switching window size
+		defer func() {
+			if r := recover(); r != nil {
+				fmt.Println("Recovered from panic:", r)
+			}
+		}()
+		screen.WritePixels(g.gb.Ppu.Fb.Pix) // dunno which one is faster
 	case 2:
 		// this is to catch the panic that is thrown when switching window size
 		defer func() {

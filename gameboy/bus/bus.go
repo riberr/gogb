@@ -227,7 +227,6 @@ func (b *Bus) Write(address uint16, value uint8) {
 }
 
 func (b *Bus) doDMATransfer(value uint8) {
-	println("DMADMADMA")
 	address := uint16(value) << 8 // source address is data * 100
 	for i := uint16(0); i < 0xA0; i++ {
 		b.Write(uint16(0xFE00)+i, b.Read(address+i))

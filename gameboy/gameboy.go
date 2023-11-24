@@ -24,7 +24,7 @@ func New(debug bool) *GameBoy {
 	timer := timerPackage.New(interrupts)
 	timer2 := timerPackage.NewTimer2(interrupts)
 	sl := seriallink.New()
-	ppu := ppuPackage.New()
+	ppu := ppuPackage.New(interrupts)
 	bus := busPackage.New(interrupts, timer, timer2, sl, ppu)
 	cpu := cpuPackage.New(bus, interrupts, debug)
 
@@ -58,7 +58,7 @@ func (gb *GameBoy) Step() int {
 }
 
 func (gb *GameBoy) GenerateGraphics() {
-	gb.Ppu.GenerateGraphics()
+	gb.Ppu.GenerateDebugGraphics()
 }
 
 func Run() {

@@ -3,14 +3,11 @@ package ppu
 import (
 	"image"
 	"image/color"
-	"image/draw"
 )
 
 const (
-	scale      = 4
 	vramWidth  = (16 * 8 * scale) + (16 * scale)
 	vramHeight = (24 * 8 * scale) + (24 * scale)
-	vramAddr   = 0x8000
 )
 
 var colors = []color.RGBA{
@@ -71,21 +68,6 @@ func (ppu *PPU) drawTile(img *image.RGBA, tileNum uint16, x int, y int) {
 			drawSquare(img /*colors[c]*/, &coloredRects[c], 4, xx, yy)
 			//drawSquare2(img /*colors[c]*/, colors[c], 4, xx, yy)
 
-		}
-	}
-}
-
-var sp = image.Point{}
-
-func drawSquare(img *image.RGBA, c /*color.Color*/ *image.Uniform, size int, x, y int) {
-	draw.Draw(img, image.Rect(x, y, x+size, y+size), c, sp, draw.Over)
-}
-
-// slower??
-func drawSquare2(img *image.RGBA, c color.Color, size int, x, y int) {
-	for dy := 0; dy < size; dy++ {
-		for dx := 0; dx < size; dx++ {
-			img.Set(x+dx, y+dy, c)
 		}
 	}
 }

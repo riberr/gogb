@@ -26,6 +26,11 @@ type PPU struct {
 	scanlineCounter int
 }
 
+const (
+	ScreenWidth  = 160 * Scale
+	ScreenHeight = 144 * Scale
+)
+
 // STAT
 const (
 	LycIntSelect   = 6
@@ -59,7 +64,7 @@ func New(interrupts *interrupts.Interrupts) *PPU {
 		interrupts: interrupts,
 		Vram:       utils.NewSpace(0x8000, 0x9FFF), // Video RAM
 		Oam:        utils.NewSpace(0xFE00, 0xFE9F), // Object attribute bus
-		Fb:         image.NewRGBA(image.Rect(0, 0, vramWidth, vramHeight)),
+		Fb:         image.NewRGBA(image.Rect(0, 0, ScreenWidth, ScreenHeight)),
 		FbVram:     image.NewRGBA(image.Rect(0, 0, vramWidth, vramHeight)),
 	}
 }
@@ -245,43 +250,19 @@ func (ppu *PPU) renderTiles() {
 		b2 := ppu.Vram.Read(tileLocation + uint16(line) + 1)
 
 		/*
-			// pixel 0 in the tile is it 7 of data 1 and data2. Pixel 1 is bit 6 etc..
-			colorBit := int(xPos) % 8
-			colorBit -= 7
-			colorBit *= -1
-
-			// combine data 2 and data 1 to get the colour id for this pixel in the tile
-			colorNum := utils.ToInt(utils.TestBit(data2, colorBit))
-			colorNum <<= 1
-			colorNum |= utils.ToInt(utils.TestBit(data1, colorBit))
-
-			// now we have the colour id get the actual colour from palette 0xFF47
+			//gameboy color
+			if l.Mb.Cgb && internal.IsBitSet(tileAttr, 5) {
+				// horizontal flip
+				xPos = (7 - (pixel+(scrollX&0b111))%8)
+			}
+			if l.Mb.Cgb && !internal.IsBitSet(lcdControl, LCDC_BGEN) {
+				priority = false
+			}
 		*/
 
-		for bit := 7; bit >= 0; bit-- {
-			hi := uint8(b1 & (1 << bit))
-			if hi > 0 {
-				hi = 2
-			} else {
-				hi = 0
-			}
-
-			lo := uint8(b2 & (1 << bit))
-			if lo > 0 {
-				lo = 1
-			} else {
-				lo = 0
-			}
-
-			c := hi | lo // color
-
-			xx := int(xPos) + ((7 - bit) * scale)
-			//yy := int(yPos) + (int(tileY) / 2 * scale)
-
-			drawSquare(ppu.Fb, &coloredRects[c], 4, xx, int(ppu.ly))
-			//drawSquare2(img /*colors[c]*/, colors[c], 4, xx, yy)
-
-		}
+		colorBit := uint8(int8((xPos%8)-7) * -1)
+		colorNum := (utils.BitValue(b1, colorBit) << 1) | utils.BitValue(b2, colorBit)
+		drawSquare(ppu.Fb, &coloredRects[colorNum], 4, int(pixel)*Scale, int(ppu.ly)*Scale)
 	}
 }
 

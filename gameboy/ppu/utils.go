@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	scale    = 4
-	vramAddr = 0x8000
+	Scale    = 4
+	VramAddr = 0x8000
 )
 
 var sp = image.Point{}

@@ -75,12 +75,12 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func New(gb *gameboy.GameBoy) *Game {
 	return &Game{
 		gb:           gb,
-		activeScreen: 2,
+		activeScreen: 1,
 	}
 }
 
 func (g *Game) Run() {
-	ebiten.SetWindowSize(DebugWidth, DebugHeight)
+	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Noise (Ebitengine Demo)")
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)

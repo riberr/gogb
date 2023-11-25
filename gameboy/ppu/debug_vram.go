@@ -6,8 +6,8 @@ import (
 )
 
 const (
-	vramWidth  = (16 * 8 * scale) + (16 * scale)
-	vramHeight = (24 * 8 * scale) + (24 * scale)
+	vramWidth  = (16 * 8 * Scale) + (16 * Scale)
+	vramHeight = (24 * 8 * Scale) + (24 * Scale)
 )
 
 var colors = []color.RGBA{
@@ -29,12 +29,12 @@ func (ppu *PPU) GenerateDebugVram() {
 	//384 tiles, 24 x 16
 	for y := 0; y < 24; y++ {
 		for x := 0; x < 16; x++ {
-			ppu.drawTile(ppu.FbVram, tileNum, xDraw+(x*scale), yDraw+(y*scale))
-			xDraw += 8 * scale
+			ppu.drawTile(ppu.FbVram, tileNum, xDraw+(x*Scale), yDraw+(y*Scale))
+			xDraw += 8 * Scale
 			tileNum++
 		}
 
-		yDraw += 8 * scale
+		yDraw += 8 * Scale
 		xDraw = 0
 	}
 }
@@ -42,8 +42,8 @@ func (ppu *PPU) GenerateDebugVram() {
 // https://github.com/rockytriton/LLD_gbemu/blob/main/part11/lib/ui.c
 func (ppu *PPU) drawTile(img *image.RGBA, tileNum uint16, x int, y int) {
 	for tileY := uint16(0); tileY < 16; tileY += 2 {
-		b1 := ppu.Vram.Read(vramAddr + (tileNum * 16) + tileY)
-		b2 := ppu.Vram.Read(vramAddr + (tileNum * 16) + tileY + 1)
+		b1 := ppu.Vram.Read(VramAddr + (tileNum * 16) + tileY)
+		b2 := ppu.Vram.Read(VramAddr + (tileNum * 16) + tileY + 1)
 
 		for bit := 7; bit >= 0; bit-- {
 			hi := uint8(b1 & (1 << bit))
@@ -62,8 +62,11 @@ func (ppu *PPU) drawTile(img *image.RGBA, tileNum uint16, x int, y int) {
 
 			c := hi | lo // color
 
-			xx := x + ((7 - bit) * scale)
-			yy := y + (int(tileY) / 2 * scale)
+			//colorBit := uint8(int8((bit%8)-7) * -1)
+			//c := (utils.BitValue(b1, colorBit) << 1) | utils.BitValue(b2, colorBit)
+
+			xx := x + ((7 - bit) * Scale)
+			yy := y + (int(tileY) / 2 * Scale)
 
 			drawSquare(img /*colors[c]*/, &coloredRects[c], 4, xx, yy)
 			//drawSquare2(img /*colors[c]*/, colors[c], 4, xx, yy)

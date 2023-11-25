@@ -19,6 +19,10 @@ func TestBit(n uint8, pos int) bool {
 	return val > 0
 }
 
+func BitValue(value uint8, bit uint8) uint8 {
+	return (value >> bit) & 1
+}
+
 func ToUint16(lsb uint8, msb uint8) uint16 {
 	return uint16(lsb) | (uint16(msb) << 8)
 }

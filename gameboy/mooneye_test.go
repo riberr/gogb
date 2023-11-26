@@ -54,6 +54,23 @@ func TestMooneyeInterrupts(t *testing.T) {
 	}
 }
 
+func TestMooneyeMBC1(t *testing.T) {
+	path := "../third_party/mooneye/emulator-only/mbc1/"
+	roms := getRoms(path, "")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			result, err := testMooneye(path, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if !result {
+				t.Errorf("Failed")
+			}
+		})
+	}
+}
+
 func TestMooneyeTimingAndVarious(t *testing.T) {
 	path := "../third_party/mooneye/acceptance/"
 	roms := getRoms(path, "")
@@ -71,8 +88,8 @@ func TestMooneyeTimingAndVarious(t *testing.T) {
 	}
 }
 
-func TestMooneyeMBC1(t *testing.T) {
-	path := "../third_party/mooneye/emulator-only/mbc1/"
+func TestMooneyePPU(t *testing.T) {
+	path := "../third_party/mooneye/acceptance/ppu/"
 	roms := getRoms(path, "")
 
 	for _, test := range roms {

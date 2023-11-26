@@ -18,7 +18,7 @@ const romsPathGbMicro = "../third_party/gbmicrotest/bin/"
 func TestOneRom(t *testing.T) {
 	got, want, _ := testGbMicro(
 		romsPathGbMicro,
-		"int_timer_halt.gb",
+		"int_hblank_halt_bug_a.gb",
 	)
 
 	if got != want {
@@ -49,6 +49,24 @@ func TestTimer(t *testing.T) {
 // passes 2/7. GoBoy passes 3 (diff is int_timer_incs.gb)
 func TestInterruptsTimer(t *testing.T) {
 	roms := getRoms(romsPathGbMicro, "int_timer")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			//t.Parallel()
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if got != want {
+				t.Errorf("got %d, want %d", got, want)
+			}
+			fmt.Printf("Correct result: %d\n", got)
+		})
+	}
+}
+
+func TestInterruptsHBlank(t *testing.T) {
+	roms := getRoms(romsPathGbMicro, "int_hblank_halt_s")
 
 	for _, test := range roms {
 		t.Run(test.rom, func(t *testing.T) {
@@ -157,13 +175,31 @@ func TestMBC1Banking(t *testing.T) {
 	}
 }
 
+func TestSprite(t *testing.T) {
+	roms := getRoms(romsPathGbMicro, "sprite")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			//t.Parallel()
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if got != want {
+				t.Errorf("got %d, want %d", got, want)
+			}
+			fmt.Printf("Correct result: %d\n", got)
+		})
+	}
+}
+
 func testGbMicro(
 	romPath string,
 	romName string,
 	// t *testing.T,
 ) (uint8, uint8, error) {
 	// SETUP
-	gb := New(false)
+	gb := New(true)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
 		return 0, 0, errors.New("could not load rom")

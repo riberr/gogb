@@ -16,7 +16,7 @@ var OpCodesMisc = map[uint8]OpCode{
 	}}),
 
 	// Stop system and main clocks
-	0x10: NewOpCode(0x10, "STOP /*todo*/", 1, 4, []func(cpu *CPU){func(cpu *CPU) { panic("STOP") }}),
+	0x10: NewOpCode(0x10, "STOP /*todo*/", 1, 4, []func(cpu *CPU){func(cpu *CPU) { println("warning: STOP!") }}),
 
 	// Disable interrupts
 	0xf3: NewOpCode(0xf3, "DI", 1, 4, []func(cpu *CPU){func(cpu *CPU) { /*cpu.interrupts.DisableIME()*/ cpu.interrupts.SetIMEEnabling(false) }}),

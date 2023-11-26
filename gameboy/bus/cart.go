@@ -117,6 +117,15 @@ var RAM_SIZE = map[uint8]string{
 	0x05: "64 KiB",
 }
 
+var RAM_BANKS = map[uint8]uint16{
+	0x00: 0,
+	0x01: 0,
+	0x02: 1,
+	0x03: 4,
+	0x04: 16,
+	0x05: 8,
+}
+
 type Cart struct {
 	fileName string
 	size     int
@@ -134,6 +143,7 @@ type header struct {
 	cartType       uint8
 	romSize        uint8
 	ramSize        uint8
+	ramBanks       uint16
 	destCode       uint8
 	licCode        uint8
 	version        uint8
@@ -152,6 +162,7 @@ func newHeader(data []uint8) header {
 		cartType:       data[0x147],
 		romSize:        data[0x148],
 		ramSize:        data[0x149],
+		ramBanks:       RAM_BANKS[data[0x149]],
 		destCode:       data[0x14A],
 		licCode:        data[0x14B],
 		version:        data[0x14C],
@@ -179,7 +190,7 @@ func (cart *Cart) Load(romPath string, romName string) bool {
 	fmt.Printf("\t Title    : %s\n", cart.header.title)
 	fmt.Printf("\t Type     : %2.2X (%s)\n", cart.header.cartType, ROM_TYPES[cart.header.cartType])
 	fmt.Printf("\t ROM Size : %d KB\n", 32<<cart.header.romSize)
-	fmt.Printf("\t RAM Size : %2.2X (%s)\n", cart.header.ramSize, RAM_SIZE[cart.header.ramSize])
+	fmt.Printf("\t RAM Size : %2.2X (%s) (%v banks)\n", cart.header.ramSize, RAM_SIZE[cart.header.ramSize], cart.header.ramBanks)
 	fmt.Printf("\t LIC Code : %2.2X (%s)\n", cart.header.newLicCode, LIC_CODE[utils.ToUint16(cart.header.newLicCode[0], cart.header.newLicCode[1])])
 	fmt.Printf("\t LIC Code : %2.2X (%s)\n", cart.header.licCode, LIC_CODE[uint16(cart.header.licCode)])
 	fmt.Printf("\t ROM Vers : %2.2X\n", cart.header.version)

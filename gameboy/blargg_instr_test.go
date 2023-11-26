@@ -17,7 +17,7 @@ import (
 */
 
 func TestCpuOutputBlargg01(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"01-special.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/1.log",
@@ -28,7 +28,7 @@ func TestCpuOutputBlargg01(t *testing.T) {
 }
 
 func TestCpuOutputBlargg02(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
 		// https://github.com/robert/gameboy-doctor/pull/11
@@ -40,7 +40,7 @@ func TestCpuOutputBlargg02(t *testing.T) {
 }
 
 func TestCpuOutputBlargg03(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/3.log",
@@ -51,7 +51,7 @@ func TestCpuOutputBlargg03(t *testing.T) {
 }
 
 func TestCpuOutputBlargg04(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"04-op r,imm.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/4.log",
@@ -62,7 +62,7 @@ func TestCpuOutputBlargg04(t *testing.T) {
 }
 
 func TestCpuOutputBlargg05(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"05-op rp.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/5.log",
@@ -73,7 +73,7 @@ func TestCpuOutputBlargg05(t *testing.T) {
 }
 
 func TestCpuOutputBlargg06(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"06-ld r,r.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/6.log",
@@ -84,7 +84,7 @@ func TestCpuOutputBlargg06(t *testing.T) {
 }
 
 func TestCpuOutputBlargg07(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"07-jr,jp,call,ret,rst.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/7.log",
@@ -95,7 +95,7 @@ func TestCpuOutputBlargg07(t *testing.T) {
 }
 
 func TestCpuOutputBlargg08(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"08-misc instrs.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/8.log",
@@ -106,7 +106,7 @@ func TestCpuOutputBlargg08(t *testing.T) {
 }
 
 func TestCpuOutputBlargg09(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"09-op r,r.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/9.log",
@@ -117,7 +117,7 @@ func TestCpuOutputBlargg09(t *testing.T) {
 }
 
 func TestCpuOutputBlargg10(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"10-bit ops.gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/10.log",
@@ -128,7 +128,7 @@ func TestCpuOutputBlargg10(t *testing.T) {
 }
 
 func TestCpuOutputBlargg11(t *testing.T) {
-	testBlarggRom(
+	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"11-op a,(hl).gb",
 		"../third_party/gameboy-doctor/truth/zipped/cpu_instrs/11.log",
@@ -138,7 +138,7 @@ func TestCpuOutputBlargg11(t *testing.T) {
 	)
 }
 
-func testBlarggRom(
+func testBlarggRomWithLog(
 	romPath string,
 	romName string,
 	logPath string,

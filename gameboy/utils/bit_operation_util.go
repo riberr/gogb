@@ -19,6 +19,12 @@ func TestBit(n uint8, pos int) bool {
 	return val > 0
 }
 
+// TestBit checks whether a bit is set
+func TestBit16(n uint16, pos int) bool {
+	val := n & (1 << pos)
+	return val > 0
+}
+
 func BitValue(value uint8, bit uint8) uint8 {
 	return (value >> bit) & 1
 }

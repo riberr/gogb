@@ -65,7 +65,7 @@ func TestInterruptsTimer(t *testing.T) {
 	}
 }
 
-// passes 0. GoBoy passes halt_op_dupe and halt_op_dupe_delay
+// passes 1. GoBoy passes halt_op_dupe and halt_op_dupe_delay
 func TestHalt(t *testing.T) {
 	roms := getRoms(romsPathGbMicro, "halt_")
 
@@ -123,6 +123,24 @@ func TestVram(t *testing.T) {
 
 func TestOam(t *testing.T) {
 	roms := getRoms(romsPathGbMicro, "oam_write")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			//t.Parallel()
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if got != want {
+				t.Errorf("got %d, want %d", got, want)
+			}
+			fmt.Printf("Correct result: %d\n", got)
+		})
+	}
+}
+
+func TestMBC1Banking(t *testing.T) {
+	roms := getRoms(romsPathGbMicro, "mbc1_")
 
 	for _, test := range roms {
 		t.Run(test.rom, func(t *testing.T) {

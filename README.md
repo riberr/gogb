@@ -23,6 +23,7 @@
 - https://github.com/guigzzz/GoGB/blob/master/backend/cpu.go#L62  go
 - https://github.com/theinternetftw/dmgo/blob/master/dmgo.go#L492 go
 - https://github.com/duysqubix/gobc go (pixel)
+- https://github.com/adtennant/sm83-test-data/tree/master json cpu unit tests
 ## timing related:
 
 - http://blog.rekawek.eu/2017/02/09/coffee-gb/#cpu-timing

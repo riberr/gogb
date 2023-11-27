@@ -3,29 +3,32 @@ package gameboy
 import (
 	busPackage "gogb/gameboy/bus"
 	cpuPackage "gogb/gameboy/cpu"
-	interrupts2 "gogb/gameboy/interrupts"
+	interruptsPackage "gogb/gameboy/interrupts"
+	joypadPackage "gogb/gameboy/joypad"
 	ppuPackage "gogb/gameboy/ppu"
 	"gogb/gameboy/seriallink"
 	timerPackage "gogb/gameboy/timer"
 )
 
 type GameBoy struct {
-	Interrupts *interrupts2.Interrupts
+	Interrupts *interruptsPackage.Interrupts
 	Timer      *timerPackage.Timer
 	timer2     *timerPackage.Timer2
 	SerialLink *seriallink.SerialLink
 	Bus        *busPackage.Bus
 	Cpu        *cpuPackage.CPU
 	Ppu        *ppuPackage.PPU
+	JoyPad     *joypadPackage.JoyPad
 }
 
 func New(debug bool) *GameBoy {
-	interrupts := interrupts2.New()
+	interrupts := interruptsPackage.New()
 	timer := timerPackage.New(interrupts)
 	timer2 := timerPackage.NewTimer2(interrupts)
 	sl := seriallink.New()
 	ppu := ppuPackage.New(interrupts)
-	bus := busPackage.New(interrupts, timer, timer2, sl, ppu)
+	joyPad := joypadPackage.New(interrupts)
+	bus := busPackage.New(interrupts, timer, timer2, sl, ppu, joyPad)
 	cpu := cpuPackage.New(bus, interrupts, debug)
 
 	return &GameBoy{
@@ -36,6 +39,7 @@ func New(debug bool) *GameBoy {
 		Bus:        bus,
 		Cpu:        cpu,
 		Ppu:        ppu,
+		JoyPad:     joyPad,
 	}
 }
 

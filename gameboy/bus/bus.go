@@ -2,6 +2,7 @@ package bus
 
 import (
 	"gogb/gameboy/interrupts"
+	"gogb/gameboy/joypad"
 	"gogb/gameboy/ppu"
 	"gogb/gameboy/seriallink"
 	"gogb/gameboy/timer"
@@ -32,6 +33,7 @@ type Bus struct {
 	timer2     *timer.Timer2
 	sl         *seriallink.SerialLink
 	ppu        *ppu.PPU
+	joypad     *joypad.JoyPad
 	//vram       Space
 	eram    utils.Space
 	wramC   utils.Space
@@ -50,7 +52,7 @@ type Bus struct {
 
 //var ieReg uint8 = 0 //Interrupt Enable register
 
-func New(interrupts *interrupts.Interrupts, timer *timer.Timer, timer2 *timer.Timer2, sl *seriallink.SerialLink, ppu *ppu.PPU) *Bus {
+func New(interrupts *interrupts.Interrupts, timer *timer.Timer, timer2 *timer.Timer2, sl *seriallink.SerialLink, ppu *ppu.PPU, joypad *joypad.JoyPad) *Bus {
 	return &Bus{
 		cart:       &Cart{},
 		interrupts: interrupts,
@@ -58,6 +60,7 @@ func New(interrupts *interrupts.Interrupts, timer *timer.Timer, timer2 *timer.Ti
 		timer2:     timer2,
 		sl:         sl,
 		ppu:        ppu,
+		joypad:     joypad,
 		//vram:       NewSpace(0x8000, 0x9FFF), // Video RAM
 		eram:    utils.NewSpace(0xA000, 0xBFFF), // External RAM
 		wramC:   utils.NewSpace(0xC000, 0xCFFF),
@@ -132,8 +135,8 @@ func (b *Bus) Read(address uint16) uint8 {
 	}
 
 	switch address {
-	case 0xFF00: //joypad
-		return 0xFF
+	case 0xFF00:
+		return b.joypad.GetJoyPadState()
 	case 0xFF01:
 		return b.sl.GetSB()
 	case 0xFF02:

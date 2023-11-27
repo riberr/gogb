@@ -30,19 +30,19 @@ func (g *Game) keyDown() {
 func (g *Game) keyUp() {
 	switch {
 	case inpututil.IsKeyJustReleased(ebiten.KeyLeft):
-		g.gb.JoyPad.ButtonReleased(joypad.PadStart)
+		g.gb.JoyPad.ButtonReleased(joypad.PadLeft)
 	case inpututil.IsKeyJustReleased(ebiten.KeyRight):
-		g.gb.JoyPad.ButtonReleased(joypad.PadStart)
+		g.gb.JoyPad.ButtonReleased(joypad.PadRight)
 	case inpututil.IsKeyJustReleased(ebiten.KeyUp):
-		g.gb.JoyPad.ButtonReleased(joypad.PadStart)
+		g.gb.JoyPad.ButtonReleased(joypad.PadUp)
 	case inpututil.IsKeyJustReleased(ebiten.KeyDown):
-		g.gb.JoyPad.ButtonReleased(joypad.PadStart)
+		g.gb.JoyPad.ButtonReleased(joypad.PadDown)
 	case inpututil.IsKeyJustReleased(ebiten.KeyZ):
-		g.gb.JoyPad.ButtonReleased(joypad.PadStart)
+		g.gb.JoyPad.ButtonReleased(joypad.PadA)
 	case inpututil.IsKeyJustReleased(ebiten.KeyX):
-		g.gb.JoyPad.ButtonReleased(joypad.PadStart)
+		g.gb.JoyPad.ButtonReleased(joypad.PadB)
 	case inpututil.IsKeyJustReleased(ebiten.KeySpace):
-		g.gb.JoyPad.ButtonReleased(joypad.PadStart)
+		g.gb.JoyPad.ButtonReleased(joypad.PadSelect)
 	case inpututil.IsKeyJustReleased(ebiten.KeyEnter):
 		g.gb.JoyPad.ButtonReleased(joypad.PadStart)
 	}

@@ -1,6 +1,7 @@
 package joypad
 
 import (
+	"fmt"
 	"gogb/gameboy/interrupts"
 	"gogb/gameboy/utils"
 )
@@ -28,12 +29,13 @@ func New(interrupts *interrupts.Interrupts) *JoyPad {
 	return &JoyPad{
 		interrupts:  interrupts,
 		joyp:        0,
-		buttonState: 0,
+		buttonState: 0xff,
 	}
 }
 
 func (j *JoyPad) ButtonPressed(button Button) {
 	previouslyUnset := false
+	fmt.Printf("press button: %v\n", button)
 
 	// if setting from 1 to 0 we may have to request an interupt
 	if utils.TestBit(j.buttonState, int(button)) {
@@ -61,11 +63,13 @@ func (j *JoyPad) ButtonPressed(button Button) {
 	}
 
 	if requestInterrupt && !previouslyUnset {
+		fmt.Printf("req int: keys: %08b\n", j.buttonState)
 		j.interrupts.SetIF(interrupts.JOYPAD)
 	}
 }
 
 func (j *JoyPad) ButtonReleased(button Button) {
+	fmt.Printf("release button: %v\n", button)
 	j.buttonState = utils.SetBit(j.buttonState, int(button))
 }
 
@@ -85,4 +89,10 @@ func (j *JoyPad) GetJoyPadState() uint8 {
 		res &= bottomJoyPad
 	}
 	return res
+}
+
+func (j *JoyPad) Write(address uint16, value uint8) {
+	if address == 0xFF00 {
+		j.joyp = value
+	}
 }

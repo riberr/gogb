@@ -33,8 +33,7 @@ func (g *Game) Update() error {
 		ebiten.SetWindowSize(DebugWidth, DebugHeight)
 	}
 
-	g.keyDown()
-	g.keyUp()
+	g.handleKeys()
 
 	cyclesThisUpdate := 0
 	// 4194304 (cpuFreq) / 60 (targetFPS) = 69905

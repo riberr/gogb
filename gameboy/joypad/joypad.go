@@ -9,86 +9,94 @@ import (
 type Button int
 
 const (
-	PadLeft   Button = 0
-	PadUp     Button = 1
-	PadRight  Button = 2
-	PadDown   Button = 3
-	PadStart  Button = 4
-	PadSelect Button = 5
-	PadB      Button = 6
-	PadA      Button = 7
+	PadRight Button = iota
+	PadLeft
+	PadUp
+	PadDown
+
+	PadA
+	PadB
+	PadSelect
+	PadStart
+)
+
+const (
+	joyp0             = 0
+	joyp1             = 1
+	joyp2             = 2
+	joyp3             = 3
+	joypSelectPad     = 4
+	joypSelectButtons = 5
 )
 
 type JoyPad struct {
-	interrupts  *interrupts.Interrupts
-	joyp        uint8 // 0xFF00
-	buttonState uint8 // holds all 8 buttons
+	interrupts *interrupts.Interrupts
+	joyp       uint8 // 0xFF00
+	pad        uint8
+	buttons    uint8
 }
 
 func New(interrupts *interrupts.Interrupts) *JoyPad {
 	return &JoyPad{
-		interrupts:  interrupts,
-		joyp:        0,
-		buttonState: 0xff,
+		interrupts: interrupts,
+		joyp:       0,
+		pad:        0xF,
+		buttons:    0xF,
 	}
 }
 
-func (j *JoyPad) ButtonPressed(button Button) {
-	previouslyUnset := false
-	fmt.Printf("press button: %v\n", button)
+func (j *JoyPad) KeyEvent(button Button, isPress bool) {
+	prevPad := j.pad
+	prevButtons := j.buttons
 
-	// if setting from 1 to 0 we may have to request an interupt
-	if utils.TestBit(j.buttonState, int(button)) {
-		previouslyUnset = true
+	switch button {
+	case PadRight:
+		j.pad = setOrClearBit(j.pad, joyp0, isPress)
+	case PadLeft:
+		j.pad = setOrClearBit(j.pad, joyp1, isPress)
+	case PadUp:
+		j.pad = setOrClearBit(j.pad, joyp2, isPress)
+	case PadDown:
+		j.pad = setOrClearBit(j.pad, joyp3, isPress)
+	case PadA:
+		j.buttons = setOrClearBit(j.buttons, joyp0, isPress)
+	case PadB:
+		j.buttons = setOrClearBit(j.buttons, joyp1, isPress)
+	case PadSelect:
+		j.buttons = setOrClearBit(j.buttons, joyp2, isPress)
+	case PadStart:
+		j.buttons = setOrClearBit(j.buttons, joyp3, isPress)
 	}
 
-	// remember if a keypressed its bit is 0 not 1
-	j.buttonState = utils.ClearBit(j.buttonState, int(button))
-
-	// is this a standard button or a directional button?
-	var isButton bool
-	if button > 3 {
-		isButton = true
-	} else { // directional button pressed
-		isButton = false
-	}
-
-	requestInterrupt := false
-
-	// only request interrupt if the button just pressed is the style of button the game is interested in
-	if isButton && !utils.TestBit(j.joyp, 5) {
-		requestInterrupt = true
-	} else if !isButton && !utils.TestBit(j.joyp, 4) {
-		requestInterrupt = true
-	}
-
-	if requestInterrupt && !previouslyUnset {
-		fmt.Printf("req int: keys: %08b\n", j.buttonState)
+	res := ((prevPad ^ j.pad) & j.pad) | ((prevButtons ^ j.buttons) & j.buttons)
+	if res != 0 {
 		j.interrupts.SetIF(interrupts.JOYPAD)
 	}
+	fmt.Printf("%04b %04b\n", j.pad, j.buttons)
 }
 
-func (j *JoyPad) ButtonReleased(button Button) {
-	fmt.Printf("release button: %v\n", button)
-	j.buttonState = utils.SetBit(j.buttonState, int(button))
+func setOrClearBit(n uint8, pos int, isPress bool) uint8 {
+	if isPress {
+		return utils.ClearBit(n, pos)
+	} else {
+		return utils.SetBit(n, pos)
+	}
 }
 
 func (j *JoyPad) GetJoyPadState() uint8 {
-	res := j.joyp
-	// flip all bits
-	res ^= 0xFF
+	P14 := (j.joyp >> joypSelectPad) & 0x01
+	P15 := (j.joyp >> joypSelectButtons) & 0x01
 
-	// are we interested in the standard buttons?
-	if !utils.TestBit(res, 4) {
-		topJoyPad := j.buttonState >> 4
-		topJoyPad |= 0xF0 // turn the top 4 bits on
-		res &= topJoyPad  // show what buttons are pressed
-	} else if !utils.TestBit(res, 5) { //directional buttons
-		bottomJoyPad := j.buttonState & 0xF
-		bottomJoyPad |= 0xF0
-		res &= bottomJoyPad
+	joyPadState := 0xFF & (j.joyp | 0b11001111)
+	if P14 == 0 {
+		joyPadState &= j.pad
 	}
-	return res
+
+	if P15 == 0 {
+		joyPadState &= j.buttons
+	}
+
+	return joyPadState
 }
 
 func (j *JoyPad) Write(address uint16, value uint8) {

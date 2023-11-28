@@ -2,10 +2,7 @@ package cpu
 
 import (
 	"fmt"
-	bus2 "gogb/gameboy/bus"
-	interrupts2 "gogb/gameboy/interrupts"
-	"gogb/gameboy/seriallink"
-	timer2 "gogb/gameboy/timer"
+	"gogb/gameboy"
 	"testing"
 )
 
@@ -20,78 +17,64 @@ func TestSBC(t *testing.T) {
 	*/
 
 	// setup
-	interrupts := interrupts2.New()
-	timer := timer2.New(interrupts)
-	sl := seriallink.New()
-	bus := bus2.New(interrupts, timer, sl)
-	cpu := New(bus, interrupts, false)
+	gb := gameboy.New(false)
 
 	// preconditions
-	cpu.regs.setAF(0x0000)
-	cpu.regs.setBC(0x010F)
+	gb.Cpu.regs.setAF(0x0000)
+	gb.Cpu.regs.setBC(0x010F)
 	var value uint8 = 1
 
 	// test
-	sbc(cpu, value)
+	sbc(gb.Cpu, value)
 
 	// assert
-	if cpu.regs.a != 0xFF {
-		t.Errorf("A: got %02x, want %02x", cpu.regs.a, 0xFF)
+	if gb.Cpu.regs.a != 0xFF {
+		t.Errorf("A: got %02x, want %02x", gb.Cpu.regs.a, 0xFF)
 	}
 
-	if cpu.regs.f != 0x70 {
-		t.Errorf("F: got %08b, want %08b", cpu.regs.f, 0x70)
+	if gb.Cpu.regs.f != 0x70 {
+		t.Errorf("F: got %08b, want %08b", gb.Cpu.regs.f, 0x70)
 	}
 }
 
 func TestRelativeJumpOP(t *testing.T) {
-	// di
-	interrupts := interrupts2.New()
-	timer := timer2.New(interrupts)
-	sl := seriallink.New()
-	bus := bus2.New(interrupts, timer, sl)
-	cpu := New(bus, interrupts, false)
+	gb := gameboy.New(false)
 
 	// preconditions
 	opcode := OpCodes[0x18]
-	cpu.pc = 0xc2cb
-	bus.Write(cpu.pc, 0xf4)
+	gb.Cpu.pc = 0xc2cb
+	gb.Bus.Write(gb.Cpu.pc, 0xf4)
 
 	// test
 	for _, step := range opcode.steps {
-		step(cpu)
+		step(gb.Cpu)
 	}
 
 	truth := uint16(0xC2C0)
-	if cpu.pc != truth {
-		t.Fatalf("Got %02x, expected %02x", cpu.pc, truth)
+	if gb.Cpu.pc != truth {
+		t.Fatalf("Got %02x, expected %02x", gb.Cpu.pc, truth)
 	}
 }
 
 // LD HL,SP+i8
 func Test0xF8(t *testing.T) {
-	// di
-	interrupts := interrupts2.New()
-	timer := timer2.New(interrupts)
-	sl := seriallink.New()
-	bus := bus2.New(interrupts, timer, sl)
-	cpu := New(bus, interrupts, false)
+	gb := gameboy.New(false)
 
 	// preconditions
 	opcode := OpCodes[0xF8]
-	cpu.pc = 0xC2C5
-	cpu.sp = 0xDFFD
-	bus.Write(cpu.pc, 0xfe)
+	gb.Cpu.pc = 0xC2C5
+	gb.Cpu.sp = 0xDFFD
+	gb.Bus.Write(gb.Cpu.pc, 0xfe)
 
 	// test
 	for _, step := range opcode.steps {
-		step(cpu)
+		step(gb.Cpu)
 	}
 
-	fmt.Printf("result: %02x \n", cpu.regs.getHL())
+	fmt.Printf("result: %02x \n", gb.Cpu.regs.getHL())
 
 	truth := uint16(0xDFFB)
-	if cpu.regs.getHL() != truth {
-		t.Fatalf("Got %02x, expected %02x", cpu.pc, truth)
+	if gb.Cpu.regs.getHL() != truth {
+		t.Fatalf("Got %02x, expected %02x", gb.Cpu.pc, truth)
 	}
 }

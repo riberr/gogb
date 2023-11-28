@@ -1,7 +1,6 @@
 package bus
 
 import (
-	"fmt"
 	"gogb/gameboy/interrupts"
 	"gogb/gameboy/joypad"
 	"gogb/gameboy/ppu"
@@ -137,9 +136,11 @@ func (b *Bus) Read(address uint16) uint8 {
 
 	switch address {
 	case 0xFF00:
-		if b.joypad.GetJoyPadState() != 0xFF {
-			fmt.Printf("joypad: %08b\n", b.joypad.GetJoyPadState())
-		}
+		/*
+			if b.joypad.GetJoyPadState() != 0xFF {
+				fmt.Printf("joypad: %08b\n", b.joypad.GetJoyPadState())
+			}
+		*/
 		return b.joypad.GetJoyPadState()
 	case 0xFF01:
 		return b.sl.GetSB()

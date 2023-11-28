@@ -12,7 +12,7 @@ import (
 
 type GameBoy struct {
 	Interrupts *interruptsPackage.Interrupts2
-	Timer      *timerPackage.Timer
+	Timer      *timerPackage.Timer3
 	SerialLink *seriallink.SerialLink
 	Bus        *busPackage.Bus
 	Cpu        *cpuPackage.CPU
@@ -22,7 +22,7 @@ type GameBoy struct {
 
 func New(debug bool) *GameBoy {
 	interrupts := interruptsPackage.NewInterrupts2()
-	timer := timerPackage.New(interrupts)
+	timer := timerPackage.NewTimer3(interrupts)
 	sl := seriallink.New()
 	ppu := ppuPackage.New(interrupts)
 	joyPad := joypadPackage.New(interrupts)
@@ -43,12 +43,12 @@ func New(debug bool) *GameBoy {
 func (gb *GameBoy) Step() int {
 	cycles := 0
 	cyclesOp := 0
-
+	//fmt.Printf("tima %02x\n", gb.Timer.Read(0xFF05))
 	cyclesOp = gb.Cpu.Step()
 
 	cycles += cyclesOp
 
-	gb.Timer.UpdateTimers(cyclesOp)
+	gb.Timer.Tick(cyclesOp) //UpdateTimers(cyclesOp)
 
 	gb.Ppu.Update(cyclesOp)
 

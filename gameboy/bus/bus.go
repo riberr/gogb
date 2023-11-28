@@ -29,7 +29,7 @@ import (
 type Bus struct {
 	cart       *Cart
 	interrupts *interrupts.Interrupts2
-	timer      *timer.Timer
+	timer      *timer.Timer3
 	timer2     *timer.Timer2
 	sl         *seriallink.SerialLink
 	ppu        *ppu.PPU
@@ -50,7 +50,7 @@ type Bus struct {
 	romBanking     bool
 }
 
-func New(interrupts *interrupts.Interrupts2, timer *timer.Timer, sl *seriallink.SerialLink, ppu *ppu.PPU, joypad *joypad.JoyPad) *Bus {
+func New(interrupts *interrupts.Interrupts2, timer *timer.Timer3, sl *seriallink.SerialLink, ppu *ppu.PPU, joypad *joypad.JoyPad) *Bus {
 	return &Bus{
 		cart:       &Cart{},
 		interrupts: interrupts,

@@ -67,10 +67,13 @@ func (cpu *CPU) Step() int {
 	}
 
 	for _, step := range opcode.steps {
-		if !cpu.jumpStop {
-			step(cpu)
-			cpu.thisCpuTicks += 4
+		if cpu.jumpStop {
+			break
 		}
+
+		step(cpu)
+		cpu.thisCpuTicks += 4
+
 	}
 
 	/*

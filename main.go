@@ -6,14 +6,14 @@ import (
 )
 
 func main() {
-	romPath := "third_party/games/"
-	romName := "Yoshi.gb"
+	//romPath := "third_party/games/"
+	//romName := "Yoshi.gb"
 
 	//romPath := "third_party/games/"
 	//romName := "Tetris.gb"
 
-	//romPath := "third_party/gb-test-roms/instr_timing/"
-	//romName := "instr_timing.gb"
+	romPath := "third_party/gb-test-roms/instr_timing/"
+	romName := "instr_timing.gb"
 
 	//romPath := "third_party/"
 	//romName := "dmg-acid2.gb"

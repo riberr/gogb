@@ -7,7 +7,7 @@ package timer
 import "gogb/gameboy/interrupts"
 
 type Timer3 struct {
-	interrupts  *interrupts.Interrupts
+	interrupts  *interrupts.Interrupts2
 	DivCounter  int    // Divider counter
 	TimaCounter int    // Timer counter
 	DIV         uint32 // Divider register (0xFF04)
@@ -16,7 +16,7 @@ type Timer3 struct {
 	TAC         uint32 // Timer control (0xFF07)
 }
 
-func NewTimer3(interrupts *interrupts.Interrupts) *Timer3 {
+func NewTimer3(interrupts *interrupts.Interrupts2) *Timer3 {
 	return &Timer3{
 		interrupts: interrupts,
 		DivCounter: 0,
@@ -83,7 +83,8 @@ func (t *Timer3) Tick(cycles int) {
 			t.TimaCounter -= freq
 			if t.TIMA == 0xFF {
 				t.TIMA = t.TMA
-				t.interrupts.SetIF(interrupts.TIMER)
+				//t.interrupts.SetIF(interrupts.TIMER)
+				t.interrupts.SetInterruptFlag(interrupts.INTR_TIMER)
 				break
 			} else {
 				t.TIMA++

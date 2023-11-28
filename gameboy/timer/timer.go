@@ -29,7 +29,7 @@ func New(interrupts *interrupts.Interrupts2) *Timer {
 }
 
 func (t *Timer) UpdateTimers(cycles int) {
-	fmt.Printf("%04x\n", t.sysclk)
+	//fmt.Printf("%04x\n", t.sysclk)
 	for i := 0; i < cycles; i++ {
 		t.Tick()
 	}
@@ -111,6 +111,8 @@ func (t *Timer) Write(address uint16, value uint8) {
 	switch address {
 	case 0xFF04: // DIV, which is upper 8 bits of SYSCLK. Writing to it resets it
 		t.updateSysClk(0)
+		//t.tima = 0
+		//t.sysclk = 0
 	case 0xFF05: // TIMA, the timer counter
 		fmt.Printf("write tima, before: %02x\n", t.tima)
 		if t.ticksSinceOverflow < 5 {

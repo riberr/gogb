@@ -38,3 +38,7 @@ Notes
 - GoBoy passes the same gbmicrotests, at least for timer and interrupts
 - Mooneye test requires graphics to be implemented or else they just "time out"
 - pixel on windows: https://github.com/gopxl/pixel/wiki/Building-Pixel-on-Windows
+
+TODO
+- the issue with timing was CB prefix!!
+- Try to use Timer(1) with CB fix, cuz that timer passes all the timer microtests

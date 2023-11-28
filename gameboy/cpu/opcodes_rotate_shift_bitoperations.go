@@ -28,7 +28,14 @@ var OpCodesRotateShiftBitoperations = map[uint8]OpCode{
 			opCodeCB := OpCodesCB[cpu.bus.Read(cpu.pc)]
 			cpu.pc++
 
-			ticks := 0 // fetch counts as 4 t cycles
+			ticks := 0
+			if opCodeCB.tCycles == 8 {
+				ticks = 0 // there are some ALU operations that can be completed in the same cycle as fetch (fetch / overlap)
+			} else {
+				ticks = 4 // fetch counts for 4 tCycles
+			}
+
+			//ticks := 0 // fetch counts as 4 t cycles
 			for _, step := range opCodeCB.steps {
 				step(cpu)
 				ticks += 4

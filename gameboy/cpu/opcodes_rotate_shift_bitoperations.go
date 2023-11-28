@@ -28,7 +28,7 @@ var OpCodesRotateShiftBitoperations = map[uint8]OpCode{
 			opCodeCB := OpCodesCB[cpu.bus.Read(cpu.pc)]
 			cpu.pc++
 
-			ticks := 0
+			var ticks int
 			if opCodeCB.tCycles == 8 {
 				ticks = 0 // there are some ALU operations that can be completed in the same cycle as fetch (fetch / overlap)
 			} else {

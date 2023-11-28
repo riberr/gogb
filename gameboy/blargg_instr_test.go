@@ -32,7 +32,7 @@ func TestCpuOutputBlargg02(t *testing.T) {
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
 		// https://github.com/robert/gameboy-doctor/pull/11
-		"../third_party/Blargg2LYStubbed/EpicLogReformat.txt",
+		"../third_party/BlarggLogs/EpicLogReformat.txt",
 		false,
 		true,
 		t,
@@ -138,6 +138,17 @@ func TestCpuOutputBlargg11(t *testing.T) {
 	)
 }
 
+func TestInstrTiming(t *testing.T) {
+	testBlarggRomWithLog(
+		"../third_party/gb-test-roms/instr_timing/",
+		"instr_timing.gb",
+		"../third_party/BlarggLogs/BlarggInstrTimingGoBoyLYFF.txt",
+		true,
+		false,
+		t,
+	)
+}
+
 func testBlarggRomWithLog(
 	romPath string,
 	romName string,
@@ -186,7 +197,6 @@ func testBlarggRomWithLog(
 				t.Fatalf("%v/%v: not equal!\ngot: \n%v\nwant: \n%v", i, nrOfLines, gb.Cpu.GetInternalString(), string(logLine))
 			}
 		}
-
 		gb.Step()
 		i++
 	}
@@ -220,14 +230,14 @@ func lineCounter(path string) (int, error) {
 // https://github.com/robert/gameboy-doctor/pull/11
 func GenerateReformatedLogFor02Interrupt(t *testing.T) {
 	// SETUP
-	logFile, err := os.Open("../../third_party/Blargg2LYStubbed/EpicLog.txt")
+	logFile, err := os.Open("../../third_party/BlarggLogs/EpicLog.txt")
 	if err != nil {
 		t.Fatalf("Error opening file: %v", err)
 	}
 	defer logFile.Close()
 	log := bufio.NewReader(logFile)
 
-	output, err := os.Create("../../third_party/Blargg2LYStubbed/EpicLogReformat.txt")
+	output, err := os.Create("../../third_party/BlarggLogs/EpicLogReformat.txt")
 	if err != nil {
 		fmt.Println("Error creating file:", err)
 		return

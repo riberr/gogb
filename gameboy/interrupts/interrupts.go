@@ -54,7 +54,7 @@ func (i *Interrupts) IsHaltBug() bool {
 }
 
 func (i *Interrupts) GetIF() uint8 {
-	return i._if
+	return i._if | 0xE0
 }
 
 func (i *Interrupts) SetAllIF(value uint8) {

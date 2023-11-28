@@ -9,7 +9,7 @@ import (
 
 type CPU struct {
 	bus        *bus.Bus
-	interrupts *interrupts.Interrupts
+	interrupts *interrupts.Interrupts2
 	debug      bool // debug print
 
 	regs    Registers
@@ -26,7 +26,7 @@ type CPU struct {
 	thisCpuTicks int
 }
 
-func New(bus *bus.Bus, interrupts *interrupts.Interrupts, debug bool) *CPU {
+func New(bus *bus.Bus, interrupts *interrupts.Interrupts2, debug bool) *CPU {
 	return &CPU{
 		bus:        bus,
 		interrupts: interrupts,
@@ -91,6 +91,54 @@ func (cpu *CPU) Step() int {
 	return cpu.thisCpuTicks
 }
 
+func (cpu *CPU) DoInterrupts() (cycles int) {
+	if cpu.interrupts.InterruptsEnabling {
+		cpu.interrupts.InterruptsOn = true
+		cpu.interrupts.InterruptsEnabling = false
+		return 0
+	}
+	if !cpu.interrupts.InterruptsOn && !cpu.halted {
+		return 0
+	}
+
+	req := cpu.bus.Read(0xFF0F)
+	enabled := cpu.bus.Read(0xFFFF)
+
+	if req > 0 {
+		var i byte
+		for i = 0; i < 5; i++ {
+			if utils.TestBit(req, int(i)) && utils.TestBit(enabled, int(i)) {
+				cpu.serviceInterrupt(i)
+				return 20
+			}
+		}
+	}
+	return 0
+}
+
+// Called if an interrupt has been raised. Will check if interrupts are
+// enabled and will jump to the interrupt address.
+func (cpu *CPU) serviceInterrupt(interrupt byte) {
+	// If was halted without interrupts, do not jump or reset IF
+	if !cpu.interrupts.InterruptsOn && cpu.halted {
+		cpu.halted = false
+		return
+	}
+	cpu.interrupts.InterruptsOn = false
+	cpu.halted = false
+
+	req := cpu.bus.Read(0xFF0F)
+	req = utils.ClearBit(req, int(interrupt))
+	cpu.bus.Write(0xFF0F, req)
+
+	cpu.sp--
+	cpu.bus.Write(cpu.sp, utils.Msb(cpu.pc))
+	cpu.sp--
+	cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc))
+	cpu.pc = interrupts.ISR_address[interrupt]
+}
+
+/*
 func (cpu *CPU) DoInterrupts() int {
 	if cpu.interrupts.GetIMEEnabling() {
 		cpu.interrupts.SetIMEEnabling(false)
@@ -128,6 +176,8 @@ func (cpu *CPU) serviceInterrupts(interruptFlag interrupts.Flag) {
 	cpu.bus.Write(cpu.sp, utils.Lsb(cpu.pc))
 	cpu.pc = interrupts.ISR_address[interruptFlag]
 }
+
+*/
 
 // GetInternalString returns a string representing the internal state of the cpu
 func (cpu *CPU) GetInternalString() string {

@@ -28,7 +28,7 @@ import (
 
 type Bus struct {
 	cart       *Cart
-	interrupts *interrupts.Interrupts
+	interrupts *interrupts.Interrupts2
 	timer      *timer.Timer
 	timer2     *timer.Timer2
 	sl         *seriallink.SerialLink
@@ -50,14 +50,11 @@ type Bus struct {
 	romBanking     bool
 }
 
-//var ieReg uint8 = 0 //Interrupt Enable register
-
-func New(interrupts *interrupts.Interrupts, timer *timer.Timer, timer2 *timer.Timer2, sl *seriallink.SerialLink, ppu *ppu.PPU, joypad *joypad.JoyPad) *Bus {
+func New(interrupts *interrupts.Interrupts2, timer *timer.Timer, sl *seriallink.SerialLink, ppu *ppu.PPU, joypad *joypad.JoyPad) *Bus {
 	return &Bus{
 		cart:       &Cart{},
 		interrupts: interrupts,
 		timer:      timer,
-		timer2:     timer2,
 		sl:         sl,
 		ppu:        ppu,
 		joypad:     joypad,
@@ -149,11 +146,13 @@ func (b *Bus) Read(address uint16) uint8 {
 	case 0xFF04, 0xFF05, 0xFF06, 0xFF07:
 		return b.timer.Read(address)
 	case 0xFF0F:
-		return b.interrupts.GetIF()
-	case 0xFF40, 0xFF41, 0xFF44, 0xFF45, 0xFF47, 0xFF48, 0xFF49:
+		return b.interrupts.IF | 0xE0
+	case 0xFF44:
+		return 0xFF
+	case 0xFF40, 0xFF41, 0xFF45, 0xFF47, 0xFF48, 0xFF49:
 		return b.ppu.Read(address)
 	case 0xFFFF:
-		return b.interrupts.GetIE()
+		return b.interrupts.IE
 	default:
 		if b.ioRegs.Has(address) {
 			return b.ioRegs.Read(address)
@@ -228,7 +227,7 @@ func (b *Bus) Write(address uint16, value uint8) {
 		b.timer.Write(address, value)
 		return
 	case 0xFF0F:
-		b.interrupts.SetAllIF(value)
+		b.interrupts.IF = value
 		return
 	case 0xFF40, 0xFF41, 0xFF44, 0xFF45, 0xFF47, 0xFF48, 0xFF49:
 		b.ppu.Write(address, value)
@@ -237,7 +236,7 @@ func (b *Bus) Write(address uint16, value uint8) {
 		b.doDMATransfer(value)
 		return
 	case 0xFFFF:
-		b.interrupts.SetAllIE(value)
+		b.interrupts.IE = value
 		return
 	default:
 		if b.ioRegs.Has(address) {

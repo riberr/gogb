@@ -11,9 +11,8 @@ import (
 )
 
 type GameBoy struct {
-	Interrupts *interruptsPackage.Interrupts
+	Interrupts *interruptsPackage.Interrupts2
 	Timer      *timerPackage.Timer
-	timer2     *timerPackage.Timer2
 	SerialLink *seriallink.SerialLink
 	Bus        *busPackage.Bus
 	Cpu        *cpuPackage.CPU
@@ -22,19 +21,17 @@ type GameBoy struct {
 }
 
 func New(debug bool) *GameBoy {
-	interrupts := interruptsPackage.New()
+	interrupts := interruptsPackage.NewInterrupts2()
 	timer := timerPackage.New(interrupts)
-	timer2 := timerPackage.NewTimer2(interrupts)
 	sl := seriallink.New()
 	ppu := ppuPackage.New(interrupts)
 	joyPad := joypadPackage.New(interrupts)
-	bus := busPackage.New(interrupts, timer, timer2, sl, ppu, joyPad)
+	bus := busPackage.New(interrupts, timer, sl, ppu, joyPad)
 	cpu := cpuPackage.New(bus, interrupts, debug)
 
 	return &GameBoy{
 		Interrupts: interrupts,
 		Timer:      timer,
-		timer2:     timer2,
 		SerialLink: sl,
 		Bus:        bus,
 		Cpu:        cpu,

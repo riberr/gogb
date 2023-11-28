@@ -29,12 +29,12 @@ func NewRegisters() Registers {
 		// values post boot rom
 		a: 0x01,
 		b: 0,
-		c: 0x13,
-		d: 0,
-		e: 0xD8,
+		c: 0,
+		d: 0xff,
+		e: 0x56,
 		f: 0xB0,
-		h: 0x01,
-		l: 0x4D,
+		h: 0x00,
+		l: 0x0D,
 	}
 }
 

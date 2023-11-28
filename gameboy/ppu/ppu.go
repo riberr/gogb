@@ -7,7 +7,7 @@ import (
 )
 
 type PPU struct {
-	interrupts *interrupts.Interrupts
+	interrupts *interrupts.Interrupts2
 
 	Vram utils.Space
 	Oam  utils.Space
@@ -67,7 +67,7 @@ const (
 	Mode3bounds = Mode2bounds - 172
 )
 
-func New(interrupts *interrupts.Interrupts) *PPU {
+func New(interrupts *interrupts.Interrupts2) *PPU {
 	return &PPU{
 		interrupts: interrupts,
 		Vram:       utils.NewSpace(0x8000, 0x9FFF), // Video RAM
@@ -83,14 +83,21 @@ func (ppu *PPU) GenerateDebugGraphics() {
 
 // Update from http://www.codeslinger.co.uk/pages/projects/gameboy/lcd.html
 func (ppu *PPU) Update(cycles int) {
-	ppu.setLcdStatus()
+	/*
+		ppu.setLcdStatus()
 
-	if ppu.isLcdEnabled() {
-		ppu.scanlineCounter -= cycles
-	} else {
+		if ppu.isLcdEnabled() {
+			ppu.scanlineCounter -= cycles
+		} else {
+			return
+		}
+	*/
+	if !ppu.isLcdEnabled() {
 		return
 	}
-
+	ppu.scanlineCounter -= cycles
+	ppu.setLcdStatus()
+	/**/
 	if ppu.scanlineCounter <= 0 {
 		// time to move onto next scanline
 		ppu.ly++
@@ -98,7 +105,7 @@ func (ppu *PPU) Update(cycles int) {
 
 		// we have entered vertical blank period
 		if ppu.ly == 144 {
-			ppu.interrupts.SetIF(interrupts.VBLANK)
+			ppu.interrupts.SetInterruptFlag(interrupts.INTR_VBLANK)
 		} else if ppu.ly > 153 {
 			ppu.ly = 0
 		} else if ppu.ly < 144 {
@@ -148,16 +155,16 @@ func (ppu *PPU) setLcdStatus() {
 		reqInt = utils.TestBit(ppu.stat, Mode0IntSelect)
 	}
 
-	// just entered a new mode so request interupt
+	// just entered a new mode so request interrupt
 	if reqInt && (mode != currentMode) {
-		ppu.interrupts.SetIF(interrupts.LCD)
+		ppu.interrupts.SetInterruptFlag(interrupts.INTR_LCD)
 	}
 
 	// check the coincidence flag
 	if ppu.ly == ppu.lyc {
 		ppu.stat = utils.SetBit(ppu.stat, LycEqualsLy)
 		if utils.TestBit(ppu.stat, LycIntSelect) {
-			ppu.interrupts.SetIF(interrupts.LCD)
+			ppu.interrupts.SetInterruptFlag(interrupts.INTR_LCD)
 		}
 	} else {
 		ppu.stat = utils.ClearBit(ppu.stat, LycEqualsLy)
@@ -415,7 +422,9 @@ func (ppu *PPU) Write(address uint16, value uint8) {
 	case 0xFF41:
 		ppu.stat = value | 0x80
 	case 0xFF44:
+		println("writing to ppu LY 0")
 		ppu.ly = 0
+		//ppu.ly = value
 	case 0xFF45:
 		ppu.lyc = value
 	case 0xFF47:

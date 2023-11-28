@@ -121,6 +121,7 @@ func TestDma(t *testing.T) {
 	}
 }
 
+// passes 8/16
 func TestVram(t *testing.T) {
 	roms := getRoms(romsPathGbMicro, "vram")
 
@@ -193,13 +194,49 @@ func TestSprite(t *testing.T) {
 	}
 }
 
+func TestLCDOn(t *testing.T) {
+	roms := getRoms(romsPathGbMicro, "lcdon")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			//t.Parallel()
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if got != want {
+				t.Errorf("got %d, want %d", got, want)
+			}
+			fmt.Printf("Correct result: %d\n", got)
+		})
+	}
+}
+
+func TestLYWhileLCDOff(t *testing.T) {
+	roms := getRoms(romsPathGbMicro, "ly_while")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			//t.Parallel()
+			got, want, err := testGbMicro(romsPathGbMicro, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if got != want {
+				t.Errorf("got %d, want %d", got, want)
+			}
+			fmt.Printf("Correct result: %d\n", got)
+		})
+	}
+}
+
 func testGbMicro(
 	romPath string,
 	romName string,
 	// t *testing.T,
 ) (uint8, uint8, error) {
 	// SETUP
-	gb := New(true)
+	gb := New(false)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
 		return 0, 0, errors.New("could not load rom")

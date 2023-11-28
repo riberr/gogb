@@ -115,7 +115,7 @@ func testBlarggRom(
 	romPath string,
 	romName string,
 ) (bool, error) {
-	gb := New(false)
+	gb := New(true)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
 		return false, errors.New("could not load rom")

@@ -20,6 +20,7 @@ func TestOneMooneye(t *testing.T) {
 	}
 }
 
+// all pass
 func TestMooneyeTimer(t *testing.T) {
 	path := "../third_party/mooneye/acceptance/timer/"
 	roms := getRoms(path, "")

@@ -185,7 +185,7 @@ var OpCodesControlFlow = map[uint8]OpCode{
 		func(cpu *CPU) { cpu.msb = cpu.bus.Read(cpu.sp); cpu.sp++ },
 		func(cpu *CPU) {
 			cpu.pc = utils.ToUint16(cpu.lsb, cpu.msb)
-			cpu.interrupts.SetIMEEnabling(true) /*cpu.interrupts.EnableIME()*/
+			cpu.interrupts.InterruptsEnabling = true /*cpu.interrupts.EnableIME()*/
 		},
 	}),
 

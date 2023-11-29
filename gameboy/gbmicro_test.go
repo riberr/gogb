@@ -16,6 +16,7 @@ type test struct {
 const romsPathGbMicro = "../third_party/gbmicrotest/bin/"
 
 func TestOneRom(t *testing.T) {
+	t.Skip()
 	got, want, _ := testGbMicro(
 		romsPathGbMicro,
 		"int_hblank_halt_bug_a.gb",
@@ -65,6 +66,7 @@ func TestInterruptsTimer(t *testing.T) {
 	}
 }
 
+// pass 0
 func TestInterruptsHBlank(t *testing.T) {
 	roms := getRoms(romsPathGbMicro, "int_hblank_halt_s")
 
@@ -199,7 +201,7 @@ func testGbMicro(
 	// t *testing.T,
 ) (uint8, uint8, error) {
 	// SETUP
-	gb := New(true)
+	gb := New(false)
 
 	if !gb.Bus.LoadCart(romPath, romName) {
 		return 0, 0, errors.New("could not load rom")

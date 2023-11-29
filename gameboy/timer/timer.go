@@ -5,7 +5,7 @@ import "gogb/gameboy/interrupts"
 // Timer is kinda ported from https://github.com/raddad772/jsmoo/blob/main/system/gb/gb_cpu.js
 // and https://github.com/rvaccarim/FrozenBoy/blob/master/FrozenBoyCore/Processor/Timer.cs
 type Timer struct {
-	interrupts *interrupts.Interrupts
+	interrupts *interrupts.Interrupts2
 
 	sysclk uint16
 	tima   uint8
@@ -19,7 +19,7 @@ type Timer struct {
 
 var FreqToBit = []int{9, 3, 5, 7}
 
-func New(interrupts *interrupts.Interrupts) *Timer {
+func New(interrupts *interrupts.Interrupts2) *Timer {
 	return &Timer{
 		interrupts: interrupts,
 	}
@@ -38,7 +38,7 @@ func (t *Timer) Tick() {
 	}
 	t.ticksSinceOverflow++
 	if t.ticksSinceOverflow == 4 {
-		t.interrupts.SetIF(interrupts.TIMER)
+		t.interrupts.SetInterruptFlag(interrupts.INTR_TIMER)
 	}
 	if t.ticksSinceOverflow == 5 {
 		t.tima = t.tma

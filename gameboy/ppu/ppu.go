@@ -7,7 +7,7 @@ import (
 )
 
 type PPU struct {
-	interrupts *interrupts.Interrupts
+	interrupts *interrupts.Interrupts2
 
 	Vram utils.Space
 	Oam  utils.Space
@@ -67,7 +67,7 @@ const (
 	Mode3bounds = Mode2bounds - 172
 )
 
-func New(interrupts *interrupts.Interrupts) *PPU {
+func New(interrupts *interrupts.Interrupts2) *PPU {
 	return &PPU{
 		interrupts: interrupts,
 		Vram:       utils.NewSpace(0x8000, 0x9FFF), // Video RAM
@@ -98,7 +98,7 @@ func (ppu *PPU) Update(cycles int) {
 
 		// we have entered vertical blank period
 		if ppu.ly == 144 {
-			ppu.interrupts.SetIF(interrupts.VBLANK)
+			ppu.interrupts.SetInterruptFlag(interrupts.INTR_VBLANK)
 		} else if ppu.ly > 153 {
 			ppu.ly = 0
 		} else if ppu.ly < 144 {
@@ -150,14 +150,14 @@ func (ppu *PPU) setLcdStatus() {
 
 	// just entered a new mode so request interupt
 	if reqInt && (mode != currentMode) {
-		ppu.interrupts.SetIF(interrupts.LCD)
+		ppu.interrupts.SetInterruptFlag(interrupts.INTR_LCD)
 	}
 
 	// check the coincidence flag
 	if ppu.ly == ppu.lyc {
 		ppu.stat = utils.SetBit(ppu.stat, LycEqualsLy)
 		if utils.TestBit(ppu.stat, LycIntSelect) {
-			ppu.interrupts.SetIF(interrupts.LCD)
+			ppu.interrupts.SetInterruptFlag(interrupts.INTR_LCD)
 		}
 	} else {
 		ppu.stat = utils.ClearBit(ppu.stat, LycEqualsLy)

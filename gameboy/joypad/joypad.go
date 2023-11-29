@@ -30,13 +30,13 @@ const (
 )
 
 type JoyPad struct {
-	interrupts *interrupts.Interrupts
+	interrupts *interrupts.Interrupts2
 	joyp       uint8 // 0xFF00
 	pad        uint8
 	buttons    uint8
 }
 
-func New(interrupts *interrupts.Interrupts) *JoyPad {
+func New(interrupts *interrupts.Interrupts2) *JoyPad {
 	return &JoyPad{
 		interrupts: interrupts,
 		joyp:       0,
@@ -70,7 +70,7 @@ func (j *JoyPad) KeyEvent(button Button, isPress bool) {
 
 	res := ((prevPad ^ j.pad) & j.pad) | ((prevButtons ^ j.buttons) & j.buttons)
 	if res != 0 {
-		j.interrupts.SetIF(interrupts.JOYPAD)
+		j.interrupts.SetInterruptFlag(interrupts.INTR_JOYPAD)
 	}
 	fmt.Printf("%04b %04b\n", j.pad, j.buttons)
 }

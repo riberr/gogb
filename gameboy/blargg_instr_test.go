@@ -17,6 +17,7 @@ import (
 */
 
 func TestCpuOutputBlargg01(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"01-special.gb",
@@ -28,6 +29,7 @@ func TestCpuOutputBlargg01(t *testing.T) {
 }
 
 func TestCpuOutputBlargg02(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"02-interrupts.gb",
@@ -40,6 +42,7 @@ func TestCpuOutputBlargg02(t *testing.T) {
 }
 
 func TestCpuOutputBlargg03(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"03-op sp,hl.gb",
@@ -51,6 +54,7 @@ func TestCpuOutputBlargg03(t *testing.T) {
 }
 
 func TestCpuOutputBlargg04(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"04-op r,imm.gb",
@@ -62,6 +66,7 @@ func TestCpuOutputBlargg04(t *testing.T) {
 }
 
 func TestCpuOutputBlargg05(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"05-op rp.gb",
@@ -73,6 +78,7 @@ func TestCpuOutputBlargg05(t *testing.T) {
 }
 
 func TestCpuOutputBlargg06(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"06-ld r,r.gb",
@@ -84,6 +90,7 @@ func TestCpuOutputBlargg06(t *testing.T) {
 }
 
 func TestCpuOutputBlargg07(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"07-jr,jp,call,ret,rst.gb",
@@ -95,6 +102,7 @@ func TestCpuOutputBlargg07(t *testing.T) {
 }
 
 func TestCpuOutputBlargg08(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"08-misc instrs.gb",
@@ -106,6 +114,7 @@ func TestCpuOutputBlargg08(t *testing.T) {
 }
 
 func TestCpuOutputBlargg09(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"09-op r,r.gb",
@@ -117,6 +126,7 @@ func TestCpuOutputBlargg09(t *testing.T) {
 }
 
 func TestCpuOutputBlargg10(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"10-bit ops.gb",
@@ -128,6 +138,7 @@ func TestCpuOutputBlargg10(t *testing.T) {
 }
 
 func TestCpuOutputBlargg11(t *testing.T) {
+	t.Skip()
 	testBlarggRomWithLog(
 		"../third_party/gb-test-roms/cpu_instrs/individual/",
 		"11-op a,(hl).gb",

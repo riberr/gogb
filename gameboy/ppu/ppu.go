@@ -74,6 +74,10 @@ func New(interrupts *interrupts.Interrupts2) *PPU {
 		Oam:        utils.NewSpace(0xFE00, 0xFE9F), // Object attribute bus
 		Fb:         image.NewRGBA(image.Rect(0, 0, ScreenWidth, ScreenHeight)),
 		FbVram:     image.NewRGBA(image.Rect(0, 0, vramWidth, vramHeight)),
+		lcdc:       0x91,
+		stat:       0x81,
+		ly:         0x91,
+		bgp:        0xFC,
 	}
 }
 
@@ -116,32 +120,43 @@ func (ppu *PPU) setLcdStatus() {
 		// set the mode to 1 during lcd disabled and reset scanline
 		ppu.scanlineCounter = 456
 		ppu.ly = 0
-		ppu.stat = utils.ClearBit(ppu.stat, PpuModeHi)
-		ppu.stat = utils.SetBit(ppu.stat, PpuModeLo) // set ppumode = 1
+
+		//ppu.stat = utils.ClearBit(ppu.stat, PpuModeHi)
+		//ppu.stat = utils.SetBit(ppu.stat, PpuModeLo) // set ppumode = 1
+
+		status := ppu.stat
+		status &= 252
+		status = utils.ClearBit(status, PpuModeLo)
+		status = utils.ClearBit(status, PpuModeHi)
+		ppu.stat = status
 		return
 	}
 
 	currentMode := ppu.stat & 0x3
-	mode := uint8(0)
+	var mode uint8
 	reqInt := false
 
 	switch {
 	case ppu.ly >= 144:
+		println("111")
 		// in vblank so set mode to 1
 		mode = 1
 		ppu.stat = utils.ClearBit(ppu.stat, PpuModeHi)
 		ppu.stat = utils.SetBit(ppu.stat, PpuModeLo)
 		reqInt = utils.TestBit(ppu.stat, Mode1IntSelect)
 	case ppu.scanlineCounter >= Mode2bounds:
+		println("222")
 		mode = 2
 		ppu.stat = utils.SetBit(ppu.stat, PpuModeHi)
 		ppu.stat = utils.ClearBit(ppu.stat, PpuModeLo)
 		reqInt = utils.TestBit(ppu.stat, Mode2IntSelect)
 	case ppu.scanlineCounter >= Mode3bounds:
+		println("333")
 		mode = 3
 		ppu.stat = utils.SetBit(ppu.stat, PpuModeHi)
 		ppu.stat = utils.SetBit(ppu.stat, PpuModeLo)
 	default:
+		println("000")
 		mode = 0
 		ppu.stat = utils.ClearBit(ppu.stat, PpuModeHi)
 		ppu.stat = utils.ClearBit(ppu.stat, PpuModeLo)
@@ -150,6 +165,7 @@ func (ppu *PPU) setLcdStatus() {
 
 	// just entered a new mode so request interupt
 	if reqInt && (mode != currentMode) {
+		println(mode)
 		ppu.interrupts.SetInterruptFlag(interrupts.INTR_LCD)
 	}
 
@@ -212,17 +228,19 @@ func (ppu *PPU) renderTiles() {
 		}
 	}
 
-	yPos := uint8(0)
-
 	// yPos is used to calculate which of 32 vertical tiles the current scanline is drawing
+	var yPos uint8
 	if !usingWindow {
 		yPos = ppu.scy + ppu.ly
 	} else {
+		println("is")
 		yPos = ppu.ly - ppu.wy
 	}
 
 	// which of the 8 vertical pixels of the current tile is the scanline on?
 	tileRow := uint16(yPos/8) * 32
+
+	palette := ppu.bgp
 
 	// time to start drawing the 160 horizontal pixels for this scanline
 	ppu.tileScanline = [160]uint8{}
@@ -239,11 +257,11 @@ func (ppu *PPU) renderTiles() {
 		// which of the 32 horizontal tiles does this xPos fall within?
 		tileCol := uint16(xPos / 8)
 
-		// deduce where this tile identifier is in memory.
-		tileLocation := tileData
-
-		// get the tile identity number. Remember it can be signed or unsigned
+		// Get the tile identity number
 		tileAddress := backgroundMemory + tileRow + tileCol
+
+		// Deduce where this tile id is in memory
+		tileLocation := tileData
 		if unsigned {
 			tileNum := int16(ppu.Vram.Read(tileAddress))
 			tileLocation = tileLocation + uint16(tileNum*16)
@@ -251,10 +269,24 @@ func (ppu *PPU) renderTiles() {
 			tileNum := int16(int8(ppu.Vram.Read(tileAddress)))
 			tileLocation = uint16(int32(tileLocation) + int32((tileNum+128)*16))
 		}
+		/*
+			// deduce where this tile identifier is in memory.
+			tileLocation := tileData
+
+			// get the tile identity number. Remember it can be signed or unsigned
+			tileAddress := backgroundMemory + tileRow + tileCol
+			if unsigned {
+				tileNum := int16(ppu.Vram.Read(tileAddress))
+				tileLocation = tileLocation + uint16(tileNum*16)
+			} else {
+				tileNum := int16(int8(ppu.Vram.Read(tileAddress)))
+				tileLocation = uint16(int32(tileLocation) + int32((tileNum+128)*16))
+			}
+		*/
 
 		// find the correct vertical line we're on of the tile to get the tile data from in memory
-		line := yPos % 8
-		line *= 2 // each vertical line takes up two bytes of memory
+		line := (yPos % 8) * 2
+		//line *= 2 // each vertical line takes up two bytes of memory
 		b1 := ppu.Vram.Read(tileLocation + uint16(line))
 		b2 := ppu.Vram.Read(tileLocation + uint16(line) + 1)
 
@@ -271,7 +303,8 @@ func (ppu *PPU) renderTiles() {
 
 		colorBit := uint8(int8((xPos%8)-7) * -1)
 		colorNum := (utils.BitValue(b1, colorBit) << 1) | utils.BitValue(b2, colorBit)
-		drawSquare(ppu.Fb, &coloredRects[colorNum], 4, int(pixel)*Scale, int(ppu.ly)*Scale)
+		//drawSquare(ppu.Fb, &coloredRects[colorNum], 4, int(pixel)*Scale, int(ppu.ly)*Scale)
+		drawSquare(ppu.Fb, &coloredRects[ppu.getColor(colorNum, palette)], 4, int(pixel)*Scale, int(ppu.ly)*Scale)
 		ppu.tileScanline[pixel] = colorNum
 	}
 }

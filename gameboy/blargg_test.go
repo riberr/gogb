@@ -111,6 +111,23 @@ func TestBlarggMemTiming2(t *testing.T) {
 	}
 }
 
+func TestBlarggOamBug(t *testing.T) {
+	path := "../third_party/gb-test-roms/oam_bug/rom_singles/"
+	roms := getRoms(path, "")
+
+	for _, test := range roms {
+		t.Run(test.rom, func(t *testing.T) {
+			result, err := testBlarggRom(path, test.rom)
+			if err != nil {
+				t.Fatalf("error: %v", err)
+			}
+			if !result {
+				t.Errorf("Failed")
+			}
+		})
+	}
+}
+
 func testBlarggRom(
 	romPath string,
 	romName string,

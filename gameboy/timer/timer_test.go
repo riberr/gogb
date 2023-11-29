@@ -9,7 +9,7 @@ const cpuFreq = 4194304
 
 func TestDIVSecond(t *testing.T) {
 	// SETUP
-	timer := New(interrupts.New())
+	timer := New(interrupts.NewInterrupts2())
 	var cycles = 0
 
 	// 1 second
@@ -33,7 +33,7 @@ func TestDIVSecond(t *testing.T) {
 
 func TestDIVHalfSecond(t *testing.T) {
 	// SETUP
-	timer := New(interrupts.New())
+	timer := New(interrupts.NewInterrupts2())
 	var cycles = 0
 
 	// 0.5 second
@@ -56,7 +56,7 @@ func TestDIVHalfSecond(t *testing.T) {
 
 func TestTIMAClockDisabled(t *testing.T) {
 	// SETUP
-	timer := New(interrupts.New())
+	timer := New(interrupts.NewInterrupts2())
 	timer.Write(0xFF07, 0x00) // timer disabled
 
 	initialTima := timer.Read(0xFF05)
@@ -73,7 +73,7 @@ func TestTIMAClockDisabled(t *testing.T) {
 
 func TestTIMAClockDEnabled(t *testing.T) {
 	// SETUP
-	timer := New(interrupts.New())
+	timer := New(interrupts.NewInterrupts2())
 	timer.Write(0xFF07, 0b100) // TAC: timer enabled, 4096Hz, /1024
 
 	cycles := 0
@@ -93,7 +93,7 @@ func TestTIMAClockDEnabled(t *testing.T) {
 }
 
 func TestDivIncrease(t *testing.T) {
-	timer := New(interrupts.New())
+	timer := New(interrupts.NewInterrupts2())
 
 	for i := 0; i < 255; i++ {
 		timer.Tick()
@@ -133,7 +133,7 @@ func TestTimaIncrease(t *testing.T) {
 }
 
 func addTima(TAC uint8) uint16 {
-	timer := New(interrupts.New())
+	timer := New(interrupts.NewInterrupts2())
 
 	timer.Write(0xFF07, TAC)
 
@@ -151,7 +151,7 @@ func addTima(TAC uint8) uint16 {
 }
 
 func TestClockDisabled(t *testing.T) {
-	timer := New(interrupts.New())
+	timer := New(interrupts.NewInterrupts2())
 
 	for i := 0; i < 2056; i++ {
 		timer.Tick()
@@ -168,7 +168,7 @@ func TestClockDisabled(t *testing.T) {
 
 // borrowed from https://github.com/rvaccarim/FrozenBoy/blob/dac3dac1d33301019c02a78f9473f80d07999747/FrozenBoyTest/Tests/TimerTest.cs
 func TestTimaOverflow(t *testing.T) {
-	timer := New(interrupts.New())
+	timer := New(interrupts.NewInterrupts2())
 
 	timer.tac = 0b_0000_00101 // frequency = 16
 
@@ -178,7 +178,7 @@ func TestTimaOverflow(t *testing.T) {
 	}
 
 	// the interruption should not happen immediately
-	if timer.interrupts.GetIF()>>2&1 != 0 {
+	if timer.interrupts.IF>>2&1 != 0 {
 		t.Fatalf("Should be 0")
 	}
 	timer.Tick()
@@ -187,7 +187,7 @@ func TestTimaOverflow(t *testing.T) {
 	if timer.ticksSinceOverflow != 4 {
 		t.Fatalf("should be 4")
 	}
-	if timer.interrupts.GetIF()>>2&1 != 1 {
+	if timer.interrupts.IF>>2&1 != 1 {
 		t.Fatalf("should be 1")
 	}
 

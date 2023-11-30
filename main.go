@@ -12,8 +12,8 @@ func main() {
 	//romPath := "third_party/roms/"
 	//romName := "Yoshi.gb"
 
-	//romPath := "third_party/roms/"
-	//romName := "Kirby.gb"
+	romPath := "third_party/roms/"
+	romName := "Kirby.gb"
 
 	//romPath := "third_party/scribbltests/"
 	//romName := "winpos.gb"
@@ -27,8 +27,8 @@ func main() {
 	//romPath := "third_party/roms/games/"
 	//romName := "Pokemon Red.gb"
 
-	romPath := "third_party/mooneye/emulator-only/mbc1/"
-	romName := "rom_512kb.gb"
+	//romPath := "third_party/mooneye/emulator-only/mbc1/"
+	//romName := "bits_bank1.gb"
 
 	gb := gameboy.New(false)
 	if !gb.Bus.LoadCart(romPath, romName) {

@@ -55,6 +55,7 @@ func TestMooneyeInterrupts(t *testing.T) {
 	}
 }
 
+// passes all but multicart. same as goboy passes 2
 func TestMooneyeMBC1(t *testing.T) {
 	path := "../third_party/mooneye/emulator-only/mbc1/"
 	roms := getRoms(path, "")

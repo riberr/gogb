@@ -6,14 +6,17 @@ import (
 )
 
 func main() {
-	//romPath := "third_party/games/"
+	//romPath := "third_party/roms/"
 	//romName := "Tetris.gb"
 
 	//romPath := "third_party/roms/"
-	//romName := "SuperMarioLand.gb"
+	//romName := "Yoshi.gb"
 
-	romPath := "third_party/scribbltests/"
-	romName := "scxly.gb"
+	romPath := "third_party/roms/"
+	romName := "Kirby.gb"
+
+	//romPath := "third_party/scribbltests/"
+	//romName := "winpos.gb"
 
 	//romPath := "third_party/gb-test-roms/mem_timing/"
 	//romName := "mem_timing.gb"

@@ -37,4 +37,25 @@
 Notes
 - GoBoy passes the same gbmicrotests, at least for timer and interrupts
 - Mooneye test requires graphics to be implemented or else they just "time out"
-- pixel on windows: https://github.com/gopxl/pixel/wiki/Building-Pixel-on-Windows
+  - pixel on windows: https://github.com/gopxl/pixel/wiki/Building-Pixel-on-Windows
+
+          main:
+          set_test 2,"Turning LCD on starts too late in scanline"
+          call disable_lcd
+          ld   a,$81
+          ldh  (LCDC-$FF00),a ; LCD on
+          delay 109
+          ldh  a,(LY-$FF00)   ; just before LY increments. PC C450
+          cp   0  // PC C452
+          jp   nz,test_failed
+
+           set_test 3,"Turning LCD on starts too early in scanline"
+           call disable_lcd
+           ld   a,$81
+           ldh  (LCDC-$FF00),a ; LCD on
+           delay 110
+           ldh  a,(LY-$FF00)   ; just after LY increments
+           cp   1
+           jp   nz,test_failed
+         
+           jp   tests_passed

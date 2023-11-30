@@ -55,6 +55,6 @@ func (i *Interrupts2) SetInterruptFlag(f uint8) {
 }
 
 func (i *Interrupts2) IsHaltBug() bool {
-	println("is haltbug!")
+	//println("is haltbug!")
 	return (i.IE&i.IF&0x1F) != 0 && !i.InterruptsOn
 }

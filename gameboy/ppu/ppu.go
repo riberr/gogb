@@ -98,15 +98,16 @@ func (ppu *PPU) Update(cycles int) {
 	if ppu.scanlineCounter <= 0 {
 		// time to move onto next scanline
 		ppu.ly++
-		ppu.scanlineCounter = 456
+		ppu.scanlineCounter += 456
 
 		// we have entered vertical blank period
 		if ppu.ly == 144 {
 			ppu.interrupts.SetInterruptFlag(interrupts.INTR_VBLANK)
+			//println("VBLANK")
 		} else if ppu.ly > 153 {
 			ppu.ly = 0
 		} else if ppu.ly < 144 {
-			ppu.drawScanLine()
+			//ppu.drawScanLine()
 		}
 	}
 }
@@ -116,6 +117,8 @@ func (ppu *PPU) isLcdEnabled() bool {
 }
 
 func (ppu *PPU) setLcdStatus() {
+	status := ppu.stat
+
 	if !ppu.isLcdEnabled() {
 		// set the mode to 1 during lcd disabled and reset scanline
 		ppu.scanlineCounter = 456
@@ -124,7 +127,6 @@ func (ppu *PPU) setLcdStatus() {
 		//ppu.stat = utils.ClearBit(ppu.stat, PpuModeHi)
 		//ppu.stat = utils.SetBit(ppu.stat, PpuModeLo) // set ppumode = 1
 
-		status := ppu.stat
 		status &= 252
 		status = utils.ClearBit(status, PpuModeLo)
 		status = utils.ClearBit(status, PpuModeHi)
@@ -138,46 +140,55 @@ func (ppu *PPU) setLcdStatus() {
 
 	switch {
 	case ppu.ly >= 144:
-		println("111")
 		// in vblank so set mode to 1
 		mode = 1
-		ppu.stat = utils.ClearBit(ppu.stat, PpuModeHi)
-		ppu.stat = utils.SetBit(ppu.stat, PpuModeLo)
-		reqInt = utils.TestBit(ppu.stat, Mode1IntSelect)
+		status = utils.ClearBit(status, PpuModeHi)
+		status = utils.SetBit(status, PpuModeLo)
+		reqInt = utils.TestBit(status, Mode1IntSelect)
+		if reqInt {
+			println("111")
+		}
 	case ppu.scanlineCounter >= Mode2bounds:
-		println("222")
 		mode = 2
-		ppu.stat = utils.SetBit(ppu.stat, PpuModeHi)
-		ppu.stat = utils.ClearBit(ppu.stat, PpuModeLo)
-		reqInt = utils.TestBit(ppu.stat, Mode2IntSelect)
+		status = utils.SetBit(status, PpuModeHi)
+		status = utils.ClearBit(status, PpuModeLo)
+		reqInt = utils.TestBit(status, Mode2IntSelect)
+		if reqInt {
+			println("222")
+		}
 	case ppu.scanlineCounter >= Mode3bounds:
-		println("333")
 		mode = 3
-		ppu.stat = utils.SetBit(ppu.stat, PpuModeHi)
-		ppu.stat = utils.SetBit(ppu.stat, PpuModeLo)
+		status = utils.SetBit(status, PpuModeHi)
+		status = utils.SetBit(status, PpuModeLo)
+		if mode != currentMode {
+			ppu.drawScanLine()
+		}
 	default:
-		println("000")
 		mode = 0
-		ppu.stat = utils.ClearBit(ppu.stat, PpuModeHi)
-		ppu.stat = utils.ClearBit(ppu.stat, PpuModeLo)
-		reqInt = utils.TestBit(ppu.stat, Mode0IntSelect)
+		status = utils.ClearBit(status, PpuModeHi)
+		status = utils.ClearBit(status, PpuModeLo)
+		reqInt = utils.TestBit(status, Mode0IntSelect) // HBLANK interrupt
+		if reqInt {
+			//println("000")
+		}
 	}
 
 	// just entered a new mode so request interupt
 	if reqInt && (mode != currentMode) {
-		println(mode)
 		ppu.interrupts.SetInterruptFlag(interrupts.INTR_LCD)
 	}
 
 	// check the coincidence flag
 	if ppu.ly == ppu.lyc {
-		ppu.stat = utils.SetBit(ppu.stat, LycEqualsLy)
-		if utils.TestBit(ppu.stat, LycIntSelect) {
+		status = utils.SetBit(status, LycEqualsLy)
+		if utils.TestBit(status, LycIntSelect) {
+			println("LYC==LY")
 			ppu.interrupts.SetInterruptFlag(interrupts.INTR_LCD)
 		}
 	} else {
-		ppu.stat = utils.ClearBit(ppu.stat, LycEqualsLy)
+		status = utils.ClearBit(status, LycEqualsLy)
 	}
+	ppu.stat = status
 }
 
 func (ppu *PPU) drawScanLine() {
@@ -233,7 +244,6 @@ func (ppu *PPU) renderTiles() {
 	if !usingWindow {
 		yPos = ppu.scy + ppu.ly
 	} else {
-		println("is")
 		yPos = ppu.ly - ppu.wy
 	}
 
@@ -426,6 +436,10 @@ func (ppu *PPU) Read(address uint16) uint8 {
 		return ppu.lcdc
 	case 0xFF41:
 		return ppu.stat
+	case 0xFF42:
+		return ppu.scy
+	case 0xFF43:
+		return ppu.scx
 	case 0xFF44:
 		return ppu.ly
 	case 0xFF45:
@@ -436,6 +450,10 @@ func (ppu *PPU) Read(address uint16) uint8 {
 		return ppu.obp0
 	case 0xFF49:
 		return ppu.obp1
+	case 0xFF4A:
+		return ppu.wy
+	case 0xFF4B:
+		return ppu.wx
 	default:
 		panic("not handled ppu read")
 	}
@@ -447,6 +465,10 @@ func (ppu *PPU) Write(address uint16, value uint8) {
 		ppu.lcdc = value
 	case 0xFF41:
 		ppu.stat = value | 0x80
+	case 0xFF42:
+		ppu.scy = value
+	case 0xFF43:
+		ppu.scx = value
 	case 0xFF44:
 		ppu.ly = 0
 	case 0xFF45:
@@ -457,7 +479,10 @@ func (ppu *PPU) Write(address uint16, value uint8) {
 		ppu.obp0 = value
 	case 0xFF49:
 		ppu.obp1 = value
-
+	case 0xFF4A:
+		ppu.wy = value
+	case 0xFF4B:
+		ppu.wx = value
 	default:
 		panic("not handled ppu write")
 	}

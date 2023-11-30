@@ -1,10 +1,14 @@
 package bus
 
-import "gogb/gameboy/utils"
+import (
+	"fmt"
+	"gogb/gameboy/utils"
+)
 
 func (b *Bus) handleBanking(address uint16, value uint8) {
 
 	if address < 0x2000 {
+		println("RAMG")
 		// do RAM enabling
 		// todo prettify
 		if b.cart.header.cartType == 1 || b.cart.header.cartType == 2 || b.cart.header.cartType == 3 ||
@@ -28,6 +32,7 @@ func (b *Bus) handleBanking(address uint16, value uint8) {
 			}
 		}
 	} else if address < 0x8000 {
+		println("bom")
 		// this will change whether we are doing ROM banking
 		// or RAM banking with the above if statement
 		if b.cart.header.cartType == 1 || b.cart.header.cartType == 2 || b.cart.header.cartType == 3 {
@@ -49,6 +54,15 @@ func (b *Bus) doRamBankEnable(address uint16, value uint8) {
 		b.enableRam = false
 	}
 }
+
+/*
+// Update the romBank if it is on a value which cannot be used.
+func (b *Bus) updateRomBankIfZero() {
+	if b.currentRomBank == 0x00 || b.currentRomBank == 0x20 || b.currentRomBank == 0x40 || b.currentRomBank == 0x60 {
+		b.currentRomBank++
+	}
+}
+*/
 
 func (b *Bus) doChangeLoROMBank(value uint8) {
 	if b.cart.header.cartType == 5 || b.cart.header.cartType == 6 {
@@ -81,14 +95,17 @@ func (b *Bus) doChangeHiRomBank(value uint8) {
 
 func (b *Bus) doRamBankChange(value uint8) {
 	b.currentRamBank = uint16(value) & 0x3
+	fmt.Printf("changing ram bank to %02x\n", b.currentRamBank)
 }
 
 func (b *Bus) doChangeRomRamMode(value uint8) {
 	newValue := value & 0x1
 	if newValue == 0 {
+
 		b.romBanking = true
 		b.currentRamBank = 0
 	} else {
+		println("RAM banking")
 		b.romBanking = false
 	}
 

@@ -19,6 +19,10 @@ func NewSpace(from uint16, to uint16) Space {
 	return mem
 }
 
+func (m *Space) WriteDirect(address uint16, value uint8) {
+	m.data[address] = value
+}
+
 func (m *Space) Write(address uint16, value uint8) {
 	m.data[address-m.Start] = value
 }

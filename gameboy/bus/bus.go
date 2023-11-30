@@ -81,31 +81,44 @@ func (b *Bus) LoadCart(romPath string, romName string) bool {
 }
 
 func (b *Bus) Read(address uint16) uint8 {
+	/*
+		if address < 0x4000 {
+			println("rom1")
+			//ROM Data
+			return b.cart.read(address)
+		}
 
-	if address < 0x4000 {
-		//ROM Data
-		return b.cart.read(address)
-	}
-
-	// are we reading from the rom memory bank?
+		// are we reading from the rom memory bank?
+		if address < 0x8000 {
+			fmt.Printf("rom2\n")
+			newAddress := address - 0x4000
+			//fmt.Printf("banking read from %04x\n", newAddress+(b.currentRomBank*0x4000))
+			return b.cart.read(newAddress + (b.currentRomBank * 0x4000))
+		}
+	*/
 	if address < 0x8000 {
-		newAddress := address - 0x4000
-		return b.cart.read(newAddress + (b.currentRomBank * 0x4000))
+		return b.cart.MBC.Read(address)
 	}
 
 	if b.ppu.Vram.Has(address) {
-		//println("reading from vram")
 		return b.ppu.Vram.Read(address)
 	}
 
-	if b.eram.Has(address) {
-		if b.enableRam {
-			bank := b.currentRamBank % b.cart.header.ramBanks
-			return b.eram.Read(address + bank)
-		} else {
-			return 0xFF
-		}
+	if address < 0xC000 {
+		return b.cart.MBC.Read(address)
 	}
+
+	/*
+		if b.eram.Has(address) {
+			println("eram")
+			if b.enableRam {
+				bank := b.currentRamBank % b.cart.header.ramBanks
+				return b.eram.Read(address + bank)
+			} else {
+				return 0xFF
+			}
+		}
+	*/
 
 	if b.wramC.Has(address) {
 		return b.wramC.Read(address)
@@ -164,9 +177,7 @@ func (b *Bus) Read(address uint16) uint8 {
 
 func (b *Bus) Write(address uint16, value uint8) {
 	if address < 0x8000 {
-		//ROM Data
-		//b.cart.write(address, value)
-		b.handleBanking(address, value)
+		b.cart.MBC.WriteRom(address, value)
 		return
 	}
 
@@ -176,7 +187,7 @@ func (b *Bus) Write(address uint16, value uint8) {
 	}
 
 	if b.eram.Has(address) {
-		b.eram.Write(address, value)
+		b.cart.MBC.WriteRam(address, value)
 		return
 	}
 

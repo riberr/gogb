@@ -9,8 +9,8 @@ import (
 
 func TestOneMooneye(t *testing.T) {
 	res, err := testMooneye(
-		"../third_party/mooneye/acceptance/timer/",
-		"div_write.gb",
+		"../third_party/mooneye/emulator-only/mbc1/",
+		"bits_bank2.gb",
 	)
 	if err != nil {
 		t.Fatalf("error: %v", err)

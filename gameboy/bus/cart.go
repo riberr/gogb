@@ -2,6 +2,7 @@ package bus
 
 import (
 	"fmt"
+	"gogb/gameboy/bus/mbc"
 	"gogb/gameboy/utils"
 	"os"
 )
@@ -129,8 +130,9 @@ var RAM_BANKS = map[uint8]uint16{
 type Cart struct {
 	fileName string
 	size     int
-	data     []uint8
-	header   header
+	//data     []uint8
+	header header
+	MBC    mbc.MBC
 }
 
 type header struct {
@@ -178,13 +180,19 @@ func (cart *Cart) Load(romPath string, romName string) bool {
 		fmt.Printf("Failed to open: %s\n", romPath+romName)
 		return false
 	}
+	cart.header = newHeader(rom)
 
 	cart.fileName = romName
 	fmt.Printf("Opened: %s\n", cart.fileName)
 	cart.size = len(rom)
-	cart.data = rom
+	//cart.data = rom
 
-	cart.header = newHeader(cart.data)
+	switch cart.header.cartType {
+	case 1, 2, 3:
+		cart.MBC = mbc.NewMBC1(rom)
+	default:
+		panic(fmt.Sprintf("not implementented cart type: %v\n", cart.header.cartType))
+	}
 
 	fmt.Printf("Cartridge Loaded:\n")
 	fmt.Printf("\t Title    : %s\n", cart.header.title)
@@ -196,8 +204,8 @@ func (cart *Cart) Load(romPath string, romName string) bool {
 	fmt.Printf("\t ROM Vers : %2.2X\n", cart.header.version)
 
 	var x uint8 = 0
-	for i := 0x134; i <= 0x14C; i++ {
-		x = x - cart.data[i] - 1
+	for i := uint16(0x134); i <= 0x14C; i++ {
+		x = x - cart.MBC.Read(i) - 1
 	}
 
 	if x&0xFF != 0 {
@@ -209,6 +217,7 @@ func (cart *Cart) Load(romPath string, romName string) bool {
 	return true
 }
 
+/*
 func (cart *Cart) read(address uint16) uint8 {
 	return cart.data[address]
 }
@@ -217,3 +226,4 @@ func (cart *Cart) write(address uint16, value uint8) {
 	println("warning: writing to ROM")
 	cart.data[address] = value
 }
+*/

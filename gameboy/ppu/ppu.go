@@ -182,7 +182,6 @@ func (ppu *PPU) setLcdStatus() {
 	if ppu.ly == ppu.lyc {
 		status = utils.SetBit(status, LycEqualsLy)
 		if utils.TestBit(status, LycIntSelect) {
-			println("LYC==LY")
 			ppu.interrupts.SetInterruptFlag(interrupts.INTR_LCD)
 		}
 	} else {

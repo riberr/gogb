@@ -203,6 +203,8 @@ func (cart *Cart) Load(romPath string, romName string) bool {
 	switch cart.header.cartType {
 	case 0, 1, 2, 3:
 		cart.MBC = mbc.NewMBC1(rom, ROM_BANKS[cart.header.romSize], RAM_BANKS[rom[0x149]])
+	case 5, 6:
+		cart.MBC = mbc.NewMBC2(rom, ROM_BANKS[cart.header.romSize], RAM_BANKS[rom[0x149]])
 	default:
 		panic(fmt.Sprintf("not implementented cart type: %v\n", cart.header.cartType))
 	}

@@ -28,7 +28,7 @@ func main() {
 	//romName := "Pokemon Red.gb"
 
 	romPath := "third_party/mooneye/emulator-only/mbc2/"
-	romName := "bits_ramg.gb"
+	romName := "rom_1Mb.gb"
 
 	//romPath := "third_party/mealybug-tearoom-tests/ppu/"
 	//romName := "m3_wx_5_change.gb"

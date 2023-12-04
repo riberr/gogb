@@ -1,7 +1,12 @@
 package mbc
 
-import "gogb/gameboy/utils"
+import (
+	"gogb/gameboy/bus/mbc/rtc"
+	"gogb/gameboy/utils"
+)
 
+// https://github.com/TASEmulators/BizHawk/blob/84e195659c47fdf8b617777a1504efe5cffb169e/src/BizHawk.Emulation.Cores/Consoles/Nintendo/GBHawk/Mappers/Mapper_MBC3.cs#L175
+// https://github.com/trekawek/coffee-gb/blob/master/src/main/java/eu/rekawek/coffeegb/memory/cart/type/Mbc3.java
 type MBC3 struct {
 	rom             []uint8
 	selectedRomBank uint16
@@ -16,11 +21,14 @@ type MBC3 struct {
 	latchClockReg uint8
 	clockLatched  bool
 
-	rtc *RTC
+	rtc *rtc.RTC
 }
 
 func NewMBC3(rom []uint8, romBanks uint16, ramBanks uint16) MBC {
-	ram := make([]uint8, 0x0200) //512
+	if ramBanks == 0 {
+		ramBanks = 1
+	}
+	ram := make([]uint8, ramBanks*0x2000)
 	for i := range ram {
 		ram[i] = 0xFF
 	}
@@ -34,7 +42,7 @@ func NewMBC3(rom []uint8, romBanks uint16, ramBanks uint16) MBC {
 		mapSelect:       0,
 		latchClockReg:   0xFF,
 		clockLatched:    false,
-		rtc:             NewRTC(),
+		rtc:             rtc.NewRTC(rtc.NewRealClock()),
 	}
 }
 
@@ -57,13 +65,24 @@ func (m *MBC3) WriteRom(address uint16, value uint8) {
 	switch {
 	case address < 0x2000:
 		m.mapEnable = (value & 0x0F) == 0x0A
+		//m.mapEnable = (value & 0b1010) != 0
 	case address < 0x4000:
+		/*
+			bank := 0b01111111 & value
+			if bank == 0 {
+				bank = 1
+			}
+			m.selectedRomBank = uint16(value)
+			m.romOffset = 0x4000 * int(m.selectedRomBank)
+		*/
+
 		if value == 0 {
 			m.selectedRomBank = 1
 		} else {
 			m.selectedRomBank = uint16(value)
 			m.romOffset = 0x4000 * int(m.selectedRomBank)
 		}
+
 	case address < 0x6000:
 		m.mapSelect = value & 0xF
 		/*
@@ -99,8 +118,12 @@ func (m *MBC3) WriteRam(address uint16, value uint8) {
 			if ramAddress < uint16(len(m.ram)) {
 				m.ram[ramAddress] = value & 0x0F
 			}
+		case 0x4, 0x5, 0x6, 0x7:
+			println("mbc30?")
 		case 0x8, 0x9, 0xA, 0xB, 0xC:
-			m.setTimer(value)
+			if m.mapEnable {
+				m.setTimer(value)
+			}
 		default:
 			panic("OHNO")
 		}
@@ -108,8 +131,8 @@ func (m *MBC3) WriteRam(address uint16, value uint8) {
 }
 
 func (m *MBC3) getRamAddress(address uint16) uint16 {
-	addr := address - uint16(m.ramOffset) //address - 0xA000
-	return addr & 0b0000_0001_1111_1111
+	addr := int(address) - m.ramOffset //address - 0xA000
+	return uint16(addr) & 0b0000_0001_1111_1111
 }
 
 func (m *MBC3) Read(address uint16) uint8 {
@@ -129,15 +152,13 @@ func (m *MBC3) Read(address uint16) uint8 {
 		} else {
 			return 0xF0
 		}
-	case 0xA000 <= address && address < 0xC000:
-		if m.mapEnable {
-			// if mbc30 => self.read_ram(addr, default_value),
-			return m.getTimer()
-		} else {
-			return 0xF0
-		}
+	case 0xA000 <= address && address < 0xC000 && m.mapSelect < 8:
+		println("mbc30???")
+		return 0xF0
+	case 0xA000 <= address && address < 0xC000 && m.mapEnable:
+		return m.getTimer()
 	default:
-		return 0xFF
+		return 0xF0
 	}
 }
 
@@ -153,14 +174,15 @@ func (m *MBC3) getTimer() uint8 {
 		return uint8(m.rtc.Days() & 0xFF)
 	case 0x0C:
 		result := (m.rtc.Days() & 0x100) >> 8
-		if m.rtc.isHalt() {
+		if m.rtc.IsHalt() {
 			result |= 1 << 6
 		}
-		if m.rtc.isCounterOverflow() {
+		if m.rtc.IsCounterOverflow() {
 			result |= 1 << 7
 		}
 		return uint8(result)
 	default:
+		panic("ohno gettimer")
 		return 0xFF
 	}
 }
@@ -176,12 +198,14 @@ func (m *MBC3) setTimer(value uint8) {
 	case 0x0B:
 		m.rtc.SetDays((m.rtc.Days() & 0x100) | (int64(value) & 0xFF))
 	case 0x0C:
-		m.rtc.SetDays((m.rtc.Days() & 0xff) | (int64(value)&1)<<8)
+		m.rtc.SetDays((m.rtc.Days() & 0xff) | ((int64(value) & 1) << 8))
 		//m.rtc.SetHalt((value & (1 << 6)) != 0)
 		m.rtc.SetHalt(utils.TestBit(value, 6))
 		if utils.TestBit(value, 7) {
 			m.rtc.ClearCounterOverflow()
 		}
-		//if (value & (1 << 7)) == 0 {}
+	//if (value & (1 << 7)) == 0 {}
+	default:
+		panic("ohno settimer")
 	}
 }

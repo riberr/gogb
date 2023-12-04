@@ -1,7 +1,6 @@
 package joypad
 
 import (
-	"fmt"
 	"gogb/gameboy/interrupts"
 	"gogb/gameboy/utils"
 )
@@ -72,7 +71,6 @@ func (j *JoyPad) KeyEvent(button Button, isPress bool) {
 	if res != 0 {
 		j.interrupts.SetInterruptFlag(interrupts.INTR_JOYPAD)
 	}
-	fmt.Printf("%04b %04b\n", j.pad, j.buttons)
 }
 
 func setOrClearBit(n uint8, pos int, isPress bool) uint8 {

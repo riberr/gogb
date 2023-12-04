@@ -1,4 +1,4 @@
-package mbc
+package rtc
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 )
 
 type RTC struct {
+	clock      Clock
 	clockStart time.Time
 	latchStart time.Time
 
@@ -18,14 +19,15 @@ type RTC struct {
 	haltDays    int64
 }
 
-func NewRTC() *RTC {
+func NewRTC(clock Clock) *RTC {
 	return &RTC{
-		clockStart: time.Now(),
+		clock:      clock,
+		clockStart: clock.Now(),
 	}
 }
 
 func (rtc *RTC) Latch() {
-	rtc.latchStart = time.Now()
+	rtc.latchStart = rtc.clock.Now() //time.Now()
 }
 
 func (rtc *RTC) Unlatch() {
@@ -45,12 +47,12 @@ func (rtc *RTC) Days() int64 {
 	return rtc.timeInSeconds() % (60 * 60 * 24 * 512) / (60 * 60 * 24)
 }
 
-func (rtc *RTC) isHalt() bool {
-	fmt.Printf("halt is %v\n", rtc.halt)
+func (rtc *RTC) IsHalt() bool {
+	fmt.Printf("halt should be %v\n", rtc.halt)
 	return rtc.halt
 }
 
-func (rtc *RTC) isCounterOverflow() bool {
+func (rtc *RTC) IsCounterOverflow() bool {
 	return rtc.timeInSeconds() >= 60*60*24*512
 }
 
@@ -89,14 +91,14 @@ func (rtc *RTC) SetHalt(halt bool) {
 		rtc.Unlatch()
 	} else if !halt && rtc.halt {
 		rtc.offsetSec = rtc.haltSeconds + rtc.haltMinutes*60 + rtc.haltHours*60*60 + rtc.haltDays*60*60*24
-		rtc.clockStart = time.Now()
+		rtc.clockStart = rtc.clock.Now()
 	}
 	rtc.halt = halt
 	fmt.Printf("halt is now %v\n", rtc.halt)
 }
 
 func (rtc *RTC) ClearCounterOverflow() {
-	for rtc.isCounterOverflow() {
+	for rtc.IsCounterOverflow() {
 		rtc.offsetSec -= 60 * 60 * 24 * 512
 	}
 }
@@ -104,7 +106,7 @@ func (rtc *RTC) ClearCounterOverflow() {
 func (rtc *RTC) timeInSeconds() int64 {
 	var now time.Time
 	if rtc.latchStart.IsZero() {
-		now = time.Now()
+		now = rtc.clock.Now()
 	} else {
 		now = rtc.latchStart
 	}

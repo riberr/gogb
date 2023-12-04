@@ -89,25 +89,24 @@ func (ppu *PPU) GenerateDebugGraphics() {
 func (ppu *PPU) Update(cycles int) {
 	ppu.setLcdStatus()
 
-	if ppu.isLcdEnabled() {
-		ppu.scanlineCounter -= cycles
-	} else {
+	if !ppu.isLcdEnabled() {
 		return
 	}
+	ppu.scanlineCounter -= cycles
 
 	if ppu.scanlineCounter <= 0 {
 		// time to move onto next scanline
 		ppu.ly++
-		ppu.scanlineCounter += 456
 
 		// we have entered vertical blank period
+		if ppu.ly > 153 {
+			ppu.ly = 0
+		}
+
+		ppu.scanlineCounter += 456
+
 		if ppu.ly == 144 {
 			ppu.interrupts.SetInterruptFlag(interrupts.INTR_VBLANK)
-			//println("VBLANK")
-		} else if ppu.ly > 153 {
-			ppu.ly = 0
-		} else if ppu.ly < 144 {
-			//ppu.drawScanLine()
 		}
 	}
 }
@@ -223,20 +222,31 @@ func (ppu *PPU) renderTiles() {
 	}
 
 	// which background mem?
-	if !usingWindow {
-		if utils.TestBit(ppu.lcdc, BGTileMap) {
-			backgroundMemory = 0x9C00
-		} else {
-			backgroundMemory = 0x9800
-		}
-	} else {
-		// which window memory?
-		if utils.TestBit(ppu.lcdc, WindowTileMap) {
-			backgroundMemory = 0x9C00
-		} else {
-			backgroundMemory = 0x9800
-		}
+	// Work out where to look in background memory.
+	var testBit = BGTileMap
+	if usingWindow {
+		testBit = WindowTileMap
 	}
+	backgroundMemory = uint16(0x9800)
+	if utils.TestBit(ppu.lcdc, testBit) {
+		backgroundMemory = 0x9C00
+	}
+	/*
+		if !usingWindow {
+			if utils.TestBit(ppu.lcdc, BGTileMap) {
+				backgroundMemory = 0x9C00
+			} else {
+				backgroundMemory = 0x9800
+			}
+		} else {
+			// which window memory?
+			if utils.TestBit(ppu.lcdc, WindowTileMap) {
+				backgroundMemory = 0x9C00
+			} else {
+				backgroundMemory = 0x9800
+			}
+		}
+	*/
 
 	// yPos is used to calculate which of 32 vertical tiles the current scanline is drawing
 	var yPos uint8

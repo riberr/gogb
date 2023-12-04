@@ -69,12 +69,9 @@ func (m *MBC2) Read(address uint16) uint8 {
 			ramAddress := m.getRamAddress(address)
 			if ramAddress < uint16(len(m.ram)) {
 				return m.ram[ramAddress] | 0xF0
-			} else {
-				return 0xF0
 			}
-		} else {
-			return 0xFF
 		}
+		return 0xFF
 	default:
 		return 0xFF
 	}

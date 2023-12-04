@@ -15,8 +15,8 @@ func main() {
 	//romPath := "third_party/roms/"
 	//romName := "Kirby.gb"
 
-	//romPath := "third_party/scribbltests/"
-	//romName := "winpos.gb"
+	romPath := "third_party/scribbltests/"
+	romName := "winpos.gb"
 
 	//romPath := "third_party/gb-test-roms/interrupt_time/"
 	//romName := "interrupt_time.gb"
@@ -24,11 +24,11 @@ func main() {
 	//romPath := "third_party/"
 	//romName := "dmg-acid2.gb"
 
-	//romPath := "third_party/roms/games/"
+	//romPath := "third_party/roms/"
 	//romName := "Pokemon Red.gb"
 
-	romPath := "third_party/mbc3/"
-	romName := "rtc3test.gb"
+	//romPath := "third_party/mbc3/"
+	//romName := "rtc3test.gb"
 
 	//romPath := "third_party/roms/games/"
 	//romName := "Pokemon Red.gb"

@@ -31,6 +31,10 @@ func (m *Space) Read(address uint16) uint8 {
 	return m.data[address-m.Start]
 }
 
+func (m *Space) ReadIndex(index uint16) uint8 {
+	return m.data[index]
+}
+
 func (m *Space) Has(address uint16) bool {
 	if m.Start <= address && address <= m.End {
 		return true

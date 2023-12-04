@@ -24,7 +24,7 @@ type PPU struct {
 	lyc  uint8 // 0xFF45
 	stat uint8 // 0xFF41
 	scy  uint8 // 0xFF42
-	scx  uint8 //0xFF43
+	scx  uint8 // 0xFF43
 	wy   uint8 // 0xFF4A
 	wx   uint8 // 0xFF4B
 	bgp  uint8 // 0xFF47 BG palette data
@@ -144,32 +144,24 @@ func (ppu *PPU) setLcdStatus() {
 		status = utils.ClearBit(status, PpuModeHi)
 		status = utils.SetBit(status, PpuModeLo)
 		reqInt = utils.TestBit(status, Mode1IntSelect)
-		if reqInt {
-			println("111")
-		}
 	case ppu.scanlineCounter >= Mode2bounds:
 		mode = 2
 		status = utils.SetBit(status, PpuModeHi)
 		status = utils.ClearBit(status, PpuModeLo)
 		reqInt = utils.TestBit(status, Mode2IntSelect)
-		if reqInt {
-			println("222")
-		}
 	case ppu.scanlineCounter >= Mode3bounds:
 		mode = 3
 		status = utils.SetBit(status, PpuModeHi)
 		status = utils.SetBit(status, PpuModeLo)
 		if mode != currentMode {
-			ppu.drawScanLine()
+			//ppu.drawScanLine()
+			ppu.renderLine(ppu.ly)
 		}
 	default:
 		mode = 0
 		status = utils.ClearBit(status, PpuModeHi)
 		status = utils.ClearBit(status, PpuModeLo)
 		reqInt = utils.TestBit(status, Mode0IntSelect) // HBLANK interrupt
-		if reqInt {
-			//println("000")
-		}
 	}
 
 	// just entered a new mode so request interupt
@@ -196,6 +188,90 @@ func (ppu *PPU) drawScanLine() {
 	if utils.TestBit(ppu.lcdc, ObjEnable) {
 		ppu.renderSprites()
 	}
+}
+
+func (ppu *PPU) renderLine(line uint8) {
+	windowTileMap := utils.TestBit(ppu.lcdc, 6)
+	windowEnabled := utils.TestBit(ppu.lcdc, 5)
+	tileSelect := utils.TestBit(ppu.lcdc, 4)
+	bgTileMap := utils.TestBit(ppu.lcdc, 3)
+	spriteEnabled := utils.TestBit(ppu.lcdc, 1)
+	bgEnabled := utils.TestBit(ppu.lcdc, 0)
+
+	bgPalette := ppu.bgp
+	//obj0Palette := ppu.obp0
+	//obj1Palette := ppu.obp1
+
+	y := line
+	winx := ppu.wx - 7
+
+	// RENDER TILES
+	// the display is 166x144
+	for x := uint8(0); x < 160; x++ {
+		if bgEnabled {
+			realX := x + ppu.scx //& 256
+			realY := y + ppu.scy //& 256
+			ppu.renderTile(x, y, realX, realY, bgTileMap, tileSelect, bgPalette)
+		}
+
+		if windowEnabled {
+			if y >= ppu.wy && x >= winx {
+				realX := x - winx
+				realY := y - ppu.wy
+				ppu.renderTile(x, y, realX, realY, windowTileMap, tileSelect, bgPalette)
+			}
+		}
+	}
+	if spriteEnabled {
+		//RenderSprites(Obj0Palette, Obj1Palette);
+	}
+}
+
+func (ppu *PPU) renderTile(x uint8, y uint8, realX uint8, realY uint8, tileMap bool, tileSelect bool, palette uint8) {
+	// the BG is 256x256 pixels
+	// calculate the coordinates of the tile where the pixel belongs
+	// there are 32 possible tiles (256 / 8)
+	tileCol := realX / 8
+	tileRow := realY / 8
+
+	// Get tile number from memory map
+	// map the values to a flat memory structure
+	tileId := (tileRow * 32) + tileCol
+
+	var tileNumber uint8
+	if tileMap {
+		tileNumber = ppu.Vram.Read(0x9C00 + uint16(tileId))
+	} else {
+		tileNumber = ppu.Vram.Read(0x9800 + uint16(tileId))
+	}
+
+	// get tile data
+	var tileAddress uint16
+	if tileSelect {
+		// unsigned $8000-8FFF
+		tileAddress = 0x8000 + (uint16(tileNumber) * 16)
+	} else {
+		// signed $8800-97FF (9000 = 0)
+		// todo feels wrong
+		id := int8(tileNumber)
+		if id >= 0 {
+			tileAddress = 0x9000 + (uint16(id) * 16)
+		} else {
+			tileAddress = 0x8800 + ((uint16(id) + 128) * 16)
+		}
+	}
+
+	tileXpos := realX % 8
+	tileYpos := realY % 8
+
+	tileLsb := ppu.Vram.Read(tileAddress + (uint16(tileYpos) * 2))
+	tileMsb := ppu.Vram.Read(tileAddress + (uint16(tileYpos) * 2) + 1)
+
+	bitLsb := (tileLsb << tileXpos) >> 7
+	bitMsb := (tileMsb << tileXpos) >> 7
+	colorIndex := (bitMsb << 1) | bitLsb
+
+	drawSquare(ppu.Fb, &coloredRects[ppu.getColor(colorIndex, palette)], 4, int(x)*Scale, int(y)*Scale)
 }
 
 func (ppu *PPU) renderTiles() {
@@ -231,22 +307,6 @@ func (ppu *PPU) renderTiles() {
 	if utils.TestBit(ppu.lcdc, testBit) {
 		backgroundMemory = 0x9C00
 	}
-	/*
-		if !usingWindow {
-			if utils.TestBit(ppu.lcdc, BGTileMap) {
-				backgroundMemory = 0x9C00
-			} else {
-				backgroundMemory = 0x9800
-			}
-		} else {
-			// which window memory?
-			if utils.TestBit(ppu.lcdc, WindowTileMap) {
-				backgroundMemory = 0x9C00
-			} else {
-				backgroundMemory = 0x9800
-			}
-		}
-	*/
 
 	// yPos is used to calculate which of 32 vertical tiles the current scanline is drawing
 	var yPos uint8

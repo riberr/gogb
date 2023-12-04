@@ -18,8 +18,8 @@ func main() {
 	romPath := "third_party/scribbltests/"
 	romName := "winpos.gb"
 
-	//romPath := "third_party/gb-test-roms/interrupt_time/"
-	//romName := "interrupt_time.gb"
+	//romPath := "third_party/mealybug-tearoom-tests/ppu/"
+	//romName := "m3_lcdc_tile_sel_win_change2.gb"
 
 	//romPath := "third_party/"
 	//romName := "dmg-acid2.gb"

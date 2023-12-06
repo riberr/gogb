@@ -1,6 +1,7 @@
 package mbc
 
 import (
+	"fmt"
 	"gogb/gameboy/bus/mbc/rtc"
 	"gogb/gameboy/utils"
 )
@@ -82,6 +83,7 @@ func (m *MBC3) WriteRom(address uint16, value uint8) {
 			m.selectedRomBank = uint16(value)
 			m.romOffset = 0x4000 * int(m.selectedRomBank)
 		}
+		fmt.Printf("selected rom bank: %v\n", m.selectedRomBank)
 
 	case address < 0x6000:
 		m.mapSelect = value & 0xF
@@ -141,6 +143,14 @@ func (m *MBC3) Read(address uint16) uint8 {
 		return m.rom[(0x00|(address&0x3fff))&(uint16(len(m.rom))-1)]
 	case address < 0x8000:
 		return m.rom[(m.romOffset|int(address&0x3fff))&(len(m.rom)-1)]
+		/*
+			cartOffset := int(m.selectedRomBank)*0x4000 + int(address-0x4000)
+			if cartOffset < len(m.rom) {
+				return m.rom[cartOffset]
+			} else {
+				return 0xFF
+			}
+		*/
 	case 0xA000 <= address && address < 0xC000 && m.mapSelect < 4:
 		if m.mapEnable {
 			ramAddress := m.getRamAddress(address)

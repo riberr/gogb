@@ -33,6 +33,7 @@ type Bus struct {
 	sl         *seriallink.SerialLink
 	ppu        *ppu.PPU
 	joypad     *joypad.JoyPad
+	Dma        *dma
 	//vram       Space
 	eram    utils.Space
 	wramC   utils.Space
@@ -59,6 +60,7 @@ func New(interrupts *interrupts.Interrupts2, timer *timer.Timer, sl *seriallink.
 		sl:         sl,
 		ppu:        ppu,
 		joypad:     joypad,
+		Dma:        newDMA(),
 		//vram:       NewSpace(0x8000, 0x9FFF), // Video RAM
 		eram:    utils.NewSpace(0xA000, 0xBFFF), // External RAM
 		wramC:   utils.NewSpace(0xC000, 0xCFFF),
@@ -134,7 +136,12 @@ func (b *Bus) Read(address uint16) uint8 {
 
 	if b.ppu.Oam.Has(address) {
 		//println("reading from vram")
-		return b.ppu.Oam.Read(address)
+		if b.Dma.isOAMBlocked() {
+			println("blocked")
+			return 0xFF
+		} else {
+			return b.ppu.Oam.Read(address)
+		}
 	}
 
 	if b.notUsable.Has(address) {
@@ -163,6 +170,9 @@ func (b *Bus) Read(address uint16) uint8 {
 		return b.interrupts.IF | 0xE0
 	case 0xFF40, 0xFF41, 0xFF42, 0xFF43, 0xFF44, 0xFF45, 0xFF47, 0xFF48, 0xFF49, 0xFF4A, 0xFF4B:
 		return b.ppu.Read(address)
+	case 0xFF46:
+		//b.doDMATransfer(value)
+		return b.Dma.getDmaRegister()
 	case 0xFFFF:
 		return b.interrupts.IE
 	default:
@@ -243,7 +253,8 @@ func (b *Bus) Write(address uint16, value uint8) {
 		b.ppu.Write(address, value)
 		return
 	case 0xFF46:
-		b.doDMATransfer(value)
+		//b.doDMATransfer(value)
+		b.Dma.setDmaRegister(value)
 		return
 	case 0xFFFF:
 		b.interrupts.IE = value
@@ -259,6 +270,7 @@ func (b *Bus) Write(address uint16, value uint8) {
 }
 
 func (b *Bus) doDMATransfer(value uint8) {
+	println("DMADMADMA")
 	address := uint16(value) << 8 // source address is data * 100
 	for i := uint16(0); i < 0xA0; i++ {
 		b.Write(uint16(0xFE00)+i, b.Read(address+i))

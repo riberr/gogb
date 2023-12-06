@@ -48,6 +48,8 @@ func (gb *GameBoy) Step() int {
 
 	cycles += cyclesOp
 
+	gb.Bus.Dma.Tick(cyclesOp, gb.Bus)
+
 	gb.Timer.UpdateTimers(cyclesOp)
 
 	gb.Ppu.Update(cyclesOp)

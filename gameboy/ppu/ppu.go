@@ -190,6 +190,7 @@ func (ppu *PPU) drawScanLine() {
 	}
 }
 
+// https://github.com/rvaccarim/FrozenBoy/blob/master/FrozenBoyCore/Graphics/GPU.cs#L265
 func (ppu *PPU) renderLine(line uint8) {
 	windowTileMap := utils.TestBit(ppu.lcdc, 6)
 	windowEnabled := utils.TestBit(ppu.lcdc, 5)
@@ -202,32 +203,32 @@ func (ppu *PPU) renderLine(line uint8) {
 	//obj0Palette := ppu.obp0
 	//obj1Palette := ppu.obp1
 
-	y := line
-	winx := ppu.wx - 7
+	y := int(line)
+	winx := int(ppu.wx - 7)
 
 	// RENDER TILES
 	// the display is 166x144
-	for x := uint8(0); x < 160; x++ {
+	for x := 0; x < 160; x++ {
 		if bgEnabled {
-			realX := x + ppu.scx //& 256
-			realY := y + ppu.scy //& 256
+			realX := x + int(ppu.scx)
+			realY := y + int(ppu.scy)
 			ppu.renderTile(x, y, realX, realY, bgTileMap, tileSelect, bgPalette)
 		}
 
 		if windowEnabled {
-			if y >= ppu.wy && x >= winx {
+			if y >= int(ppu.wy) && x >= winx {
 				realX := x - winx
-				realY := y - ppu.wy
+				realY := y - int(ppu.wy)
 				ppu.renderTile(x, y, realX, realY, windowTileMap, tileSelect, bgPalette)
 			}
 		}
 	}
 	if spriteEnabled {
-		//RenderSprites(Obj0Palette, Obj1Palette);
+		ppu.renderSprites()
 	}
 }
 
-func (ppu *PPU) renderTile(x uint8, y uint8, realX uint8, realY uint8, tileMap bool, tileSelect bool, palette uint8) {
+func (ppu *PPU) renderTile(x int, y int, realX int, realY int, tileMap bool, tileSelect bool, palette uint8) {
 	// the BG is 256x256 pixels
 	// calculate the coordinates of the tile where the pixel belongs
 	// there are 32 possible tiles (256 / 8)
@@ -273,6 +274,21 @@ func (ppu *PPU) renderTile(x uint8, y uint8, realX uint8, realY uint8, tileMap b
 
 	drawSquare(ppu.Fb, &coloredRects[ppu.getColor(colorIndex, palette)], 4, int(x)*Scale, int(y)*Scale)
 }
+
+/*
+func (ppu *PPU) renderSprite(palette0 uint8, palette1 uint8) {
+	// this is system wide, not on a tile by tile
+	var spriteSize int
+	if utils.TestBit(ppu.lcdc, 2) {
+		spriteSize = 16
+	} else {
+		spriteSize = 8
+	}
+
+	// SORT, see Sprites_DrawPriority1.png and Sprites_DrawPriority2.png
+
+}
+*/
 
 func (ppu *PPU) renderTiles() {
 	tileData := uint16(0)

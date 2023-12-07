@@ -24,8 +24,8 @@ func main() {
 	//romPath := "third_party/"
 	//romName := "dmg-acid2.gb"
 
-	//romPath := "third_party/roms/"
-	//romName := "Pokemon Red.gb"
+	//romPath := "third_party/mbc3/"
+	//romName := "ramg-mbc3-test.gb"
 
 	//romPath := "third_party/mbc3/"
 	//romName := "rtc3test.gb"

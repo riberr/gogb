@@ -207,6 +207,8 @@ func (cart *Cart) Load(romPath string, romName string) bool {
 		cart.MBC = mbc.NewMBC2(rom)
 	case 15, 16, 17, 18, 19:
 		cart.MBC = mbc.NewMBC3(rom, ROM_BANKS[cart.header.romSize], RAM_BANKS[rom[0x149]])
+	case 25, 26, 27, 28, 29, 30:
+		panic("mbc5 not implemented")
 	default:
 		panic(fmt.Sprintf("not implementented cart type: %v\n", cart.header.cartType))
 	}

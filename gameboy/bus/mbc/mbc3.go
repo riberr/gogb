@@ -1,7 +1,6 @@
 package mbc
 
 import (
-	"fmt"
 	"gogb/gameboy/bus/mbc/rtc"
 	"gogb/gameboy/utils"
 )
@@ -68,22 +67,13 @@ func (m *MBC3) WriteRom(address uint16, value uint8) {
 		m.mapEnable = (value & 0x0F) == 0x0A
 		//m.mapEnable = (value & 0b1010) != 0
 	case address < 0x4000:
-		/*
-			bank := 0b01111111 & value
-			if bank == 0 {
-				bank = 1
-			}
-			m.selectedRomBank = uint16(value)
-			m.romOffset = 0x4000 * int(m.selectedRomBank)
-		*/
-
 		if value == 0 {
 			m.selectedRomBank = 1
 		} else {
 			m.selectedRomBank = uint16(value)
 			m.romOffset = 0x4000 * int(m.selectedRomBank)
 		}
-		fmt.Printf("selected rom bank: %v\n", m.selectedRomBank)
+		//fmt.Printf("selected rom bank: %v\n", m.selectedRomBank)
 
 	case address < 0x6000:
 		m.mapSelect = value & 0xF
@@ -118,7 +108,7 @@ func (m *MBC3) WriteRam(address uint16, value uint8) {
 		case 0x0, 0x1, 0x2, 0x3:
 			ramAddress := m.getRamAddress(address)
 			if ramAddress < uint16(len(m.ram)) {
-				m.ram[ramAddress] = value & 0x0F
+				m.ram[ramAddress] = value
 			}
 		case 0x4, 0x5, 0x6, 0x7:
 			println("mbc30?")
@@ -133,8 +123,9 @@ func (m *MBC3) WriteRam(address uint16, value uint8) {
 }
 
 func (m *MBC3) getRamAddress(address uint16) uint16 {
-	addr := int(address) - m.ramOffset //address - 0xA000
-	return uint16(addr) & 0b0000_0001_1111_1111
+	//addr := int(address) - m.ramOffset //address - 0xA000
+	//return uint16(addr) & 0b0000_0001_1111_1111
+	return uint16(m.mapSelect)*0x2000 + (address - 0xa000)
 }
 
 func (m *MBC3) Read(address uint16) uint8 {
@@ -143,19 +134,11 @@ func (m *MBC3) Read(address uint16) uint8 {
 		return m.rom[(0x00|(address&0x3fff))&(uint16(len(m.rom))-1)]
 	case address < 0x8000:
 		return m.rom[(m.romOffset|int(address&0x3fff))&(len(m.rom)-1)]
-		/*
-			cartOffset := int(m.selectedRomBank)*0x4000 + int(address-0x4000)
-			if cartOffset < len(m.rom) {
-				return m.rom[cartOffset]
-			} else {
-				return 0xFF
-			}
-		*/
 	case 0xA000 <= address && address < 0xC000 && m.mapSelect < 4:
 		if m.mapEnable {
 			ramAddress := m.getRamAddress(address)
 			if ramAddress < uint16(len(m.ram)) {
-				return m.ram[ramAddress] | 0xF0
+				return m.ram[ramAddress]
 			} else {
 				return 0xF0
 			}
